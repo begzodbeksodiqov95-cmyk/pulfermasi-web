@@ -272,8 +272,8 @@ picker.addEventListener("change", function() {
 
     xhr.onerror = function() {
 
-        progress.innerText =
-            "Internet/server xatosi ❌";
+progress.innerText =
+    "XATO " + xhr.status + ": " + xhr.responseText;
 
 
         setTimeout(function() {
