@@ -1,237 +1,226 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pul Fermasi</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<style>
-* {
-    box-sizing: border-box;
-}
+  <title>VideoUZ</title>
 
-html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-body {
-    background:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,.18) 0 2px, transparent 3px),
-        radial-gradient(circle at 70% 65%, rgba(0,0,0,.08) 0 2px, transparent 3px),
-        #78ad4e;
-    background-size: 55px 55px, 70px 70px, auto;
-}
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: Arial, sans-serif;
+    }
 
-/* Yuqori balans paneli */
-.top {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    height: 62px;
-    z-index: 20;
+    .app {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #000;
+    }
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
+    .reels {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
 
-.money {
-    background: rgba(255,255,255,.94);
-    padding: 12px 18px;
-    border-radius: 18px;
-    font-size: 20px;
-    font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0,0,0,.18);
-}
+    .video {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #111;
+    }
 
-/* Ferma xaritasi */
-.farm {
-    position: absolute;
-    top: 82px;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
+    .video video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    border-radius: 25px;
-    overflow: hidden;
+    .info {
+      position: absolute;
+      left: 15px;
+      bottom: 90px;
+      color: white;
+      z-index: 3;
+      text-shadow: 0 1px 4px #000;
+    }
 
-    background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.12), transparent 20%),
-        radial-gradient(circle at 75% 75%, rgba(0,0,0,.08), transparent 25%),
-        #86bd58;
+    .username {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
 
-    box-shadow:
-        inset 0 0 0 3px rgba(255,255,255,.25),
-        0 6px 20px rgba(0,0,0,.25);
-}
+    .caption {
+      font-size: 15px;
+      max-width: 280px;
+    }
 
-/* Daraxt */
-.tree {
-    position: absolute;
-    width: 75px;
-    height: 105px;
-}
+    .actions {
+      position: absolute;
+      right: 12px;
+      bottom: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      z-index: 3;
+    }
 
-.tree .trunk {
-    position: absolute;
-    width: 18px;
-    height: 50px;
-    background: #76502f;
-    left: 29px;
-    bottom: 0;
-    border-radius: 7px;
-}
+    .action {
+      color: white;
+      text-align: center;
+      font-size: 28px;
+      cursor: pointer;
+      text-shadow: 0 1px 5px #000;
+    }
 
-.tree .leaves {
-    position: absolute;
-    width: 65px;
-    height: 65px;
-    left: 5px;
-    top: 0;
-    background: #2f7437;
-    border-radius: 50%;
-    box-shadow:
-        20px 12px 0 #3f8440,
-        -15px 18px 0 #347b39,
-        8px -8px 0 #4b9145;
-}
+    .action span {
+      display: block;
+      font-size: 12px;
+      margin-top: 3px;
+    }
 
-/* Butalar */
-.bush {
-    position: absolute;
-    width: 75px;
-    height: 40px;
-}
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 65px;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 10;
+    }
 
-.bush span {
-    position: absolute;
-    width: 38px;
-    height: 38px;
-    background: #3d823c;
-    border-radius: 50%;
-}
+    .nav {
+      color: #aaa;
+      font-size: 12px;
+      text-align: center;
+      cursor: pointer;
+    }
 
-.bush span:nth-child(1) {
-    left: 0;
-    top: 7px;
-}
+    .nav .icon {
+      display: block;
+      font-size: 23px;
+      margin-bottom: 2px;
+    }
 
-.bush span:nth-child(2) {
-    left: 20px;
-    top: 0;
-}
+    .nav.active {
+      color: white;
+    }
 
-.bush span:nth-child(3) {
-    left: 40px;
-    top: 8px;
-}
-
-/* Tosh */
-.rock {
-    position: absolute;
-    width: 48px;
-    height: 30px;
-    background: #777d72;
-    border-radius: 55% 45% 50% 45%;
-    transform: rotate(-8deg);
-    box-shadow:
-        inset 8px 5px 0 rgba(255,255,255,.18),
-        0 4px 5px rgba(0,0,0,.15);
-}
-
-/* Mayda maysa */
-.grass {
-    position: absolute;
-    width: 35px;
-    height: 25px;
-}
-
-.grass::before,
-.grass::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    width: 4px;
-    height: 22px;
-    background: #397c38;
-    border-radius: 5px;
-}
-
-.grass::before {
-    left: 12px;
-    transform: rotate(-20deg);
-}
-
-.grass::after {
-    left: 21px;
-    transform: rotate(20deg);
-}
-</style>
+    .upload {
+      width: 48px;
+      height: 38px;
+      border-radius: 12px;
+      background: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 25px;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="top">
-    <div class="money">🪙 10 000</div>
-    <div class="money">💵 3 500</div>
+<div class="app">
+
+  <div class="reels">
+
+    <div class="video">
+      <video
+        src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+        autoplay
+        muted
+        loop
+        playsinline>
+      </video>
+
+      <div class="info">
+        <div class="username">@video_uz</div>
+        <div class="caption">Bizning birinchi video platformamiz 🎬🔥</div>
+      </div>
+
+      <div class="actions">
+        <div class="action" onclick="like(this)">
+          ❤️
+          <span>0</span>
+        </div>
+
+        <div class="action">
+          💬
+          <span>0</span>
+        </div>
+
+        <div class="action">
+          ↗️
+          <span>Ulashish</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom">
+
+    <div class="nav active">
+      <span class="icon">🏠</span>
+      Bosh sahifa
+    </div>
+
+    <div class="nav">
+      <span class="icon">🔥</span>
+      Reels
+    </div>
+
+    <div class="nav">
+      <div class="upload">＋</div>
+    </div>
+
+    <div class="nav">
+      <span class="icon">💬</span>
+      Chat
+    </div>
+
+    <div class="nav">
+      <span class="icon">👤</span>
+      Profil
+    </div>
+
+  </div>
+
 </div>
 
-<div class="farm">
+<script>
+  function like(element) {
+    const number = element.querySelector("span");
 
-    <!-- Daraxtlar -->
-    <div class="tree" style="left:3%; top:5%;">
-        <div class="leaves"></div>
-        <div class="trunk"></div>
-    </div>
-
-    <div class="tree" style="right:30%; top:8%;">
-        <div class="leaves"></div>
-        <div class="trunk"></div>
-    </div>
-
-    <div class="tree" style="right:3%; bottom:8%;">
-        <div class="leaves"></div>
-        <div class="trunk"></div>
-    </div>
-
-    <div class="tree" style="left:8%; bottom:5%;">
-        <div class="leaves"></div>
-        <div class="trunk"></div>
-    </div>
-
-    <!-- Butalar -->
-    <div class="bush" style="left:25%; top:5%;">
-        <span></span><span></span><span></span>
-    </div>
-
-    <div class="bush" style="right:20%; bottom:12%;">
-        <span></span><span></span><span></span>
-    </div>
-
-    <div class="bush" style="left:42%; bottom:7%;">
-        <span></span><span></span><span></span>
-    </div>
-
-    <!-- Toshlar -->
-    <div class="rock" style="left:17%; top:30%;"></div>
-    <div class="rock" style="right:8%; top:25%;"></div>
-    <div class="rock" style="left:48%; bottom:18%;"></div>
-    <div class="rock" style="right:35%; bottom:8%;"></div>
-
-    <!-- Maysa -->
-    <div class="grass" style="left:35%; top:20%;"></div>
-    <div class="grass" style="left:65%; top:35%;"></div>
-    <div class="grass" style="left:28%; bottom:25%;"></div>
-    <div class="grass" style="right:25%; bottom:30%;"></div>
-    <div class="grass" style="left:55%; top:12%;"></div>
-
-</div>
+    if (element.dataset.liked === "true") {
+      element.dataset.liked = "false";
+      number.textContent = "0";
+    } else {
+      element.dataset.liked = "true";
+      number.textContent = "1";
+    }
+  }
+</script>
 
 </body>
 </html>
