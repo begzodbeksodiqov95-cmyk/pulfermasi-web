@@ -255,8 +255,8 @@ picker.addEventListener("change", function() {
             console.log(xhr.status);
             console.log(xhr.responseText);
 
-            progress.innerText =
-                "Yuklashda xatolik ❌";
+        progress.innerText =
+    "XATO " + xhr.status + ": " + xhr.responseText;
 
 
             setTimeout(function() {
