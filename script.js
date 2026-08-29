@@ -1,44 +1,65 @@
-const videos = document.querySelectorAll(".video");
+const picker = document.createElement("input");
+picker.type = "file";
+picker.accept = "video/*";
+picker.style.display = "none";
+document.body.appendChild(picker);
 
-let current = 0;
-let startY = 0;
-let endY = 0;
+const uploadButton = document.querySelector(".upload");
 
-function showVideo(index) {
-    if (index < 0 || index >= videos.length) return;
-
-    const oldVideo = videos[current].querySelector("video");
-    if (oldVideo) oldVideo.pause();
-
-    videos[current].classList.remove("active");
-
-    current = index;
-
-    videos[current].classList.add("active");
-
-    const newVideo = videos[current].querySelector("video");
-    if (newVideo) {
-        newVideo.currentTime = 0;
-        newVideo.play().catch(() => {});
-    }
-}
-
-document.addEventListener("touchstart", function(e) {
-    startY = e.touches[0].clientY;
+uploadButton.addEventListener("click", () => {
+    picker.click();
 });
 
-document.addEventListener("touchend", function(e) {
-    endY = e.changedTouches[0].clientY;
+picker.addEventListener("change", () => {
 
-    const distance = startY - endY;
+    const file = picker.files[0];
 
-    if (Math.abs(distance) < 60) return;
+    if (!file) return;
 
-    if (distance > 0) {
-        // Yuqoriga surish
-        showVideo(current + 1);
-    } else {
-        // Pastga surish
-        showVideo(current - 1);
+    if (!file.type.startsWith("video/")) {
+        alert("Faqat video tanlang!");
+        return;
     }
+
+    const videoURL = URL.createObjectURL(file);
+
+    const videoBox = document.createElement("div");
+    videoBox.className = "video";
+
+    videoBox.innerHTML = `
+        <video
+            src="${videoURL}"
+            autoplay
+            muted
+            loop
+            playsinline>
+        </video>
+
+        <div class="info">
+            <div class="username">@video_uz</div>
+            <div class="caption">Mening yangi videom 🎬</div>
+        </div>
+
+        <div class="actions">
+            <div class="action">
+                ❤️
+                <span>0</span>
+            </div>
+
+            <div class="action">
+                💬
+                <span>0</span>
+            </div>
+
+            <div class="action">
+                ↗️
+                <span>Ulashish</span>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("feed").appendChild(videoBox);
+
+    alert("Video qo‘shildi! 🎬");
+
 });
