@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pul Fermasi</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #dff3d8;
+}
+
+.header {
+    background: #4caf50;
+    color: white;
+    text-align: center;
+    padding: 16px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.balance {
+    background: white;
+    margin: 12px;
+    padding: 14px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.farm {
+    display: flex;
+    justify-content: space-around;
+    padding: 25px 10px;
+    font-size: 55px;
+}
+
+.area {
+    margin: 10px;
+    background: #f7e6bd;
+    border-radius: 15px;
+    padding: 15px;
+}
+
+.title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.conveyor {
+    height: 55px;
+    background: #777;
+    border: 4px solid #555;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.product {
+    position: absolute;
+    left: -50px;
+    top: 5px;
+    font-size: 35px;
+    animation: move 4s linear infinite;
+}
+
+@keyframes move {
+    from {
+        left: -50px;
+    }
+    to {
+        left: 100%;
+    }
+}
+
+.warehouse {
+    margin: 15px 10px;
+    background: white;
+    border-radius: 15px;
+    padding: 18px;
+    text-align: center;
+}
+
+.warehouse-icon {
+    font-size: 50px;
+}
+
+button {
+    width: calc(100% - 20px);
+    margin: 8px 10px;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: #4caf50;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+🌾 PUL FERMASI
+</div>
+
+<div class="balance">
+💰 Balans: <span id="money">0</span> so'm
+</div>
+
+<div class="farm">
+🐔
+🐄
+🐔
+</div>
+
+<div class="area">
+
+<div class="title">
+📦 Mahsulotlar
+</div>
+
+<div class="conveyor">
+<div class="product">🥚</div>
+</div>
+
+</div>
+
+<div class="warehouse">
+
+<div class="warehouse-icon">
+📦
+</div>
+
+<div>
+<b>OMBOR</b>
+</div>
+
+<div>
+🥚 Tuxum: <span id="eggs">0</span>
+</div>
+
+</div>
+
+<button onclick="collect()">
+🌾 Mahsulot yig‘ish
+</button>
+
+<button onclick="sell()">
+🛒 Mahsulot sotish
+</button>
+
+<script>
+
+let eggs = 0;
+let money = 0;
+
+function collect() {
+
+    eggs++;
+
+    document.getElementById("eggs").textContent = eggs;
+
+}
+
+function sell() {
+
+    if (eggs > 0) {
+
+        money = money + eggs * 100;
+
+        eggs = 0;
+
+        document.getElementById("eggs").textContent = eggs;
+
+        document.getElementById("money").textContent = money;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
