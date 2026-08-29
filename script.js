@@ -1,4 +1,4 @@
-let current = 0;
+alert("SCRIPT ISHLADI");let current = 0;
 let startY = 0;
 
 const feed = document.getElementById("feed");
