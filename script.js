@@ -1,4 +1,4 @@
-alert("SCRIPT ISHLADI");
+
 let current = 0;
 let startY = 0;
 
