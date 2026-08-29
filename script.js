@@ -159,7 +159,7 @@ picker.addEventListener("change", function() {
 
     const uploadURL =
         SUPABASE_URL +
-        "/storage/v1/object/videos/" +
+        "/storage/v1/object/Videos/" +
         fileName;
 
 
@@ -237,7 +237,7 @@ picker.addEventListener("change", function() {
 
             const publicURL =
                 SUPABASE_URL +
-                "/storage/v1/object/public/videos/" +
+                "/storage/v1/object/public/Videos/" +
                 fileName;
 
 
