@@ -1,140 +1,147 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
 
-    <title>VideoUZ</title>
+<title>VideoUZ</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #000;
-            font-family: Arial, sans-serif;
-        }
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
 
-        #app {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background: #000;
-        }
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    font-family:Arial,sans-serif;
+}
 
-        #feed {
-            width: 100%;
-            height: calc(100% - 65px);
-            position: relative;
-            overflow: hidden;
-        }
+#app{
+    width:100%;
+    height:100%;
+    background:#000;
+    position:relative;
+}
 
-        .video {
-            position: absolute;
-            inset: 0;
-            display: none;
-            background: #111;
-        }
+#feed{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:calc(100% - 65px);
+    overflow:hidden;
+}
 
-        .video.active {
-            display: block;
-        }
+.video{
+    position:absolute;
+    inset:0;
+    display:none;
+    background:#111;
+}
 
-        .video video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+.video.active{
+    display:block;
+}
 
-        .info {
-            position: absolute;
-            left: 15px;
-            bottom: 25px;
-            color: white;
-            z-index: 2;
-            text-shadow: 0 1px 5px #000;
-        }
+.video video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
 
-        .username {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
+.info{
+    position:absolute;
+    left:15px;
+    bottom:25px;
+    color:white;
+    z-index:5;
+    text-shadow:0 1px 5px #000;
+}
 
-        .caption {
-            font-size: 15px;
-        }
+.username{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
 
-        .actions {
-            position: absolute;
-            right: 12px;
-            bottom: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            z-index: 3;
-        }
+.caption{
+    font-size:15px;
+}
 
-        .action {
-            color: white;
-            text-align: center;
-            font-size: 28px;
-            text-shadow: 0 1px 5px #000;
-        }
+.actions{
+    position:absolute;
+    right:12px;
+    bottom:25px;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    z-index:5;
+}
 
-        .action span {
-            display: block;
-            font-size: 12px;
-            margin-top: 3px;
-        }
+.action{
+    color:white;
+    text-align:center;
+    font-size:28px;
+    text-shadow:0 1px 5px #000;
+}
 
-        .bottom {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 65px;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 10;
-        }
+.action span{
+    display:block;
+    font-size:12px;
+}
 
-        .nav {
-            color: #aaa;
-            font-size: 11px;
-            text-align: center;
-        }
+.bottom{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:65px;
+    background:#000;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    z-index:20;
+}
 
-        .nav.active {
-            color: white;
-        }
+.nav{
+    color:#aaa;
+    font-size:11px;
+    text-align:center;
+}
 
-        .icon {
-            display: block;
-            font-size: 22px;
-            margin-bottom: 2px;
-        }
+.nav.active{
+    color:white;
+}
 
-        .upload {
-            width: 46px;
-            height: 36px;
-            border-radius: 10px;
-            background: white;
-            color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 25px;
-        }
-    </style>
+.icon{
+    display:block;
+    font-size:22px;
+    margin-bottom:2px;
+}
+
+.upload{
+    width:46px;
+    height:36px;
+    border-radius:10px;
+    background:white;
+    color:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:25px;
+}
+
+#videoPicker{
+    display:none;
+}
+
+</style>
 </head>
 
 <body>
@@ -143,7 +150,6 @@
 
     <div id="feed">
 
-        <!-- 1-VIDEO -->
         <div class="video active">
 
             <video
@@ -160,6 +166,7 @@
             </div>
 
             <div class="actions">
+
                 <div class="action">
                     ❤️
                     <span>0</span>
@@ -174,12 +181,12 @@
                     ↗️
                     <span>Ulashish</span>
                 </div>
+
             </div>
 
         </div>
 
 
-        <!-- 2-VIDEO -->
         <div class="video">
 
             <video
@@ -195,6 +202,7 @@
             </div>
 
             <div class="actions">
+
                 <div class="action">
                     ❤️
                     <span>0</span>
@@ -209,14 +217,13 @@
                     ↗️
                     <span>Ulashish</span>
                 </div>
+
             </div>
 
         </div>
 
     </div>
 
-
-    <!-- PASTKI MENYU -->
 
     <div class="bottom">
 
@@ -231,8 +238,11 @@
         </div>
 
         <div class="nav">
-        <label class="upload" for="videoPicker">＋</label>
-<input id="videoPicker" type="file" accept="video/*" style="display:none">
+
+            <label class="upload" for="videoPicker">
+                ＋
+            </label>
+
         </div>
 
         <div class="nav">
@@ -249,31 +259,12 @@
 
 </div>
 
+<input
+    id="videoPicker"
+    type="file"
+    accept="video/*">
 
 <script src="script.js"></script>
-<script>
-const picker = document.getElementById("videoPicker");
 
-picker.addEventListener("change", function() {
-    const file = this.files[0];
-
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-
-    const video = document.createElement("video");
-    video.src = url;
-    video.controls = true;
-    video.autoplay = true;
-    video.muted = true;
-    video.loop = true;
-
-    video.style.width = "100%";
-    video.style.height = "100%";
-    video.style.objectFit = "cover";
-
-    document.getElementById("feed").appendChild(video);
-});
-</script>
 </body>
 </html>
