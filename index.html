@@ -231,7 +231,8 @@
         </div>
 
         <div class="nav">
-            <div class="upload">＋</div>
+        <label class="upload" for="videoPicker">＋</label>
+<input id="videoPicker" type="file" accept="video/*" style="display:none">
         </div>
 
         <div class="nav">
@@ -250,6 +251,29 @@
 
 
 <script src="script.js"></script>
+<script>
+const picker = document.getElementById("videoPicker");
 
+picker.addEventListener("change", function() {
+    const file = this.files[0];
+
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    const video = document.createElement("video");
+    video.src = url;
+    video.controls = true;
+    video.autoplay = true;
+    video.muted = true;
+    video.loop = true;
+
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.objectFit = "cover";
+
+    document.getElementById("feed").appendChild(video);
+});
+</script>
 </body>
 </html>
