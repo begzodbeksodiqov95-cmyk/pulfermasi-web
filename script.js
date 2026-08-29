@@ -1,4 +1,3 @@
-
 let current = 0;
 let startY = 0;
 
@@ -6,28 +5,26 @@ const feed = document.getElementById("feed");
 const picker = document.getElementById("videoPicker");
 
 // SUPABASE
-const SUPABASE_URL = https://bbgruqvwkygjwqdocnsb.supabase.co/rest/v1/
-const SUPABASE_KEY = sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat
+const SUPABASE_URL = "https://bbgruqvwkygjwqdocnsb.supabase.co";
+const SUPABASE_KEY = "";
 
 
-// Videolar
 function getVideos() {
     return document.querySelectorAll(".video");
 }
 
 
-// Videoni ko‘rsatish
 function showVideo(index) {
 
     const videos = getVideos();
 
     if (index < 0 || index >= videos.length) return;
 
-    videos.forEach(function(item) {
+    videos.forEach(function(box) {
 
-        item.classList.remove("active");
+        box.classList.remove("active");
 
-        const video = item.querySelector("video");
+        const video = box.querySelector("video");
 
         if (video) {
             video.pause();
@@ -50,9 +47,11 @@ function showVideo(index) {
 }
 
 
-// Swipe
+// SWIPE
 document.addEventListener("touchstart", function(event) {
+
     startY = event.touches[0].clientY;
+
 });
 
 
@@ -65,15 +64,19 @@ document.addEventListener("touchend", function(event) {
     if (Math.abs(distance) < 60) return;
 
     if (distance > 0) {
+
         showVideo(current + 1);
+
     } else {
+
         showVideo(current - 1);
+
     }
 
 });
 
 
-// Yangi videoni Reelsga chiqarish
+// VIDEO QO‘SHISH
 function addVideoToFeed(videoURL) {
 
     const box = document.createElement("div");
@@ -124,9 +127,7 @@ function addVideoToFeed(videoURL) {
 
     feed.appendChild(box);
 
-    const videos = getVideos();
-
-    showVideo(videos.length - 1);
+    showVideo(getVideos().length - 1);
 }
 
 
@@ -137,17 +138,20 @@ picker.addEventListener("change", function() {
 
     if (!file) return;
 
+
     if (!file.type.startsWith("video/")) {
 
         alert("Faqat video tanlang!");
+
+        picker.value = "";
 
         return;
     }
 
 
-    // Fayl nomini noyob qilamiz
     const fileName =
-        Date.now() + "_" +
+        Date.now() +
+        "_" +
         Math.random().toString(36).substring(2) +
         "_" +
         file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -159,21 +163,20 @@ picker.addEventListener("change", function() {
         fileName;
 
 
-    // Yuklanish oynasi
+    // PROGRESS OYNASI
     const progress = document.createElement("div");
 
     progress.style.position = "fixed";
     progress.style.top = "50%";
     progress.style.left = "50%";
-    progress.style.transform = "translate(-50%,-50%)";
-    progress.style.background = "rgba(0,0,0,.9)";
-    progress.style.color = "white";
+    progress.style.transform = "translate(-50%, -50%)";
+    progress.style.background = "#111";
+    progress.style.color = "#fff";
     progress.style.padding = "20px 30px";
     progress.style.borderRadius = "15px";
-    progress.style.zIndex = "9999";
+    progress.style.zIndex = "99999";
     progress.style.fontSize = "18px";
-
-    progress.innerHTML = "Yuklanmoqda: 0%";
+    progress.innerText = "Yuklanmoqda: 0%";
 
     document.body.appendChild(progress);
 
@@ -182,47 +185,61 @@ picker.addEventListener("change", function() {
 
     xhr.open("POST", uploadURL, true);
 
+
     xhr.setRequestHeader(
         "Authorization",
         "Bearer " + SUPABASE_KEY
     );
+
 
     xhr.setRequestHeader(
         "apikey",
         SUPABASE_KEY
     );
 
+
     xhr.setRequestHeader(
         "Content-Type",
         file.type
     );
 
+
+    xhr.setRequestHeader(
+        "x-upsert",
+        "false"
+    );
+
+
+    // FOIZ
     xhr.upload.onprogress = function(event) {
 
         if (event.lengthComputable) {
 
-            const percent =
-                Math.round(
-                    (event.loaded / event.total) * 100
-                );
+            const percent = Math.round(
+                (event.loaded / event.total) * 100
+            );
 
-            progress.innerHTML =
+            progress.innerText =
                 "Yuklanmoqda: " + percent + "%";
+
         }
+
     };
 
 
+    // NATIJA
     xhr.onload = function() {
 
         if (xhr.status >= 200 && xhr.status < 300) {
 
-            progress.innerHTML =
-                "Yuklandi! ✅";
+            progress.innerText = "Yuklandi! ✅";
+
 
             const publicURL =
                 SUPABASE_URL +
                 "/storage/v1/object/public/videos/" +
                 fileName;
+
 
             setTimeout(function() {
 
@@ -232,27 +249,37 @@ picker.addEventListener("change", function() {
 
             }, 700);
 
+
         } else {
 
-            progress.innerHTML =
-                "Xatolik ❌";
-
+            console.log(xhr.status);
             console.log(xhr.responseText);
 
+            progress.innerText =
+                "Yuklashda xatolik ❌";
+
+
             setTimeout(function() {
+
                 progress.remove();
+
             }, 2000);
+
         }
+
     };
 
 
     xhr.onerror = function() {
 
-        progress.innerHTML =
-            "Internet yoki server xatosi ❌";
+        progress.innerText =
+            "Internet/server xatosi ❌";
+
 
         setTimeout(function() {
+
             progress.remove();
+
         }, 2000);
 
     };
@@ -260,9 +287,7 @@ picker.addEventListener("change", function() {
 
     xhr.send(file);
 
+
     picker.value = "";
 
-});
-picker.addEventListener("change", function () {
-    alert("VIDEO TANLANDI");
 });
