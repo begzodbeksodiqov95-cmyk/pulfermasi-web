@@ -6,7 +6,7 @@ const picker = document.getElementById("videoPicker");
 
 // SUPABASE
 const SUPABASE_URL = "https://bbgruqvwkygjwqdocnsb.supabase.co";
-const SUPABASE_KEY = "";
+const SUPABASE_KEY = "sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat";
 
 
 function getVideos() {
