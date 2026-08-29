@@ -49,34 +49,27 @@ function showVideo(index) {
 
 // SWIPE
 document.addEventListener("touchstart", function(event) {
-
     startY = event.touches[0].clientY;
-
 });
 
 
 document.addEventListener("touchend", function(event) {
 
     const endY = event.changedTouches[0].clientY;
-
     const distance = startY - endY;
 
     if (Math.abs(distance) < 60) return;
 
     if (distance > 0) {
-
         showVideo(current + 1);
-
     } else {
-
         showVideo(current - 1);
-
     }
 
 });
 
 
-// VIDEO QO‘SHISH
+// YANGI VIDEO
 function addVideoToFeed(videoURL) {
 
     const box = document.createElement("div");
@@ -122,7 +115,6 @@ function addVideoToFeed(videoURL) {
             </div>
 
         </div>
-
     `;
 
     feed.appendChild(box);
@@ -134,10 +126,9 @@ function addVideoToFeed(videoURL) {
 // VIDEO YUKLASH
 picker.addEventListener("change", function() {
 
-    const file = this.files[0];
+    const file = picker.files[0];
 
     if (!file) return;
-
 
     if (!file.type.startsWith("video/")) {
 
@@ -157,13 +148,14 @@ picker.addEventListener("change", function() {
         file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
 
 
+    // MUHIM: bucket nomi Videos
     const uploadURL =
         SUPABASE_URL +
         "/storage/v1/object/Videos/" +
         fileName;
 
 
-    // PROGRESS OYNASI
+    // PROGRESS
     const progress = document.createElement("div");
 
     progress.style.position = "fixed";
@@ -176,6 +168,8 @@ picker.addEventListener("change", function() {
     progress.style.borderRadius = "15px";
     progress.style.zIndex = "99999";
     progress.style.fontSize = "18px";
+    progress.style.textAlign = "center";
+
     progress.innerText = "Yuklanmoqda: 0%";
 
     document.body.appendChild(progress);
@@ -215,15 +209,14 @@ picker.addEventListener("change", function() {
 
         if (event.lengthComputable) {
 
-            const percent = Math.round(
-                (event.loaded / event.total) * 100
-            );
+            const percent =
+                Math.round(
+                    (event.loaded / event.total) * 100
+                );
 
             progress.innerText =
                 "Yuklanmoqda: " + percent + "%";
-
         }
-
     };
 
 
@@ -232,7 +225,8 @@ picker.addEventListener("change", function() {
 
         if (xhr.status >= 200 && xhr.status < 300) {
 
-            progress.innerText = "Yuklandi! ✅";
+            progress.innerText =
+                "Yuklandi! ✅";
 
 
             const publicURL =
@@ -252,41 +246,44 @@ picker.addEventListener("change", function() {
 
         } else {
 
-            console.log(xhr.status);
-            console.log(xhr.responseText);
+            progress.innerText =
+                "XATO " +
+                xhr.status +
+                ": " +
+                xhr.responseText;
 
-        progress.innerText =
-    "XATO " + xhr.status + ": " + xhr.responseText;
+
+            console.log(
+                "Supabase:",
+                xhr.status,
+                xhr.responseText
+            );
 
 
             setTimeout(function() {
 
                 progress.remove();
 
-            }, 2000);
-
+            }, 4000);
         }
-
     };
 
 
     xhr.onerror = function() {
 
-progress.innerText =
-    "XATO " + xhr.status + ": " + xhr.responseText;
+        progress.innerText =
+            "Internet/server xatosi ❌";
 
 
         setTimeout(function() {
 
             progress.remove();
 
-        }, 2000);
-
+        }, 3000);
     };
 
 
     xhr.send(file);
-
 
     picker.value = "";
 
