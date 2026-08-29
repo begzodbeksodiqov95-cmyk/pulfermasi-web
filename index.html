@@ -1,217 +1,255 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-<title>VideoUZ</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial}
-#app{width:100%;height:100%;position:relative;background:#000}
-#feed{width:100%;height:calc(100% - 65px);overflow:hidden;position:relative}
+    <title>VideoUZ</title>
 
-.video{
-  position:absolute;
-  width:100%;
-  height:100%;
-  left:0;
-  top:0;
-  display:none;
-  background:#111;
-}
-.video.active{display:block}
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-.video video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: Arial, sans-serif;
+        }
 
-.info{
-  position:absolute;
-  left:15px;
-  bottom:25px;
-  color:white;
-  z-index:2;
-  text-shadow:0 1px 5px #000;
-}
-.username{font-size:18px;font-weight:bold;margin-bottom:8px}
-.caption{font-size:15px}
+        #app {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #000;
+        }
 
-.actions{
-  position:absolute;
-  right:12px;
-  bottom:25px;
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  z-index:3;
-}
-.action{
-  color:white;
-  text-align:center;
-  font-size:28px;
-  text-shadow:0 1px 5px #000;
-}
-.action span{
-  display:block;
-  font-size:12px;
-  margin-top:3px;
-}
+        #feed {
+            width: 100%;
+            height: calc(100% - 65px);
+            position: relative;
+            overflow: hidden;
+        }
 
-.bottom{
-  position:absolute;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:65px;
-  background:rgba(0,0,0,.9);
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  z-index:10;
-}
+        .video {
+            position: absolute;
+            inset: 0;
+            display: none;
+            background: #111;
+        }
 
-.nav{
-  color:#aaa;
-  font-size:11px;
-  text-align:center;
-}
-.nav.active{color:white}
-.icon{display:block;font-size:22px;margin-bottom:2px}
+        .video.active {
+            display: block;
+        }
 
-.upload{
-  width:46px;
-  height:36px;
-  border-radius:10px;
-  background:white;
-  color:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:25px;
-}
-</style>
+        .video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info {
+            position: absolute;
+            left: 15px;
+            bottom: 25px;
+            color: white;
+            z-index: 2;
+            text-shadow: 0 1px 5px #000;
+        }
+
+        .username {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .caption {
+            font-size: 15px;
+        }
+
+        .actions {
+            position: absolute;
+            right: 12px;
+            bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 3;
+        }
+
+        .action {
+            color: white;
+            text-align: center;
+            font-size: 28px;
+            text-shadow: 0 1px 5px #000;
+        }
+
+        .action span {
+            display: block;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 65px;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .nav {
+            color: #aaa;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .nav.active {
+            color: white;
+        }
+
+        .icon {
+            display: block;
+            font-size: 22px;
+            margin-bottom: 2px;
+        }
+
+        .upload {
+            width: 46px;
+            height: 36px;
+            border-radius: 10px;
+            background: white;
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 25px;
+        }
+    </style>
 </head>
 
 <body>
 
 <div id="app">
 
-<div id="feed">
+    <div id="feed">
 
-  <div class="video active">
-    <video
-      src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-      autoplay muted loop playsinline>
-    </video>
+        <!-- 1-VIDEO -->
+        <div class="video active">
 
-    <div class="info">
-      <div class="username">@video_uz</div>
-      <div class="caption">Birinchi video 🎬🔥</div>
+            <video
+                src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+                autoplay
+                muted
+                loop
+                playsinline>
+            </video>
+
+            <div class="info">
+                <div class="username">@video_uz</div>
+                <div class="caption">Birinchi video 🎬</div>
+            </div>
+
+            <div class="actions">
+                <div class="action">
+                    ❤️
+                    <span>0</span>
+                </div>
+
+                <div class="action">
+                    💬
+                    <span>0</span>
+                </div>
+
+                <div class="action">
+                    ↗️
+                    <span>Ulashish</span>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- 2-VIDEO -->
+        <div class="video">
+
+            <video
+                src="https://www.w3schools.com/html/mov_bbb.mp4"
+                muted
+                loop
+                playsinline>
+            </video>
+
+            <div class="info">
+                <div class="username">@video_uz</div>
+                <div class="caption">Ikkinchi video 🔥</div>
+            </div>
+
+            <div class="actions">
+                <div class="action">
+                    ❤️
+                    <span>0</span>
+                </div>
+
+                <div class="action">
+                    💬
+                    <span>0</span>
+                </div>
+
+                <div class="action">
+                    ↗️
+                    <span>Ulashish</span>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="actions">
-      <div class="action">❤️<span>0</span></div>
-      <div class="action">💬<span>0</span></div>
-      <div class="action">↗️<span>Ulashish</span></div>
-    </div>
-  </div>
 
-  <div class="video">
-    <video
-      src="https://www.w3schools.com/html/mov_bbb.mp4"
-      muted loop playsinline>
-    </video>
+    <!-- PASTKI MENYU -->
 
-    <div class="info">
-      <div class="username">@video_uz</div>
-      <div class="caption">Ikkinchi video 🔥</div>
-    </div>
+    <div class="bottom">
 
-    <div class="actions">
-      <div class="action">❤️<span>0</span></div>
-      <div class="action">💬<span>0</span></div>
-      <div class="action">↗️<span>Ulashish</span></div>
+        <div class="nav active">
+            <span class="icon">🏠</span>
+            Bosh sahifa
+        </div>
+
+        <div class="nav">
+            <span class="icon">🔥</span>
+            Reels
+        </div>
+
+        <div class="nav">
+            <div class="upload">＋</div>
+        </div>
+
+        <div class="nav">
+            <span class="icon">💬</span>
+            Chat
+        </div>
+
+        <div class="nav">
+            <span class="icon">👤</span>
+            Profil
+        </div>
+
     </div>
-  </div>
 
 </div>
 
-<div class="bottom">
-  <div class="nav active">
-    <span class="icon">🏠</span>Bosh sahifa
-  </div>
-
-  <div class="nav">
-    <span class="icon">🔥</span>Reels
-  </div>
-
-  <div class="nav">
-    <div class="upload">＋</div>
-  </div>
-
-  <div class="nav">
-    <span class="icon">💬</span>Chat
-  </div>
-
-  <div class="nav">
-    <span class="icon">👤</span>Profil
-  </div>
-</div>
-
-</div>
-
-<script>
-
-const videos = document.querySelectorAll(".video");
-let current = 0;
-let startY = 0;
-let endY = 0;
-
-function showVideo(index){
-
-  if(index < 0 || index >= videos.length) return;
-
-  videos[current].classList.remove("active");
-
-  const oldVideo = videos[current].querySelector("video");
-  oldVideo.pause();
-
-  current = index;
-
-  videos[current].classList.add("active");
-
-  const newVideo = videos[current].querySelector("video");
-  newVideo.currentTime = 0;
-  newVideo.play().catch(()=>{});
-}
-
-document.addEventListener("touchstart", function(e){
-  startY = e.touches[0].clientY;
-});
-
-document.addEventListener("touchend", function(e){
-
-  endY = e.changedTouches[0].clientY;
-
-  const distance = startY - endY;
-
-  if(Math.abs(distance) < 60) return;
-
-if(distance > 0){
-  if(current < videos.length - 1){
-    showVideo(current + 1);
-  }
-}else{
-  if(current > 0){
-    showVideo(current - 1);
-  }
-}
-
-});
 
 <script src="script.js"></script>
+
 </body>
 </html>
