@@ -78,12 +78,12 @@ function addVideoToFeed(videoURL) {
 
     box.innerHTML = `
 
-        <video
-            src="${videoURL}"
-            muted
-            loop
-            playsinline>
-        </video>
+<video
+    src="${videoURL}"
+    controls
+    playsinline
+    preload="metadata">
+</video> 
 
         <div class="info">
 
