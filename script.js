@@ -263,3 +263,6 @@ picker.addEventListener("change", function() {
     picker.value = "";
 
 });
+picker.addEventListener("change", function () {
+    alert("VIDEO TANLANDI");
+});
