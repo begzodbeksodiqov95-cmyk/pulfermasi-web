@@ -200,11 +200,15 @@ document.addEventListener("touchend", function(e){
 
   if(Math.abs(distance) < 60) return;
 
-  if(distance > 0){
+if(distance > 0){
+  if(current < videos.length - 1){
     showVideo(current + 1);
-  }else{
+  }
+}else{
+  if(current > 0){
     showVideo(current - 1);
   }
+}
 
 });
 
