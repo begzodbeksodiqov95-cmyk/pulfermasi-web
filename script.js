@@ -1663,8 +1663,9 @@ alert(
 
 
                         alert(
-                            "Internet xatosi ❌"
-                        );
+    "XATO: " + error.message
+);
+                        
 
                     } finally {
 
