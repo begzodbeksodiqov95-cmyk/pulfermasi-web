@@ -1208,3 +1208,209 @@ profileButton.addEventListener(
 
     }
 );
+document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target.id !==
+            "editProfileButton"
+        ) {
+            return;
+        }
+
+        const oldEdit =
+            document.getElementById(
+                "editProfileModal"
+            );
+
+        if (oldEdit) {
+            oldEdit.remove();
+        }
+
+
+        const edit =
+            document.createElement("div");
+
+        edit.id =
+            "editProfileModal";
+
+        edit.style.position = "fixed";
+        edit.style.inset = "0";
+        edit.style.background = "#111";
+        edit.style.color = "#fff";
+        edit.style.zIndex = "100000";
+        edit.style.padding = "25px";
+        edit.style.boxSizing =
+            "border-box";
+
+
+        edit.innerHTML = `
+
+            <button id="closeEditProfile"
+                style="
+                    position:absolute;
+                    top:15px;
+                    right:15px;
+                    background:none;
+                    border:0;
+                    color:white;
+                    font-size:30px;
+                ">
+                ×
+            </button>
+
+
+            <h2 style="
+                text-align:center;
+                margin-top:40px;
+            ">
+                ✏️ Profilni sozlash
+            </h2>
+
+
+            <input
+                id="profileNameInput"
+                placeholder="Ismingiz"
+                maxlength="30"
+                style="
+                    width:100%;
+                    margin-top:30px;
+                    padding:14px;
+                    border-radius:12px;
+                    border:1px solid #444;
+                    background:#222;
+                    color:white;
+                "
+            >
+
+
+            <input
+                id="profileUsernameInput"
+                placeholder="@username"
+                maxlength="30"
+                style="
+                    width:100%;
+                    margin-top:12px;
+                    padding:14px;
+                    border-radius:12px;
+                    border:1px solid #444;
+                    background:#222;
+                    color:white;
+                "
+            >
+
+
+            <textarea
+                id="profileBioInput"
+                placeholder="O‘zingiz haqingizda..."
+                maxlength="50"
+                style="
+                    width:100%;
+                    height:90px;
+                    margin-top:12px;
+                    padding:14px;
+                    border-radius:12px;
+                    border:1px solid #444;
+                    background:#222;
+                    color:white;
+                    resize:none;
+                "
+            ></textarea>
+
+
+            <div style="
+                text-align:right;
+                color:#888;
+                font-size:12px;
+                margin-top:5px;
+            ">
+                Maksimum 50 ta belgi
+            </div>
+
+
+            <button
+                id="saveProfileButton"
+                style="
+                    width:100%;
+                    margin-top:25px;
+                    padding:14px;
+                    border:0;
+                    border-radius:12px;
+                    font-size:16px;
+                "
+            >
+                💾 Saqlash
+            </button>
+
+        `;
+
+
+        document.body.appendChild(edit);
+
+
+        document
+            .getElementById(
+                "closeEditProfile"
+            )
+            .onclick =
+            function() {
+
+                edit.remove();
+
+            };
+
+
+        document
+            .getElementById(
+                "saveProfileButton"
+            )
+            .onclick =
+            function() {
+
+                const name =
+                    document.getElementById(
+                        "profileNameInput"
+                    ).value.trim();
+
+                const username =
+                    document.getElementById(
+                        "profileUsernameInput"
+                    ).value.trim();
+
+                const bio =
+                    document.getElementById(
+                        "profileBioInput"
+                    ).value.trim();
+
+
+                if (!name) {
+
+                    alert(
+                        "Ismingizni kiriting!"
+                    );
+
+                    return;
+
+                }
+
+
+                if (!username) {
+
+                    alert(
+                        "Username kiriting!"
+                    );
+
+                    return;
+
+                }
+
+
+                alert(
+                    "Profil ma’lumotlari tayyor ✅"
+                );
+
+            };
+
+    }
+);
