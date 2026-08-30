@@ -48,10 +48,10 @@ function addVideoToFeed(item) {
                 <span>${likes}</span>
             </div>
 
-            <div class="action">
-                💬
-                <span>0</span>
-            </div>
+            <div class="action comment-button">
+    💬
+    <span>0</span>
+</div>
 
             <div class="action">
                 ↗️
