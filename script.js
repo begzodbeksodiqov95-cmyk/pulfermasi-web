@@ -1069,7 +1069,142 @@ profileButton.addEventListener(
     "click",
     function() {
 
-        alert("👤 Profil oynasi");
+        const oldProfile =
+            document.getElementById("profileModal");
+
+        if (oldProfile) {
+            oldProfile.remove();
+        }
+
+
+        const modal =
+            document.createElement("div");
+
+        modal.id = "profileModal";
+
+        modal.style.position = "fixed";
+        modal.style.inset = "0";
+        modal.style.background = "#111";
+        modal.style.color = "#fff";
+        modal.style.zIndex = "99999";
+        modal.style.padding = "25px";
+        modal.style.boxSizing = "border-box";
+
+
+        modal.innerHTML = `
+
+            <button id="closeProfile"
+                style="
+                    position:absolute;
+                    top:15px;
+                    right:15px;
+                    background:none;
+                    border:0;
+                    color:white;
+                    font-size:30px;
+                ">
+                ×
+            </button>
+
+
+            <div style="
+                text-align:center;
+                margin-top:40px;
+            ">
+
+                <div style="
+                    width:90px;
+                    height:90px;
+                    border-radius:50%;
+                    background:#333;
+                    margin:auto;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:45px;
+                ">
+                    👤
+                </div>
+
+
+                <h2 style="
+                    margin-top:15px;
+                ">
+                    Foydalanuvchi
+                </h2>
+
+
+                <div style="
+                    color:#aaa;
+                    margin-top:5px;
+                ">
+                    @username
+                </div>
+
+
+                <div style="
+                    display:flex;
+                    justify-content:center;
+                    gap:50px;
+                    margin-top:25px;
+                ">
+
+                    <div>
+                        <b>0</b>
+                        <br>
+                        <span style="color:#aaa">
+                            Obunachilar
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <b>0</b>
+                        <br>
+                        <span style="color:#aaa">
+                            Obunalar
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <button
+                    style="
+                        margin-top:25px;
+                        padding:12px 25px;
+                        border:0;
+                        border-radius:20px;
+                    "
+                >
+                    ✏️ Profilni sozlash
+                </button>
+
+            </div>
+
+
+            <div style="
+                margin-top:45px;
+                text-align:center;
+                color:#aaa;
+            ">
+                🎬 Hali video yo‘q
+            </div>
+
+        `;
+
+
+        document.body.appendChild(modal);
+
+
+        document
+            .getElementById("closeProfile")
+            .onclick =
+            function() {
+
+                modal.remove();
+
+            };
 
     }
 );
