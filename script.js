@@ -232,173 +232,362 @@ try {
 
 function openComments(videoId, commentButton) {
 
-const modal = document.createElement("div");  
+    const oldModal =
+        document.getElementById("commentsModal");
 
-modal.style.position = "fixed";  
-modal.style.left = "0";  
-modal.style.right = "0";  
-modal.style.bottom = "0";  
-modal.style.height = "70%";  
-modal.style.background = "#111";  
-modal.style.color = "#fff";  
-modal.style.zIndex = "99999";  
-modal.style.borderRadius = "20px 20px 0 0";  
-modal.style.padding = "15px";  
-modal.style.boxSizing = "border-box";  
+    if (oldModal) {
+        oldModal.remove();
+    }
 
-modal.innerHTML = `  
-    <div style="  
-        text-align:center;  
-        font-size:20px;  
-        font-weight:bold;  
-        margin-bottom:15px;  
-    ">  
-        💬 Kommentlar  
-    </div>  
+    const modal =
+        document.createElement("div");
 
-    <button id="closeComments" style="  
-        position:absolute;  
-        right:15px;  
-        top:10px;  
-        background:none;  
-        border:0;  
-        color:white;  
-        font-size:25px;  
-    ">×</button>  
+    modal.id = "commentsModal";
 
-    <div id="commentsList" style="  
-        height:calc(100% - 110px);  
-        overflow-y:auto;  
-    ">  
-        Hali komment yo‘q.  
-    </div>  
+    modal.style.position = "fixed";
+    modal.style.left = "0";
+    modal.style.right = "0";
+    modal.style.bottom = "0";
+    modal.style.height = "70%";
+    modal.style.background = "#111";
+    modal.style.color = "#fff";
+    modal.style.zIndex = "99999";
+    modal.style.borderRadius = "20px 20px 0 0";
+    modal.style.padding = "15px";
+    modal.style.boxSizing = "border-box";
 
-    <div style="  
-        position:absolute;  
-        bottom:10px;  
-        left:10px;  
-        right:10px;  
-        display:flex;  
-        gap:8px;  
-    ">  
-        <input id="commentInput"  
-            placeholder="Komment yozing..."  
-            style="  
-                flex:1;  
-                padding:12px;  
-                border-radius:20px;  
-                border:1px solid #555;  
-                background:#222;  
-                color:white;  
-            ">  
+    modal.innerHTML = `
+        <div style="
+            text-align:center;
+            font-size:20px;
+            font-weight:bold;
+            margin-bottom:15px;
+        ">
+            💬 Kommentlar
+        </div>
 
-        <button id="sendComment" style="  
-            padding:10px 16px;  
-            border:0;  
-            border-radius:20px;  
-        ">  
-            Yuborish  
-        </button>  
-    </div>  
-`;  
+        <button id="closeComments" style="
+            position:absolute;
+            right:15px;
+            top:10px;
+            background:none;
+            border:0;
+            color:white;
+            font-size:25px;
+        ">×</button>
 
-document.body.appendChild(modal);  
+        <div id="commentsList" style="
+            height:calc(100% - 110px);
+            overflow-y:auto;
+        ">
+            <div id="noComments"
+                style="
+                    text-align:center;
+                    color:#888;
+                    padding:30px;
+                ">
+                Hali komment yo‘q.
+            </div>
+        </div>
 
+        <div style="
+            position:absolute;
+            bottom:10px;
+            left:10px;
+            right:10px;
+            display:flex;
+            gap:8px;
+        ">
 
-document  
-    .getElementById("closeComments")  
-    .onclick = function() {  
-        modal.remove();  
-    };  
+            <input
+                id="commentInput"
+                placeholder="Komment yozing..."
+                style="
+                    flex:1;
+                    padding:12px;
+                    border-radius:20px;
+                    border:1px solid #555;
+                    background:#222;
+                    color:white;
+                    outline:none;
+                "
+            >
 
+            <button
+                id="sendComment"
+                style="
+                    padding:10px 16px;
+                    border:0;
+                    border-radius:20px;
+                "
+            >
+                Yuborish
+            </button>
 
-document  
-    .getElementById("sendComment")  
-    .onclick = async function() {  
+        </div>
+    `;
 
-        const input =  
-            document.getElementById("commentInput");  
-
-        const text =  
-            input.value.trim();  
-
-        if (!text) {  
-            return;  
-        }  
-
-        const button =  
-            document.getElementById("sendComment");  
-
-        button.disabled = true;  
-        button.innerText = "...";  
+    document.body.appendChild(modal);
 
 
-        const response = await fetch(  
-            SUPABASE_URL +  
-            "/rest/v1/comments",  
-            {  
-                method: "POST",  
+    const list =
+        document.getElementById("commentsList");
 
-                headers: {  
-                    "apikey": SUPABASE_KEY,  
-                    "Authorization":  
-                        "Bearer " + SUPABASE_KEY,  
-                    "Content-Type":  
-                        "application/json",  
-                    "Prefer":  
-                        "return=minimal"  
-                },  
+    const input =
+        document.getElementById("commentInput");
 
-                body: JSON.stringify({  
-                    video_id:  
-                        Number(videoId),  
-
-                    comment_text:  
-                        text  
-                })  
-            }  
-        );  
+    const sendButton =
+        document.getElementById("sendComment");
 
 
-        if (!response.ok) {  
+    function addComment(text) {
 
-            alert(  
-                "Komment yuborilmadi ❌"  
-            );  
+        const noComments =
+            document.getElementById("noComments");
 
-            console.log(  
-                await response.text()  
-            );  
+        if (noComments) {
+            noComments.remove();
+        }
 
-        } else {  
+        const comment =
+            document.createElement("div");
 
-            input.value = "";  
+        comment.style.padding = "12px 5px";
+        comment.style.borderBottom =
+            "1px solid #333";
+        comment.style.wordBreak =
+            "break-word";
 
-            const list =  
-                document.getElementById(  
-                    "commentsList"  
-                );  
+        comment.innerHTML = `
+            <div style="
+                font-weight:bold;
+                margin-bottom:5px;
+            ">
+                👤 Foydalanuvchi
+            </div>
 
-            const comment =  
-                document.createElement("div");  
+            <div></div>
+        `;
 
-            comment.style.padding = "10px";  
-            comment.style.borderBottom =  
-                "1px solid #333";  
+        comment
+            .querySelector("div:last-child")
+            .textContent = text;
 
-            comment.innerText =  
-                "👤 Foydalanuvchi: " +  
-                text;  
-
-            list.appendChild(comment);  
-
-        }  
+        list.appendChild(comment);
+    }
 
 
-        button.disabled = false;  
-        button.innerText = "Yuborish";  
-    };  
+    async function loadComments() {
+
+        try {
+
+            const response =
+                await fetch(
+                    SUPABASE_URL +
+                    "/rest/v1/comments" +
+                    "?select=comment_text" +
+                    "&video_id=eq." +
+                    Number(videoId),
+                    {
+                        headers: {
+                            "apikey":
+                                SUPABASE_KEY,
+
+                            "Authorization":
+                                "Bearer " +
+                                SUPABASE_KEY
+                        }
                     }
+                );
+
+
+            if (!response.ok) {
+
+                console.log(
+                    "Kommentlarni olish xatosi:",
+                    await response.text()
+                );
+
+                return;
+            }
+
+
+            const comments =
+                await response.json();
+
+
+            if (comments.length > 0) {
+
+                comments.forEach(
+                    function(item) {
+
+                        if (item.comment_text) {
+
+                            addComment(
+                                item.comment_text
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+
+        } catch (error) {
+
+            console.log(
+                "Komment xatosi:",
+                error
+            );
+
+        }
+
+    }
+
+
+    sendButton.onclick =
+        async function() {
+
+            const text =
+                input.value.trim();
+
+            if (!text) {
+                return;
+            }
+
+            sendButton.disabled = true;
+
+            sendButton.innerText =
+                "Yuborilmoqda...";
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        SUPABASE_URL +
+                        "/rest/v1/comments",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "apikey":
+                                    SUPABASE_KEY,
+
+                                "Authorization":
+                                    "Bearer " +
+                                    SUPABASE_KEY,
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "Prefer":
+                                    "return=minimal"
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    video_id:
+                                        Number(videoId),
+
+                                    comment_text:
+                                        text
+                                })
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    console.log(
+                        "Komment xatosi:",
+                        await response.text()
+                    );
+
+                    alert(
+                        "Komment yuborilmadi ❌"
+                    );
+
+                    return;
+                }
+
+
+                addComment(text);
+
+                input.value = "";
+
+                list.scrollTop =
+                    list.scrollHeight;
+
+
+                const countElement =
+                    commentButton.querySelector(
+                        "span"
+                    );
+
+                if (countElement) {
+
+                    let count =
+                        Number(
+                            countElement.innerText
+                        ) || 0;
+
+                    count++;
+
+                    countElement.innerText =
+                        count;
+                }
+
+
+            } catch (error) {
+
+                console.log(
+                    "Xato:",
+                    error
+                );
+
+                alert(
+                    "Internet xatosi ❌"
+                );
+
+            } finally {
+
+                sendButton.disabled = false;
+
+                sendButton.innerText =
+                    "Yuborish";
+            }
+
+        };
+
+
+    input.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                sendButton.click();
+
+            }
+
+        }
+    );
+
+
+    document
+        .getElementById("closeComments")
+        .onclick =
+        function() {
+
+            modal.remove();
+
+        };
+
+
+    loadComments();
+}
 
 function showVideo(index) {
 
