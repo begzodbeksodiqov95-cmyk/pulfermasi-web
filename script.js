@@ -1700,4 +1700,4 @@ alert(
 
     }
 );
-
+alert("YANGI KOD ISHLAYAPTI");
