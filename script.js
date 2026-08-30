@@ -1,1 +1,1417 @@
 
+let current = 0;
+let startY = 0;
+
+const feed = document.getElementById("feed");
+const picker = document.getElementById("videoPicker");
+
+const SUPABASE_URL =
+"https://bbgruqvwkygjwqdocnsb.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat";
+
+function getVideos() {
+return document.querySelectorAll(".video");
+}
+
+function addVideoToFeed(item) {
+
+const box = document.createElement("div");  
+
+box.className = "video";  
+
+const likes =  
+    item.likes === null ||  
+    item.likes === undefined  
+        ? 0  
+        : item.likes;  
+
+box.innerHTML = `  
+    <video  
+        src="${item.videos_url}"  
+        controls  
+        playsinline  
+        preload="metadata">  
+    </video>  
+
+    <div class="info">  
+        <div class="username">@video_uz</div>  
+        <div class="caption">🎬 Video</div>  
+    </div>  
+
+    <div class="actions">  
+
+        <div class="action like-button">  
+            ❤️  
+            <span>${likes}</span>  
+        </div>  
+
+        <div class="action comment-button">  
+💬  
+<span>0</span>
+
+</div>  <div class="action share-button">  
+↗️  
+<span>Ulashish</span>
+
+</div>  </div>  
+`;  
+
+box.dataset.id = item.id;  
+
+
+const likeButton =  
+    box.querySelector(".like-button");  
+
+
+likeButton.addEventListener(  
+    "click",  
+    async function(event) {  
+
+        event.stopPropagation();  
+
+        const videoId =  
+            box.dataset.id;  
+
+        const countElement =  
+            likeButton.querySelector("span");  
+
+        let currentLikes =  
+            Number(  
+                countElement.innerText  
+            );  
+
+        currentLikes++;  
+
+        countElement.innerText =  
+            currentLikes;  
+
+
+        const response =  
+            await fetch(  
+                SUPABASE_URL +  
+                "/rest/v1/videos?id=eq." +  
+                videoId,  
+                {  
+                    method: "PATCH",  
+
+                    headers: {  
+                        "apikey":  
+                            SUPABASE_KEY,  
+
+                        "Authorization":  
+                            "Bearer " +  
+                            SUPABASE_KEY,  
+
+                        "Content-Type":  
+                            "application/json",  
+
+                        "Prefer":  
+                            "return=minimal"  
+                    },  
+
+                    body:  
+                        JSON.stringify({  
+                            likes:  
+                                currentLikes  
+                        })  
+                }  
+            );  
+
+
+        if (!response.ok) {  
+
+            currentLikes--;  
+
+            countElement.innerText =  
+                currentLikes;  
+
+            console.log(  
+                "Like xatosi:",  
+                await response.text()  
+            );  
+
+        }  
+
+    }  
+);
+
+const commentButton =
+box.querySelector(".comment-button");
+
+commentButton.addEventListener(
+"click",
+function(event) {
+
+event.stopPropagation();  
+
+    openComments(  
+box.dataset.id,  
+commentButton
+
+);
+
+}
+
+);
+const shareButton =
+box.querySelector(".share-button");
+
+shareButton.addEventListener(
+"click",
+function(event) {
+
+event.stopPropagation();  
+
+    const video =  
+        box.querySelector("video");  
+
+    const videoURL =  
+        video.src;  
+
+    const shareURL =  
+        "https://t.me/share/url" +  
+        "?url=" +  
+        encodeURIComponent(videoURL) +  
+        "&text=" +  
+        encodeURIComponent(  
+            "🎬 Pul Fermasi videosi"  
+        );  
+
+    window.open(  
+        shareURL,  
+        "_blank"  
+    );  
+
+}
+
+);
+feed.appendChild(box);
+}
+
+async function loadVideos() {
+
+try {  
+
+    const response =  
+        await fetch(  
+            SUPABASE_URL +  
+            "/rest/v1/videos?select=id,videos_url,likes",  
+            {  
+                headers: {  
+                    "apikey":  
+                        SUPABASE_KEY,  
+
+                    "Authorization":  
+                        "Bearer " +  
+                        SUPABASE_KEY  
+                }  
+            }  
+        );  
+
+
+    if (!response.ok) {  
+
+        alert(  
+            "Database xatosi: " +  
+            response.status  
+        );  
+
+        return;  
+    }  
+
+
+    const data =  
+        await response.json();  
+
+
+    data.forEach(  
+        function(item) {  
+
+            if (  
+                item.videos_url  
+            ) {  
+
+                addVideoToFeed(  
+                    item  
+                );  
+
+            }  
+
+        }  
+    );  
+
+
+    if (  
+        getVideos().length > 0  
+    ) {  
+
+        showVideo(0);  
+
+    }  
+
+} catch (error) {  
+
+    console.log(  
+        "Xato:",  
+        error  
+    );  
+
+}
+
+}
+
+function openComments(videoId, commentButton) {
+
+const oldModal =  
+    document.getElementById("commentsModal");  
+
+if (oldModal) {  
+    oldModal.remove();  
+}  
+
+const modal =  
+    document.createElement("div");  
+
+modal.id = "commentsModal";  
+
+modal.style.position = "fixed";  
+modal.style.left = "0";  
+modal.style.right = "0";  
+modal.style.bottom = "0";  
+modal.style.height = "70%";  
+modal.style.background = "#111";  
+modal.style.color = "#fff";  
+modal.style.zIndex = "99999";  
+modal.style.borderRadius = "20px 20px 0 0";  
+modal.style.padding = "15px";  
+modal.style.boxSizing = "border-box";  
+
+modal.innerHTML = `  
+    <div style="  
+        text-align:center;  
+        font-size:20px;  
+        font-weight:bold;  
+        margin-bottom:15px;  
+    ">  
+        💬 Kommentlar  
+    </div>  
+
+    <button id="closeComments" style="  
+        position:absolute;  
+        right:15px;  
+        top:10px;  
+        background:none;  
+        border:0;  
+        color:white;  
+        font-size:25px;  
+    ">×</button>  
+
+    <div id="commentsList" style="  
+        height:calc(100% - 110px);  
+        overflow-y:auto;  
+    ">  
+        <div id="noComments"  
+            style="  
+                text-align:center;  
+                color:#888;  
+                padding:30px;  
+            ">  
+            Hali komment yo‘q.  
+        </div>  
+    </div>  
+
+    <div style="  
+        position:absolute;  
+        bottom:10px;  
+        left:10px;  
+        right:10px;  
+        display:flex;  
+        gap:8px;  
+    ">  
+
+        <input  
+            id="commentInput"  
+            placeholder="Komment yozing..."  
+            style="  
+                flex:1;  
+                padding:12px;  
+                border-radius:20px;  
+                border:1px solid #555;  
+                background:#222;  
+                color:white;  
+                outline:none;  
+            "  
+        >  
+
+        <button  
+            id="sendComment"  
+            style="  
+                padding:10px 16px;  
+                border:0;  
+                border-radius:20px;  
+            "  
+        >  
+            Yuborish  
+        </button>  
+
+    </div>  
+`;  
+
+document.body.appendChild(modal);  
+
+
+const list =  
+    document.getElementById("commentsList");  
+
+const input =  
+    document.getElementById("commentInput");  
+
+const sendButton =  
+    document.getElementById("sendComment");  
+
+
+function addComment(text) {  
+
+    const noComments =  
+        document.getElementById("noComments");  
+
+    if (noComments) {  
+        noComments.remove();  
+    }  
+
+    const comment =  
+        document.createElement("div");  
+
+    comment.style.padding = "12px 5px";  
+    comment.style.borderBottom =  
+        "1px solid #333";  
+    comment.style.wordBreak =  
+        "break-word";  
+
+    comment.innerHTML = `  
+        <div style="  
+            font-weight:bold;  
+            margin-bottom:5px;  
+        ">  
+            👤 Foydalanuvchi  
+        </div>  
+
+        <div></div>  
+    `;  
+
+    comment  
+        .querySelector("div:last-child")  
+        .textContent = text;  
+
+    list.appendChild(comment);  
+}  
+
+
+async function loadComments() {  
+
+    try {  
+
+        const response =  
+            await fetch(  
+                SUPABASE_URL +  
+                "/rest/v1/comments" +  
+                "?select=comment_text" +  
+                "&video_id=eq." +  
+                Number(videoId),  
+                {  
+                    headers: {  
+                        "apikey":  
+                            SUPABASE_KEY,  
+
+                        "Authorization":  
+                            "Bearer " +  
+                            SUPABASE_KEY  
+                    }  
+                }  
+            );  
+
+
+        if (!response.ok) {  
+
+            console.log(  
+                "Kommentlarni olish xatosi:",  
+                await response.text()  
+            );  
+
+            return;  
+        }  
+
+
+        const comments =  
+            await response.json();  
+
+
+        if (comments.length > 0) {  
+
+            comments.forEach(  
+                function(item) {  
+
+                    if (item.comment_text) {  
+
+                        addComment(  
+                            item.comment_text  
+                        );  
+
+                    }  
+
+                }  
+            );  
+
+        }  
+
+    } catch (error) {  
+
+        console.log(  
+            "Komment xatosi:",  
+            error  
+        );  
+
+    }  
+
+}  
+
+
+sendButton.onclick =  
+    async function() {  
+
+        const text =  
+            input.value.trim();  
+
+        if (!text) {  
+            return;  
+        }  
+
+        sendButton.disabled = true;  
+
+        sendButton.innerText =  
+            "Yuborilmoqda...";  
+
+
+        try {  
+
+            const response =  
+                await fetch(  
+                    SUPABASE_URL +  
+                    "/rest/v1/comments",  
+                    {  
+                        method: "POST",  
+
+                        headers: {  
+                            "apikey":  
+                                SUPABASE_KEY,  
+
+                            "Authorization":  
+                                "Bearer " +  
+                                SUPABASE_KEY,  
+
+                            "Content-Type":  
+                                "application/json",  
+
+                            "Prefer":  
+                                "return=minimal"  
+                        },  
+
+                        body:  
+                            JSON.stringify({  
+                                video_id:  
+                                    Number(videoId),  
+
+                                comment_text:  
+                                    text  
+                            })  
+                    }  
+                );  
+
+
+            if (!response.ok) {  
+
+                console.log(  
+                    "Komment xatosi:",  
+                    await response.text()  
+                );  
+
+                alert(  
+                    "Komment yuborilmadi ❌"  
+                );  
+
+                return;  
+            }  
+
+
+            addComment(text);  
+
+            input.value = "";  
+
+            list.scrollTop =  
+                list.scrollHeight;  
+
+
+            const countElement =  
+                commentButton.querySelector(  
+                    "span"  
+                );  
+
+            if (countElement) {  
+
+                let count =  
+                    Number(  
+                        countElement.innerText  
+                    ) || 0;  
+
+                count++;  
+
+                countElement.innerText =  
+                    count;  
+            }  
+
+
+        } catch (error) {  
+
+            console.log(  
+                "Xato:",  
+                error  
+            );  
+
+            alert(  
+                "Internet xatosi ❌"  
+            );  
+
+        } finally {  
+
+            sendButton.disabled = false;  
+
+            sendButton.innerText =  
+                "Yuborish";  
+        }  
+
+    };  
+
+
+input.addEventListener(  
+    "keydown",  
+    function(event) {  
+
+        if (event.key === "Enter") {  
+
+            sendButton.click();  
+
+        }  
+
+    }  
+);  
+
+
+document  
+    .getElementById("closeComments")  
+    .onclick =  
+    function() {  
+
+        modal.remove();  
+
+    };  
+
+
+loadComments();
+
+}
+function showVideo(index) {
+
+const videos =  
+    getVideos();  
+
+
+if (  
+    index < 0 ||  
+    index >= videos.length  
+) {  
+
+    return;  
+
+}  
+
+
+videos.forEach(  
+    function(box) {  
+
+        box.classList.remove(  
+            "active"  
+        );  
+
+
+        const video =  
+            box.querySelector(  
+                "video"  
+            );  
+
+
+        if (video) {  
+
+            video.pause();  
+
+        }  
+
+    }  
+);  
+
+
+current = index;  
+
+
+const box =  
+    videos[current];  
+
+
+box.classList.add(  
+    "active"  
+);  
+
+
+const video =  
+    box.querySelector(  
+        "video"  
+    );  
+
+
+if (video) {  
+
+    video.currentTime = 0;  
+
+}
+
+}
+
+document.addEventListener(
+"touchstart",
+function(event) {
+
+startY =  
+        event.touches[0].clientY;  
+
+}
+
+);
+
+document.addEventListener(
+"touchend",
+function(event) {
+
+const endY =  
+        event.changedTouches[0].clientY;  
+
+
+    const distance =  
+        startY - endY;  
+
+
+    if (  
+        Math.abs(distance) < 60  
+    ) {  
+
+        return;  
+
+    }  
+
+
+    if (distance > 0) {  
+
+        showVideo(  
+            current + 1  
+        );  
+
+    } else {  
+
+        showVideo(  
+            current - 1  
+        );  
+
+    }  
+
+}
+
+);
+
+picker.addEventListener(
+"change",
+function() {
+
+const file =  
+        picker.files[0];  
+
+
+    if (!file) {  
+
+        return;  
+
+    }  
+
+
+    if (  
+        !file.type.startsWith(  
+            "video/"  
+        )  
+    ) {  
+
+        alert(  
+            "Faqat video tanlang!"  
+        );  
+
+        picker.value = "";  
+
+        return;  
+
+    }  
+
+
+    const fileName =  
+        Date.now() +  
+        "_" +  
+        Math.random()  
+            .toString(36)  
+            .substring(2) +  
+        "_" +  
+        file.name.replace(  
+            /[^a-zA-Z0-9._-]/g,  
+            "_"  
+        );  
+
+
+    const uploadURL =  
+        SUPABASE_URL +  
+        "/storage/v1/object/Videos/" +  
+        fileName;  
+
+
+    const progress =  
+        document.createElement(  
+            "div"  
+        );  
+
+
+    progress.style.position =  
+        "fixed";  
+
+    progress.style.top =  
+        "50%";  
+
+    progress.style.left =  
+        "50%";  
+
+    progress.style.transform =  
+        "translate(-50%, -50%)";  
+
+    progress.style.background =  
+        "#111";  
+
+    progress.style.color =  
+        "#fff";  
+
+    progress.style.padding =  
+        "20px 30px";  
+
+    progress.style.borderRadius =  
+        "15px";  
+
+    progress.style.zIndex =  
+        "99999";  
+
+
+    progress.innerText =  
+        "Yuklanmoqda: 0%";  
+
+
+    document.body.appendChild(  
+        progress  
+    );  
+
+
+    const xhr =  
+        new XMLHttpRequest();  
+
+
+    xhr.open(  
+        "POST",  
+        uploadURL,  
+        true  
+    );  
+
+
+    xhr.setRequestHeader(  
+        "Authorization",  
+        "Bearer " +  
+        SUPABASE_KEY  
+    );  
+
+
+    xhr.setRequestHeader(  
+        "apikey",  
+        SUPABASE_KEY  
+    );  
+
+
+    xhr.setRequestHeader(  
+        "Content-Type",  
+        file.type  
+    );  
+
+
+    xhr.setRequestHeader(  
+        "x-upsert",  
+        "false"  
+    );  
+
+
+    xhr.upload.onprogress =  
+        function(event) {  
+
+            if (  
+                event.lengthComputable  
+            ) {  
+
+                const percent =  
+                    Math.round(  
+                        event.loaded /  
+                        event.total *  
+                        100  
+                    );  
+
+
+                progress.innerText =  
+                    "Yuklanmoqda: " +  
+                    percent +  
+                    "%";  
+
+            }  
+
+        };  
+
+
+    xhr.onload =  
+        async function() {  
+
+            if (  
+                xhr.status >= 200 &&  
+                xhr.status < 300  
+            ) {  
+
+
+                const publicURL =  
+                    SUPABASE_URL +  
+                    "/storage/v1/object/public/Videos/" +  
+                    fileName;  
+
+
+                progress.innerText =  
+                    "Saqlanmoqda...";  
+
+
+                const dbResponse =  
+                    await fetch(  
+                        SUPABASE_URL +  
+                        "/rest/v1/videos",  
+                        {  
+                            method: "POST",  
+
+                            headers: {  
+
+                                "apikey":  
+                                    SUPABASE_KEY,  
+
+                                "Authorization":  
+                                    "Bearer " +  
+                                    SUPABASE_KEY,  
+
+                                "Content-Type":  
+                                    "application/json",  
+
+                                "Prefer":  
+                                    "return=minimal"  
+
+                            },  
+
+                            body:  
+                                JSON.stringify({  
+                                    videos_url:  
+                                        publicURL,  
+
+                                    likes:  
+                                        0  
+
+                                })  
+
+                        }  
+                    );  
+
+
+                if (  
+                    !dbResponse.ok  
+                ) {  
+
+                    progress.innerText =  
+                        "Database xatosi: " +  
+                        dbResponse.status;  
+
+
+                    console.log(  
+                        await dbResponse.text()  
+                    );  
+
+
+                    setTimeout(  
+                        function() {  
+
+                            progress.remove();  
+
+                        },  
+                        4000  
+                    );  
+
+
+                    return;  
+
+                }  
+
+
+                progress.innerText =  
+                    "Yuklandi! ✅";  
+
+
+                addVideoToFeed({  
+
+                    id:  
+                        Date.now(),  
+
+                    videos_url:  
+                        publicURL,  
+
+                    likes:  
+                        0  
+
+                });  
+
+
+                showVideo(  
+                    getVideos().length - 1  
+                );  
+
+
+                setTimeout(  
+                    function() {  
+
+                        progress.remove();  
+
+                    },  
+                    1000  
+                );  
+
+
+            } else {  
+
+
+                progress.innerText =
+"Upload xatosi: " +
+xhr.status;
+
+setTimeout(  
+                    function() {  
+
+                        progress.remove();  
+
+                    },  
+                    4000  
+                );  
+
+            }  
+
+        };  
+
+
+    xhr.onerror =  
+        function() {  
+
+            progress.innerText =  
+                "Internet xatosi ❌";  
+
+
+            setTimeout(  
+                function() {  
+
+                    progress.remove();  
+
+                },  
+                3000  
+            );  
+
+        };  
+
+
+    xhr.send(file);  
+
+
+    picker.value = "";  
+
+}
+
+);
+
+loadVideos();
+const profileButton =
+document.getElementById("profileButton");
+
+profileButton.addEventListener(
+"click",
+function() {
+
+const oldProfile =  
+        document.getElementById("profileModal");  
+
+    if (oldProfile) {  
+        oldProfile.remove();  
+    }  
+
+
+    const modal =  
+        document.createElement("div");  
+
+    modal.id = "profileModal";  
+
+    modal.style.position = "fixed";  
+    modal.style.inset = "0";  
+    modal.style.background = "#111";  
+    modal.style.color = "#fff";  
+    modal.style.zIndex = "99999";  
+    modal.style.padding = "25px";  
+    modal.style.boxSizing = "border-box";  
+
+
+    modal.innerHTML = `  
+
+        <button id="closeProfile"  
+            style="  
+                position:absolute;  
+                top:15px;  
+                right:15px;  
+                background:none;  
+                border:0;  
+                color:white;  
+                font-size:30px;  
+            ">  
+            ×  
+        </button>  
+
+
+        <div style="  
+            text-align:center;  
+            margin-top:40px;  
+        ">  
+
+            <div style="  
+                width:90px;  
+                height:90px;  
+                border-radius:50%;  
+                background:#333;  
+                margin:auto;  
+                display:flex;  
+                align-items:center;  
+                justify-content:center;  
+                font-size:45px;  
+            ">  
+                👤  
+            </div>  
+
+
+            <h2 style="  
+                margin-top:15px;  
+            ">  
+                Foydalanuvchi  
+            </h2>  
+
+
+            <div style="  
+                color:#aaa;  
+                margin-top:5px;  
+            ">  
+                @username  
+            </div>  
+
+
+            <div style="  
+                display:flex;  
+                justify-content:center;  
+                gap:50px;  
+                margin-top:25px;  
+            ">  
+
+                <div>  
+                    <b>0</b>  
+                    <br>  
+                    <span style="color:#aaa">  
+                        Obunachilar  
+                    </span>  
+                </div>  
+
+
+                <div>  
+                    <b>0</b>  
+                    <br>  
+                    <span style="color:#aaa">  
+                        Obunalar  
+                    </span>  
+                </div>  
+
+            </div>  
+
+
+            <button id="editProfileButton"  
+                style="  
+                    margin-top:25px;  
+                    padding:12px 25px;  
+                    border:0;  
+                    border-radius:20px;  
+                "  
+            >  
+                ✏️ Profilni sozlash  
+            </button>  
+
+        </div>  
+
+
+        <div style="  
+            margin-top:45px;  
+            text-align:center;  
+            color:#aaa;  
+        ">  
+            🎬 Hali video yo‘q  
+        </div>  
+
+    `;  
+
+
+    document.body.appendChild(modal);  
+
+
+    document  
+        .getElementById("closeProfile")  
+        .onclick =  
+        function() {  
+
+            modal.remove();  
+
+        };  
+
+}
+
+);
+document.addEventListener(
+"click",
+function(event) {
+
+if (  
+        event.target.id !==  
+        "editProfileButton"  
+    ) {  
+        return;  
+    }  
+
+    const oldEdit =  
+        document.getElementById(  
+            "editProfileModal"  
+        );  
+
+    if (oldEdit) {  
+        oldEdit.remove();  
+    }  
+
+
+    const edit =  
+        document.createElement("div");  
+
+    edit.id =  
+        "editProfileModal";  
+
+    edit.style.position = "fixed";  
+    edit.style.inset = "0";  
+    edit.style.background = "#111";  
+    edit.style.color = "#fff";  
+    edit.style.zIndex = "100000";  
+    edit.style.padding = "25px";  
+    edit.style.boxSizing =  
+        "border-box";  
+
+
+    edit.innerHTML = `  
+
+        <button id="closeEditProfile"  
+            style="  
+                position:absolute;  
+                top:15px;  
+                right:15px;  
+                background:none;  
+                border:0;  
+                color:white;  
+                font-size:30px;  
+            ">  
+            ×  
+        </button>  
+
+
+        <h2 style="  
+            text-align:center;  
+            margin-top:40px;  
+        ">  
+            ✏️ Profilni sozlash  
+        </h2>  
+
+
+        <input  
+            id="profileNameInput"  
+            placeholder="Ismingiz"  
+            maxlength="30"  
+            style="  
+                width:100%;  
+                margin-top:30px;  
+                padding:14px;  
+                border-radius:12px;  
+                border:1px solid #444;  
+                background:#222;  
+                color:white;  
+            "  
+        >  
+
+
+        <input  
+            id="profileUsernameInput"  
+            placeholder="@username"  
+            maxlength="30"  
+            style="  
+                width:100%;  
+                margin-top:12px;  
+                padding:14px;  
+                border-radius:12px;  
+                border:1px solid #444;  
+                background:#222;  
+                color:white;  
+            "  
+        >  
+
+
+        <textarea  
+            id="profileBioInput"  
+            placeholder="O‘zingiz haqingizda..."  
+            maxlength="50"  
+            style="  
+                width:100%;  
+                height:90px;  
+                margin-top:12px;  
+                padding:14px;  
+                border-radius:12px;  
+                border:1px solid #444;  
+                background:#222;  
+                color:white;  
+                resize:none;  
+            "  
+        ></textarea>  
+
+
+        <div style="  
+            text-align:right;  
+            color:#888;  
+            font-size:12px;  
+            margin-top:5px;  
+        ">  
+            Maksimum 50 ta belgi  
+        </div>  
+
+
+        <button  
+            id="saveProfileButton"  
+            style="  
+                width:100%;  
+                margin-top:25px;  
+                padding:14px;  
+                border:0;  
+                border-radius:12px;  
+                font-size:16px;  
+            "  
+        >  
+            💾 Saqlash  
+        </button>  
+
+    `;  
+
+
+    document.body.appendChild(edit);  
+
+
+    document  
+        .getElementById(  
+            "closeEditProfile"  
+        )  
+        .onclick =  
+        function() {  
+
+            edit.remove();  
+
+        };  
+
+
+    document  
+        .getElementById(  
+            "saveProfileButton"  
+        )  
+        .onclick =  
+        function() {  
+
+            const name =  
+                document.getElementById(  
+                    "profileNameInput"  
+                ).value.trim();  
+
+            const username =  
+                document.getElementById(  
+                    "profileUsernameInput"  
+                ).value.trim();  
+
+            const bio =  
+                document.getElementById(  
+                    "profileBioInput"  
+                ).value.trim();  
+
+
+            if (!name) {  
+
+                alert(  
+                    "Ismingizni kiriting!"  
+                );  
+
+                return;  
+
+            }  
+
+
+            if (!username) {  
+
+                alert(  
+                    "Username kiriting!"  
+                );  
+
+                return;  
+
+            }  
+
+
+            alert(  
+                "Profil ma’lumotlari tayyor ✅"  
+            );  
+
+        };  
+
+}
+
+);
