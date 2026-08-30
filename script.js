@@ -53,10 +53,10 @@ function addVideoToFeed(item) {
     <span>0</span>
 </div>
 
-            <div class="action">
-                ↗️
-                <span>Ulashish</span>
-            </div>
+        <div class="action share-button">
+    ↗️
+    <span>Ulashish</span>
+</div>
 
         </div>
     `;
@@ -153,6 +153,69 @@ commentButton.addEventListener(
     box.dataset.id,
     commentButton
 );
+
+    }
+);
+const shareButton =
+    box.querySelector(".share-button");
+
+shareButton.addEventListener(
+    "click",
+    async function(event) {
+
+        event.stopPropagation();
+
+        const video =
+            box.querySelector("video");
+
+        try {
+
+            const response =
+                await fetch(video.src);
+
+            const blob =
+                await response.blob();
+
+            const file =
+                new File(
+                    [blob],
+                    "PulFermasi-video.mp4",
+                    {
+                        type:
+                            blob.type ||
+                            "video/mp4"
+                    }
+                );
+
+            if (
+                navigator.canShare &&
+                navigator.canShare({
+                    files: [file]
+                })
+            ) {
+
+                await navigator.share({
+                    files: [file],
+                    title: "Pul Fermasi",
+                    text: "🎬 Pul Fermasi videosi"
+                });
+
+            } else {
+
+                alert(
+                    "Videoni fayl sifatida ulashish bu qurilmada ishlamaydi."
+                );
+
+            }
+
+        } catch (error) {
+
+            console.log(
+                "Ulashish xatosi:",
+                error
+            );
+
+        }
 
     }
 );
