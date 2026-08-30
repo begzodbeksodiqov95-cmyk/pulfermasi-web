@@ -41,7 +41,7 @@ async function loadVideos() {
 
         const response = await fetch(
             SUPABASE_URL +
-            "/rest/v1/videos?select=videos_url"
+            "/rest/v1/videos?select=videos_url",
             {
                 headers: {
                     "apikey": SUPABASE_KEY,
@@ -51,34 +51,47 @@ async function loadVideos() {
             }
         );
 
+
         if (!response.ok) {
-    alert(
-        "Database xatosi: " +
-        response.status +
-        "\n" +
-        await response.text()
-    );
-    return;
-        }
+
+            alert(
+                "Database xatosi: " +
+                response.status
+            );
+
+            return;
         }
 
-        const data = await response.json();
+
+        const data =
+            await response.json();
+
 
         data.forEach(function(item) {
 
             if (item.videos_url) {
-                addVideoToFeed(item.videos_url);
+
+                addVideoToFeed(
+                    item.videos_url
+                );
+
             }
 
         });
 
+
         if (getVideos().length > 0) {
+
             showVideo(0);
+
         }
 
     } catch (error) {
 
-        console.log("Xato:", error);
+        console.log(
+            "Xato:",
+            error
+        );
 
     }
 }
@@ -86,39 +99,58 @@ async function loadVideos() {
 
 function showVideo(index) {
 
-    const videos = getVideos();
+    const videos =
+        getVideos();
 
-    if (index < 0 || index >= videos.length) {
+
+    if (
+        index < 0 ||
+        index >= videos.length
+    ) {
         return;
     }
 
+
     videos.forEach(function(box) {
 
-        box.classList.remove("active");
+        box.classList.remove(
+            "active"
+        );
+
 
         const video =
             box.querySelector("video");
 
+
         if (video) {
+
             video.pause();
+
         }
 
     });
 
+
     current = index;
 
-    const box = videos[current];
+
+    const box =
+        videos[current];
+
 
     box.classList.add("active");
+
 
     const video =
         box.querySelector("video");
 
+
     if (video) {
+
         video.currentTime = 0;
 
-        video.play().catch(function() {});
     }
+
 }
 
 
@@ -140,17 +172,30 @@ document.addEventListener(
         const endY =
             event.changedTouches[0].clientY;
 
+
         const distance =
             startY - endY;
 
-        if (Math.abs(distance) < 60) {
+
+        if (
+            Math.abs(distance) < 60
+        ) {
             return;
         }
 
+
         if (distance > 0) {
-            showVideo(current + 1);
+
+            showVideo(
+                current + 1
+            );
+
         } else {
-            showVideo(current - 1);
+
+            showVideo(
+                current - 1
+            );
+
         }
 
     }
@@ -161,16 +206,24 @@ picker.addEventListener(
     "change",
     function() {
 
-        const file = picker.files[0];
+        const file =
+            picker.files[0];
+
 
         if (!file) {
             return;
         }
 
 
-        if (!file.type.startsWith("video/")) {
+        if (
+            !file.type.startsWith(
+                "video/"
+            )
+        ) {
 
-            alert("Faqat video tanlang!");
+            alert(
+                "Faqat video tanlang!"
+            );
 
             picker.value = "";
 
@@ -198,23 +251,46 @@ picker.addEventListener(
 
 
         const progress =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
-        progress.style.position = "fixed";
-        progress.style.top = "50%";
-        progress.style.left = "50%";
+
+        progress.style.position =
+            "fixed";
+
+        progress.style.top =
+            "50%";
+
+        progress.style.left =
+            "50%";
+
         progress.style.transform =
             "translate(-50%, -50%)";
-        progress.style.background = "#111";
-        progress.style.color = "#fff";
-        progress.style.padding = "20px 30px";
-        progress.style.borderRadius = "15px";
-        progress.style.zIndex = "99999";
+
+        progress.style.background =
+            "#111";
+
+        progress.style.color =
+            "#fff";
+
+        progress.style.padding =
+            "20px 30px";
+
+        progress.style.borderRadius =
+            "15px";
+
+        progress.style.zIndex =
+            "99999";
+
 
         progress.innerText =
             "Yuklanmoqda: 0%";
 
-        document.body.appendChild(progress);
+
+        document.body.appendChild(
+            progress
+        );
 
 
         const xhr =
@@ -230,18 +306,22 @@ picker.addEventListener(
 
         xhr.setRequestHeader(
             "Authorization",
-            "Bearer " + SUPABASE_KEY
+            "Bearer " +
+            SUPABASE_KEY
         );
+
 
         xhr.setRequestHeader(
             "apikey",
             SUPABASE_KEY
         );
 
+
         xhr.setRequestHeader(
             "Content-Type",
             file.type
         );
+
 
         xhr.setRequestHeader(
             "x-upsert",
@@ -252,7 +332,9 @@ picker.addEventListener(
         xhr.upload.onprogress =
             function(event) {
 
-                if (event.lengthComputable) {
+                if (
+                    event.lengthComputable
+                ) {
 
                     const percent =
                         Math.round(
@@ -261,11 +343,14 @@ picker.addEventListener(
                             100
                         );
 
+
                     progress.innerText =
                         "Yuklanmoqda: " +
                         percent +
                         "%";
+
                 }
+
             };
 
 
@@ -276,6 +361,7 @@ picker.addEventListener(
                     xhr.status >= 200 &&
                     xhr.status < 300
                 ) {
+
 
                     const publicURL =
                         SUPABASE_URL +
@@ -295,6 +381,7 @@ picker.addEventListener(
                                 method: "POST",
 
                                 headers: {
+
                                     "apikey":
                                         SUPABASE_KEY,
 
@@ -307,20 +394,26 @@ picker.addEventListener(
 
                                     "Prefer":
                                         "return=minimal"
+
                                 },
 
-                                body: JSON.stringify({
-                                    videos_url:
-                                        publicURL
-                                })
+                                body:
+                                    JSON.stringify({
+                                        videos_url:
+                                            publicURL
+                                    })
+
                             }
                         );
 
 
-                    if (!dbResponse.ok) {
+                    if (
+                        !dbResponse.ok
+                    ) {
 
                         const error =
                             await dbResponse.text();
+
 
                         console.log(
                             "DB ERROR:",
@@ -328,18 +421,24 @@ picker.addEventListener(
                             error
                         );
 
+
                         progress.innerText =
                             "Database xatosi: " +
                             dbResponse.status;
 
+
                         setTimeout(
                             function() {
+
                                 progress.remove();
+
                             },
                             4000
                         );
 
+
                         return;
+
                     }
 
 
@@ -352,9 +451,16 @@ picker.addEventListener(
                     );
 
 
+                    showVideo(
+                        getVideos().length - 1
+                    );
+
+
                     setTimeout(
                         function() {
+
                             progress.remove();
+
                         },
                         1000
                     );
@@ -362,17 +468,23 @@ picker.addEventListener(
 
                 } else {
 
+
                     progress.innerText =
                         "Upload xatosi: " +
                         xhr.status;
 
+
                     setTimeout(
                         function() {
+
                             progress.remove();
+
                         },
                         4000
                     );
+
                 }
+
             };
 
 
@@ -382,16 +494,21 @@ picker.addEventListener(
                 progress.innerText =
                     "Internet xatosi ❌";
 
+
                 setTimeout(
                     function() {
+
                         progress.remove();
+
                     },
                     3000
                 );
+
             };
 
 
         xhr.send(file);
+
 
         picker.value = "";
 
@@ -399,5 +516,4 @@ picker.addEventListener(
 );
 
 
-// ILOVA OCHILGANDA
 loadVideos();
