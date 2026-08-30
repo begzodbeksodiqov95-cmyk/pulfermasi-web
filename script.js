@@ -1047,9 +1047,10 @@ const file =
 
 }
 
-);
+); 
 
-loadVideos();// ===============================
+loadVideos();                                                    color:black;
+   // ===============================
 // PROFIL OYNASI - SUPABASE
 // ===============================
 
@@ -1057,7 +1058,7 @@ const profileButton =
     document.getElementById("profileButton");
 
 
-// Telegram foydalanuvchi ID sini olish
+// Telegram ID
 function getTelegramId() {
 
     if (
@@ -1066,29 +1067,25 @@ function getTelegramId() {
         window.Telegram.WebApp.initDataUnsafe &&
         window.Telegram.WebApp.initDataUnsafe.user
     ) {
-
         return String(
             window.Telegram.WebApp.initDataUnsafe.user.id
         );
-
     }
 
     return null;
 }
 
 
-// Profilni bazadan olish
+// ===============================
+// PROFILNI BAZADAN OLISH
+// ===============================
+
 async function loadProfileData() {
 
     const telegramId =
         getTelegramId();
 
     if (!telegramId) {
-
-        console.log(
-            "Telegram ID topilmadi"
-        );
-
         return null;
     }
 
@@ -1102,17 +1099,13 @@ async function loadProfileData() {
                 encodeURIComponent(telegramId) +
                 "&select=*",
                 {
-                    method: "GET",
-
                     headers: {
-
                         "apikey":
                             SUPABASE_KEY,
 
                         "Authorization":
                             "Bearer " +
                             SUPABASE_KEY
-
                     }
                 }
             );
@@ -1120,9 +1113,12 @@ async function loadProfileData() {
 
         if (!response.ok) {
 
+            const errorText =
+                await response.text();
+
             console.log(
-                "Profilni olish xatosi:",
-                await response.text()
+                "Profil olish xatosi:",
+                errorText
             );
 
             return null;
@@ -1134,9 +1130,7 @@ async function loadProfileData() {
 
 
         if (data.length > 0) {
-
             return data[0];
-
         }
 
 
@@ -1145,7 +1139,7 @@ async function loadProfileData() {
     } catch (error) {
 
         console.log(
-            "Profil xatosi:",
+            "Profil olish xatosi:",
             error
         );
 
@@ -1153,6 +1147,10 @@ async function loadProfileData() {
     }
 }
 
+
+// ===============================
+// PROFIL OYNASINI OCHISH
+// ===============================
 
 profileButton.addEventListener(
     "click",
@@ -1249,11 +1247,9 @@ profileButton.addEventListener(
                 margin-top:30px;
             ">
 
-
                 <label>
                     Ism
                 </label>
-
 
                 <input
                     id="profileName"
@@ -1278,7 +1274,6 @@ profileButton.addEventListener(
                     Username
                 </label>
 
-
                 <input
                     id="profileUsername"
                     type="text"
@@ -1301,7 +1296,6 @@ profileButton.addEventListener(
                 <label>
                     Bio
                 </label>
-
 
                 <textarea
                     id="profileBio"
@@ -1381,7 +1375,7 @@ profileButton.addEventListener(
 
 
         // ===============================
-        // BAZADAN PROFILNI YUKLASH
+        // BAZADAN MA'LUMOTLARNI YUKLASH
         // ===============================
 
         const profile =
@@ -1471,16 +1465,12 @@ profileButton.addEventListener(
                     reader.onload =
                         function (event) {
 
-                            const image =
-                                event.target.result;
-
-
                             document.getElementById(
                                 "profileImage"
                             ).innerHTML = `
 
                                 <img
-                                    src="${image}"
+                                    src="${event.target.result}"
                                     style="
                                         width:100%;
                                         height:100%;
@@ -1502,7 +1492,7 @@ profileButton.addEventListener(
 
 
         // ===============================
-        // PROFILNI BAZAGA SAQLASH
+        // SAQLASH
         // ===============================
 
         document
@@ -1520,7 +1510,7 @@ profileButton.addEventListener(
                     if (!telegramId) {
 
                         alert(
-                            "Telegram foydalanuvchi ID topilmadi ❌"
+                            "Telegram ID topilmadi ❌"
                         );
 
                         return;
@@ -1554,7 +1544,6 @@ profileButton.addEventListener(
                             .trim();
 
 
-                    // @ belgisi bo'lmasa qo'shamiz
                     if (
                         username &&
                         !username.startsWith("@")
@@ -1576,20 +1565,24 @@ profileButton.addEventListener(
                     saveButton.disabled =
                         true;
 
-
                     saveButton.innerText =
                         "Saqlanmoqda...";
 
 
                     try {
 
-                        const response =
+                        // Avval profil bor-yo'qligini tekshiramiz
+
+                        const checkResponse =
                             await fetch(
                                 SUPABASE_URL +
-                                "/rest/v1/profiles?on_conflict=telegram_id",
+                                "/rest/v1/profiles" +
+                                "?telegram_id=eq." +
+                                encodeURIComponent(
+                                    telegramId
+                                ) +
+                                "&select=id",
                                 {
-                                    method: "POST",
-
                                     headers: {
 
                                         "apikey":
@@ -1597,57 +1590,164 @@ profileButton.addEventListener(
 
                                         "Authorization":
                                             "Bearer " +
-                                            SUPABASE_KEY,
+                                            SUPABASE_KEY
 
-                                        "Content-Type":
-                                            "application/json",
-
-                                        "Prefer":
-                                            "resolution=merge-duplicates"
-
-                                    },
-
-                                    body:
-                                        JSON.stringify({
-
-                                            telegram_id:
-                                                telegramId,
-
-                                            username:
-                                                username,
-
-                                            display_name:
-                                                name,
-
-                                            bio:
-                                                bio
-
-                                        })
-
+                                    }
                                 }
                             );
 
 
-                        if (!response.ok) {
+                        if (
+                            !checkResponse.ok
+                        ) {
 
-                            console.log(
-                                "Profil saqlash xatosi:",
-                                await response.text()
+                            const errorText =
+                                await checkResponse.text();
+
+                            alert(
+                                "Bazani tekshirishda xato:\n\n" +
+                                errorText
                             );
 
+                            return;
+                        }
 
-                const errorText = await response.text();
 
-alert(
-    "XATO:\n" + errorText
-);
+                        const existing =
+                            await checkResponse.json();
+
+
+                        let response;
+
+
+                        // ===============================
+                        // MAVJUD PROFILNI YANGILASH
+                        // ===============================
+
+                        if (
+                            existing.length > 0
+                        ) {
+
+                            const profileId =
+                                existing[0].id;
+
+
+                            response =
+                                await fetch(
+                                    SUPABASE_URL +
+                                    "/rest/v1/profiles?id=eq." +
+                                    encodeURIComponent(
+                                        profileId
+                                    ),
+                                    {
+                                        method:
+                                            "PATCH",
+
+                                        headers: {
+
+                                            "apikey":
+                                                SUPABASE_KEY,
+
+                                            "Authorization":
+                                                "Bearer " +
+                                                SUPABASE_KEY,
+
+                                            "Content-Type":
+                                                "application/json",
+
+                                            "Prefer":
+                                                "return=minimal"
+
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+
+                                                username:
+                                                    username,
+
+                                                display_name:
+                                                    name,
+
+                                                bio:
+                                                    bio
+
+                                            })
+
+                                    }
+                                );
+
+
+                        } else {
+
+                            // ===============================
+                            // YANGI PROFIL YARATISH
+                            // ===============================
+
+                            response =
+                                await fetch(
+                                    SUPABASE_URL +
+                                    "/rest/v1/profiles",
+                                    {
+                                        method:
+                                            "POST",
+
+                                        headers: {
+
+                                            "apikey":
+                                                SUPABASE_KEY,
+
+                                            "Authorization":
+                                                "Bearer " +
+                                                SUPABASE_KEY,
+
+                                            "Content-Type":
+                                                "application/json",
+
+                                            "Prefer":
+                                                "return=minimal"
+
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+
+                                                telegram_id:
+                                                    telegramId,
+
+                                                username:
+                                                    username,
+
+                                                display_name:
+                                                    name,
+
+                                                bio:
+                                                    bio
+
+                                            })
+
+                                    }
+                                );
+
+                        }
+
+
+                        if (!response.ok) {
+
+                            const errorText =
+                                await response.text();
+
+                            alert(
+                                "Supabase xatosi:\n\n" +
+                                errorText
+                            );
 
                             return;
                         }
 
 
                         alert(
-                            "Profil ma'lumotlari saqlandi ✅"
+                            "Profil saqlandi ✅"
                         );
 
 
@@ -1656,16 +1756,10 @@ alert(
 
                     } catch (error) {
 
-                        console.log(
-                            "Xato:",
-                            error
-                        );
-
-
                         alert(
-    "XATO: " + error.message
-);
-                        
+                            "Xato:\n\n" +
+                            error.message
+                        );
 
                     } finally {
 
@@ -1699,5 +1793,4 @@ alert(
             );
 
     }
-);
-alert("YANGI KOD ISHLAYAPTI");
+);                     
