@@ -1062,3 +1062,14 @@ picker.addEventListener(
 
 
 loadVideos();
+const profileButton =
+    document.getElementById("profileButton");
+
+profileButton.addEventListener(
+    "click",
+    function() {
+
+        alert("👤 Profil oynasi");
+
+    }
+);
