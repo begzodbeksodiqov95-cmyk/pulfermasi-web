@@ -41,7 +41,7 @@ async function loadVideos() {
 
         const response = await fetch(
             SUPABASE_URL +
-            "/rest/v1/videos?select=videos_url&order=timestamp.desc",
+            "/rest/v1/videos?select=videos_url"
             {
                 headers: {
                     "apikey": SUPABASE_KEY,
