@@ -35,8 +35,7 @@ if (!profileId) {
     } else {
 
         profileId =
-            "user_" +
-            Date.now();
+            "user_" + Date.now();
 
     }
 
@@ -52,9 +51,7 @@ if (!profileId) {
 // ===============================
 
 function getVideos() {
-
     return document.querySelectorAll(".video");
-
 }
 
 
@@ -65,16 +62,13 @@ function addVideoToFeed(item) {
 
     box.className = "video";
 
-
     const likes =
         item.likes === null ||
         item.likes === undefined
             ? 0
             : item.likes;
 
-
     box.innerHTML = `
-
         <video
             src="${item.videos_url}"
             controls
@@ -114,20 +108,13 @@ function addVideoToFeed(item) {
         </div>
     `;
 
-
-    box.dataset.id =
-        item.id;
+    box.dataset.id = item.id;
 
 
-    // ===============================
     // LIKE
-    // ===============================
 
     const likeButton =
-        box.querySelector(
-            ".like-button"
-        );
-
+        box.querySelector(".like-button");
 
     likeButton.addEventListener(
         "click",
@@ -135,69 +122,69 @@ function addVideoToFeed(item) {
 
             event.stopPropagation();
 
-
             const videoId =
                 box.dataset.id;
 
-
             const countElement =
-                likeButton.querySelector(
-                    "span"
-                );
-
+                likeButton.querySelector("span");
 
             let currentLikes =
                 Number(
                     countElement.innerText
                 );
 
-
             currentLikes++;
-
 
             countElement.innerText =
                 currentLikes;
 
+            try {
 
-            const response =
-                await fetch(
-                    SUPABASE_URL +
-                    "/rest/v1/videos?id=eq." +
-                    videoId,
-                    {
+                const response =
+                    await fetch(
+                        SUPABASE_URL +
+                        "/rest/v1/videos?id=eq." +
+                        videoId,
+                        {
+                            method: "PATCH",
 
-                        method: "PATCH",
+                            headers: {
+                                "apikey":
+                                    SUPABASE_KEY,
 
-                        headers: {
+                                "Authorization":
+                                    "Bearer " +
+                                    SUPABASE_KEY,
 
-                            "apikey":
-                                SUPABASE_KEY,
+                                "Content-Type":
+                                    "application/json",
 
-                            "Authorization":
-                                "Bearer " +
-                                SUPABASE_KEY,
+                                "Prefer":
+                                    "return=minimal"
+                            },
 
-                            "Content-Type":
-                                "application/json",
+                            body:
+                                JSON.stringify({
+                                    likes:
+                                        currentLikes
+                                })
+                        }
+                    );
 
-                            "Prefer":
-                                "return=minimal"
+                if (!response.ok) {
 
-                        },
+                    currentLikes--;
 
-                        body:
-                            JSON.stringify({
+                    countElement.innerText =
+                        currentLikes;
 
-                                likes:
-                                    currentLikes
+                    console.log(
+                        "Like xatosi:",
+                        await response.text()
+                    );
+                }
 
-                            })
-
-                    }
-                );
-
-
-            if (!response.ok) {
+            } catch (error) {
 
                 currentLikes--;
 
@@ -206,24 +193,18 @@ function addVideoToFeed(item) {
 
                 console.log(
                     "Like xatosi:",
-                    await response.text()
+                    error
                 );
-
             }
 
         }
     );
 
 
-    // ===============================
     // COMMENT
-    // ===============================
 
     const commentButton =
-        box.querySelector(
-            ".comment-button"
-        );
-
+        box.querySelector(".comment-button");
 
     commentButton.addEventListener(
         "click",
@@ -240,15 +221,10 @@ function addVideoToFeed(item) {
     );
 
 
-    // ===============================
     // SHARE
-    // ===============================
 
     const shareButton =
-        box.querySelector(
-            ".share-button"
-        );
-
+        box.querySelector(".share-button");
 
     shareButton.addEventListener(
         "click",
@@ -256,28 +232,20 @@ function addVideoToFeed(item) {
 
             event.stopPropagation();
 
-
             const video =
-                box.querySelector(
-                    "video"
-                );
-
+                box.querySelector("video");
 
             const videoURL =
                 video.src;
 
-
             const shareURL =
                 "https://t.me/share/url" +
                 "?url=" +
-                encodeURIComponent(
-                    videoURL
-                ) +
+                encodeURIComponent(videoURL) +
                 "&text=" +
                 encodeURIComponent(
                     "🎬 Pul Fermasi videosi"
                 );
-
 
             window.open(
                 shareURL,
@@ -289,7 +257,6 @@ function addVideoToFeed(item) {
 
 
     feed.appendChild(box);
-
 }
 
 
@@ -306,21 +273,16 @@ async function loadVideos() {
                 SUPABASE_URL +
                 "/rest/v1/videos?select=id,videos_url,likes",
                 {
-
                     headers: {
-
                         "apikey":
                             SUPABASE_KEY,
 
                         "Authorization":
                             "Bearer " +
                             SUPABASE_KEY
-
                     }
-
                 }
             );
-
 
         if (!response.ok) {
 
@@ -330,30 +292,22 @@ async function loadVideos() {
             );
 
             return;
-
         }
-
 
         const data =
             await response.json();
 
-
         data.forEach(
             function(item) {
 
-                if (
-                    item.videos_url
-                ) {
+                if (item.videos_url) {
 
-                    addVideoToFeed(
-                        item
-                    );
+                    addVideoToFeed(item);
 
                 }
 
             }
         );
-
 
         if (
             getVideos().length > 0
@@ -371,7 +325,6 @@ async function loadVideos() {
         );
 
     }
-
 }
 
 
@@ -389,58 +342,30 @@ function openComments(
             "commentsModal"
         );
 
-
     if (oldModal) {
-
         oldModal.remove();
-
     }
-
 
     const modal =
         document.createElement("div");
 
-
     modal.id =
         "commentsModal";
 
-
-    modal.style.position =
-        "fixed";
-
-    modal.style.left =
-        "0";
-
-    modal.style.right =
-        "0";
-
-    modal.style.bottom =
-        "0";
-
-    modal.style.height =
-        "70%";
-
-    modal.style.background =
-        "#111";
-
-    modal.style.color =
-        "#fff";
-
-    modal.style.zIndex =
-        "99999";
-
+    modal.style.position = "fixed";
+    modal.style.left = "0";
+    modal.style.right = "0";
+    modal.style.bottom = "0";
+    modal.style.height = "70%";
+    modal.style.background = "#111";
+    modal.style.color = "#fff";
+    modal.style.zIndex = "99999";
     modal.style.borderRadius =
         "20px 20px 0 0";
-
-    modal.style.padding =
-        "15px";
-
-    modal.style.boxSizing =
-        "border-box";
-
+    modal.style.padding = "15px";
+    modal.style.boxSizing = "border-box";
 
     modal.innerHTML = `
-
         <div style="
             text-align:center;
             font-size:20px;
@@ -458,15 +383,12 @@ function openComments(
             border:0;
             color:white;
             font-size:25px;
-        ">
-            ×
-        </button>
+        ">×</button>
 
         <div id="commentsList" style="
             height:calc(100% - 110px);
             overflow-y:auto;
         ">
-
             <div id="noComments"
                 style="
                     text-align:center;
@@ -475,7 +397,6 @@ function openComments(
                 ">
                 Hali komment yo‘q.
             </div>
-
         </div>
 
         <div style="
@@ -515,23 +436,17 @@ function openComments(
         </div>
     `;
 
-
-    document.body.appendChild(
-        modal
-    );
-
+    document.body.appendChild(modal);
 
     const list =
         document.getElementById(
             "commentsList"
         );
 
-
     const input =
         document.getElementById(
             "commentInput"
         );
-
 
     const sendButton =
         document.getElementById(
@@ -546,19 +461,12 @@ function openComments(
                 "noComments"
             );
 
-
         if (noComments) {
-
             noComments.remove();
-
         }
 
-
         const comment =
-            document.createElement(
-                "div"
-            );
-
+            document.createElement("div");
 
         comment.style.padding =
             "12px 5px";
@@ -569,9 +477,7 @@ function openComments(
         comment.style.wordBreak =
             "break-word";
 
-
         comment.innerHTML = `
-
             <div style="
                 font-weight:bold;
                 margin-bottom:5px;
@@ -580,22 +486,15 @@ function openComments(
             </div>
 
             <div></div>
-
         `;
-
 
         comment
             .querySelector(
                 "div:last-child"
             )
-            .textContent =
-            text;
+            .textContent = text;
 
-
-        list.appendChild(
-            comment
-        );
-
+        list.appendChild(comment);
     }
 
 
@@ -611,21 +510,16 @@ function openComments(
                     "&video_id=eq." +
                     Number(videoId),
                     {
-
                         headers: {
-
                             "apikey":
                                 SUPABASE_KEY,
 
                             "Authorization":
                                 "Bearer " +
                                 SUPABASE_KEY
-
                         }
-
                     }
                 );
-
 
             if (!response.ok) {
 
@@ -635,17 +529,12 @@ function openComments(
                 );
 
                 return;
-
             }
-
 
             const comments =
                 await response.json();
 
-
-            if (
-                comments.length > 0
-            ) {
+            if (comments.length > 0) {
 
                 comments.forEach(
                     function(item) {
@@ -673,7 +562,6 @@ function openComments(
             );
 
         }
-
     }
 
 
@@ -683,21 +571,14 @@ function openComments(
             const text =
                 input.value.trim();
 
-
             if (!text) {
-
                 return;
-
             }
 
-
-            sendButton.disabled =
-                true;
-
+            sendButton.disabled = true;
 
             sendButton.innerText =
                 "Yuborilmoqda...";
-
 
             try {
 
@@ -706,441 +587,10 @@ function openComments(
                         SUPABASE_URL +
                         "/rest/v1/comments",
                         {
-
                             method: "POST",
 
                             headers: {
-
                                 "apikey":
                                     SUPABASE_KEY,
 
-                                "Authorization":
-                                    "Bearer " +
-                                    SUPABASE_KEY,
-
-                                "Content-Type":
-                                    "application/json",
-
-                                "Prefer":
-                                    "return=minimal"
-
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    video_id:
-                                        Number(
-                                            videoId
-                                        ),
-
-                                    comment_text:
-                                        text
-
-                                })
-
-                        }
-                    );
-
-
-                if (!response.ok) {
-
-                    console.log(
-                        "Komment xatosi:",
-                        await response.text()
-                    );
-
-                    alert(
-                        "Komment yuborilmadi ❌"
-                    );
-
-                    return;
-
-                }
-
-
-                addComment(text);
-
-                input.value = "";
-
-
-                list.scrollTop =
-                    list.scrollHeight;
-
-
-                const countElement =
-                    commentButton.querySelector(
-                        "span"
-                    );
-
-
-                if (countElement) {
-
-                    let count =
-                        Number(
-                            countElement.innerText
-                        ) || 0;
-
-
-                    count++;
-
-
-                    countElement.innerText =
-                        count;
-
-                }
-
-            } catch (error) {
-
-                console.log(
-                    "Xato:",
-                    error
-                );
-
-                alert(
-                    "Internet xatosi ❌"
-                );
-
-            } finally {
-
-                sendButton.disabled =
-                    false;
-
-                sendButton.innerText =
-                    "Yuborish";
-
-            }
-
-        };
-
-
-    input.addEventListener(
-        "keydown",
-        function(event) {
-
-            if (
-                event.key === "Enter"
-            ) {
-
-                sendButton.click();
-
-            }
-
-        }
-    );
-
-
-    document
-        .getElementById(
-            "closeComments"
-        )
-        .onclick =
-        function() {
-
-            modal.remove();
-
-        };
-
-
-    loadComments();
-
-}
-
-
-// ===============================
-// REELS ALMASHTIRISH
-// ===============================
-
-function showVideo(index) {
-
-    const videos =
-        getVideos();
-
-
-    if (
-        index < 0 ||
-        index >= videos.length
-    ) {
-
-        return;
-
-    }
-
-
-    videos.forEach(
-        function(box) {
-
-            box.classList.remove(
-                "active"
-            );
-
-
-            const video =
-                box.querySelector(
-                    "video"
-                );
-
-
-            if (video) {
-
-                video.pause();
-
-            }
-
-        }
-    );
-
-
-    current =
-        index;
-
-
-    const box =
-        videos[current];
-
-
-    box.classList.add(
-        "active"
-    );
-
-
-    const video =
-        box.querySelector(
-            "video"
-        );
-
-
-    if (video) {
-
-        video.currentTime =
-            0;
-
-    }
-
-}
-
-
-// ===============================
-// TELEFONDA SWIPE
-// ===============================
-
-document.addEventListener(
-    "touchstart",
-    function(event) {
-
-        startY =
-            event.touches[0].clientY;
-
-    }
-);
-
-
-document.addEventListener(
-    "touchend",
-    function(event) {
-
-        const endY =
-            event.changedTouches[0].clientY;
-
-
-        const distance =
-            startY - endY;
-
-
-        if (
-            Math.abs(distance) < 60
-        ) {
-
-            return;
-
-        }
-
-
-        if (distance > 0) {
-
-            showVideo(
-                current + 1
-            );
-
-        } else {
-
-            showVideo(
-                current - 1
-            );
-
-        }
-
-    }
-);
-
-
-// ===============================
-// VIDEO YUKLASH
-// ===============================
-
-picker.addEventListener(
-    "change",
-    function() {
-
-        const file =
-            picker.files[0];
-
-
-        if (!file) {
-
-            return;
-
-        }
-
-
-        if (
-            !file.type.startsWith(
-                "video/"
-            )
-        ) {
-
-            alert(
-                "Faqat video tanlang!"
-            );
-
-            picker.value = "";
-
-            return;
-
-        }
-
-
-        const fileName =
-            Date.now() +
-            "_" +
-            Math.random()
-                .toString(36)
-                .substring(2) +
-            "_" +
-            file.name.replace(
-                /[^a-zA-Z0-9._-]/g,
-                "_"
-            );
-
-
-        const uploadURL =
-            SUPABASE_URL +
-            "/storage/v1/object/Videos/" +
-            fileName;
-
-
-        const progress =
-            document.createElement(
-                "div"
-            );
-
-
-        progress.style.position =
-            "fixed";
-
-        progress.style.top =
-            "50%";
-
-        progress.style.left =
-            "50%";
-
-        progress.style.transform =
-            "translate(-50%, -50%)";
-
-        progress.style.background =
-            "#111";
-
-        progress.style.color =
-            "#fff";
-
-        progress.style.padding =
-            "20px 30px";
-
-        progress.style.borderRadius =
-            "15px";
-
-        progress.style.zIndex =
-            "99999";
-
-
-        progress.innerText =
-            "Yuklanmoqda: 0%";
-
-
-        document.body.appendChild(
-            progress
-        );
-
-
-        const xhr =
-            new XMLHttpRequest();
-
-
-        xhr.open(
-            "POST",
-            uploadURL,
-            true
-        );
-
-
-        xhr.setRequestHeader(
-            "Authorization",
-            "Bearer " +
-            SUPABASE_KEY
-        );
-
-
-        xhr.setRequestHeader(
-            "apikey",
-            SUPABASE_KEY
-        );
-
-
-        xhr.setRequestHeader(
-            "Content-Type",
-            file.type
-        );
-
-
-        xhr.setRequestHeader(
-            "x-upsert",
-            "false"
-        );
-
-
-        xhr.upload.onprogress =
-            function(event) {
-
-                if (
-                    event.lengthComputable
-                ) {
-
-                    const percent =
-                        Math.round(
-                            event.loaded /
-                            event.total *
-                            100
-                        );
-
-
-                    progress.innerText =
-                        "Yuklanmoqda: " +
-                        percent +
-                        "%";
-
-                }
-
-            };
-
-
-        xhr.onload =
-            async function() {
-
-                if (
-                    xhr.status >= 200 &&
-                    xhr.status < 300
-                ) {
-
-                    const publicURL =
-                        SUPABASE_URL +
-                        "/storage/v1/object/public/Videos/"
+                                "Authorization
