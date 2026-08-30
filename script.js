@@ -5,512 +5,839 @@ const feed = document.getElementById("feed");
 const picker = document.getElementById("videoPicker");
 
 const SUPABASE_URL =
-    "https://bbgruqvwkygjwqdocnsb.supabase.co";
+"https://bbgruqvwkygjwqdocnsb.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat";
-
+"sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat";
 
 function getVideos() {
-    return document.querySelectorAll(".video");
+return document.querySelectorAll(".video");
 }
 
+function addVideoToFeed(item) {
 
-function addVideoToFeed(videoURL) {
+const box = document.createElement("div");  
 
-    const box = document.createElement("div");
+box.className = "video";  
 
-    box.className = "video";
+const likes =  
+    item.likes === null ||  
+    item.likes === undefined  
+        ? 0  
+        : item.likes;  
 
-    box.innerHTML = 
-        <video
-            src="${videoURL}"
-            controls
-            playsinline
-            preload="metadata">
-        </video>
-    ;
+box.innerHTML = `  
+    <video  
+        src="${item.videos_url}"  
+        controls  
+        playsinline  
+        preload="metadata">  
+    </video>  
 
-    feed.appendChild(box);
+    <div class="info">  
+        <div class="username">@video_uz</div>  
+        <div class="caption">🎬 Video</div>  
+    </div>  
+
+    <div class="actions">  
+
+        <div class="action like-button">  
+            ❤️  
+            <span>${likes}</span>  
+        </div>  
+
+        <div class="action comment-button">  
+💬  
+<span>0</span>
+
+</div>  <div class="action">  
+            ↗️  
+            <span>Ulashish</span>  
+        </div>  
+
+    </div>  
+`;  
+
+box.dataset.id = item.id;  
+
+
+const likeButton =  
+    box.querySelector(".like-button");  
+
+
+likeButton.addEventListener(  
+    "click",  
+    async function(event) {  
+
+        event.stopPropagation();  
+
+        const videoId =  
+            box.dataset.id;  
+
+        const countElement =  
+            likeButton.querySelector("span");  
+
+        let currentLikes =  
+            Number(  
+                countElement.innerText  
+            );  
+
+        currentLikes++;  
+
+        countElement.innerText =  
+            currentLikes;  
+
+
+        const response =  
+            await fetch(  
+                SUPABASE_URL +  
+                "/rest/v1/videos?id=eq." +  
+                videoId,  
+                {  
+                    method: "PATCH",  
+
+                    headers: {  
+                        "apikey":  
+                            SUPABASE_KEY,  
+
+                        "Authorization":  
+                            "Bearer " +  
+                            SUPABASE_KEY,  
+
+                        "Content-Type":  
+                            "application/json",  
+
+                        "Prefer":  
+                            "return=minimal"  
+                    },  
+
+                    body:  
+                        JSON.stringify({  
+                            likes:  
+                                currentLikes  
+                        })  
+                }  
+            );  
+
+
+        if (!response.ok) {  
+
+            currentLikes--;  
+
+            countElement.innerText =  
+                currentLikes;  
+
+            console.log(  
+                "Like xatosi:",  
+                await response.text()  
+            );  
+
+        }  
+
+    }  
+);
+
+const commentButton =
+box.querySelector(".comment-button");
+
+commentButton.addEventListener(
+"click",
+function(event) {
+
+event.stopPropagation();  
+
+    openComments(  
+box.dataset.id,  
+commentButton
+
+);
+
 }
 
+);
+feed.appendChild(box);
+}
 
 async function loadVideos() {
 
-    try {
+try {  
 
-        const response = await fetch(
-            SUPABASE_URL +
-            "/rest/v1/videos?select=videos_url",
-            {
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization":
-                        "Bearer " + SUPABASE_KEY
-                }
-            }
-        );
+    const response =  
+        await fetch(  
+            SUPABASE_URL +  
+            "/rest/v1/videos?select=id,videos_url,likes",  
+            {  
+                headers: {  
+                    "apikey":  
+                        SUPABASE_KEY,  
 
-
-        if (!response.ok) {
-
-            alert(
-                "Database xatosi: " +
-                response.status
-            );
-
-            return;
-        }
+                    "Authorization":  
+                        "Bearer " +  
+                        SUPABASE_KEY  
+                }  
+            }  
+        );  
 
 
-        const data =
-            await response.json();
+    if (!response.ok) {  
+
+        alert(  
+            "Database xatosi: " +  
+            response.status  
+        );  
+
+        return;  
+    }  
 
 
-        data.forEach(function(item) {
-
-            if (item.videos_url) {
-
-                addVideoToFeed(
-                    item.videos_url
-                );
-
-            }
-
-        });
+    const data =  
+        await response.json();  
 
 
-        if (getVideos().length > 0) {
+    data.forEach(  
+        function(item) {  
 
-            showVideo(0);
+            if (  
+                item.videos_url  
+            ) {  
 
-        }
+                addVideoToFeed(  
+                    item  
+                );  
 
-    } catch (error) {
+            }  
 
-        console.log(
-            "Xato:",
-            error
-        );
+        }  
+    );  
 
-    }
+
+    if (  
+        getVideos().length > 0  
+    ) {  
+
+        showVideo(0);  
+
+    }  
+
+} catch (error) {  
+
+    console.log(  
+        "Xato:",  
+        error  
+    );  
+
 }
 
+}
+
+function openComments(videoId, commentButton) {
+
+const modal = document.createElement("div");  
+
+modal.style.position = "fixed";  
+modal.style.left = "0";  
+modal.style.right = "0";  
+modal.style.bottom = "0";  
+modal.style.height = "70%";  
+modal.style.background = "#111";  
+modal.style.color = "#fff";  
+modal.style.zIndex = "99999";  
+modal.style.borderRadius = "20px 20px 0 0";  
+modal.style.padding = "15px";  
+modal.style.boxSizing = "border-box";  
+
+modal.innerHTML = `  
+    <div style="  
+        text-align:center;  
+        font-size:20px;  
+        font-weight:bold;  
+        margin-bottom:15px;  
+    ">  
+        💬 Kommentlar  
+    </div>  
+
+    <button id="closeComments" style="  
+        position:absolute;  
+        right:15px;  
+        top:10px;  
+        background:none;  
+        border:0;  
+        color:white;  
+        font-size:25px;  
+    ">×</button>  
+
+    <div id="commentsList" style="  
+        height:calc(100% - 110px);  
+        overflow-y:auto;  
+    ">  
+        Hali komment yo‘q.  
+    </div>  
+
+    <div style="  
+        position:absolute;  
+        bottom:10px;  
+        left:10px;  
+        right:10px;  
+        display:flex;  
+        gap:8px;  
+    ">  
+        <input id="commentInput"  
+            placeholder="Komment yozing..."  
+            style="  
+                flex:1;  
+                padding:12px;  
+                border-radius:20px;  
+                border:1px solid #555;  
+                background:#222;  
+                color:white;  
+            ">  
+
+        <button id="sendComment" style="  
+            padding:10px 16px;  
+            border:0;  
+            border-radius:20px;  
+        ">  
+            Yuborish  
+        </button>  
+    </div>  
+`;  
+
+document.body.appendChild(modal);  
+
+
+document  
+    .getElementById("closeComments")  
+    .onclick = function() {  
+        modal.remove();  
+    };  
+
+
+document  
+    .getElementById("sendComment")  
+    .onclick = async function() {  
+
+        const input =  
+            document.getElementById("commentInput");  
+
+        const text =  
+            input.value.trim();  
+
+        if (!text) {  
+            return;  
+        }  
+
+        const button =  
+            document.getElementById("sendComment");  
+
+        button.disabled = true;  
+        button.innerText = "...";  
+
+
+        const response = await fetch(  
+            SUPABASE_URL +  
+            "/rest/v1/comments",  
+            {  
+                method: "POST",  
+
+                headers: {  
+                    "apikey": SUPABASE_KEY,  
+                    "Authorization":  
+                        "Bearer " + SUPABASE_KEY,  
+                    "Content-Type":  
+                        "application/json",  
+                    "Prefer":  
+                        "return=minimal"  
+                },  
+
+                body: JSON.stringify({  
+                    video_id:  
+                        Number(videoId),  
+
+                    comment_text:  
+                        text  
+                })  
+            }  
+        );  
+
+
+        if (!response.ok) {  
+
+            alert(  
+                "Komment yuborilmadi ❌"  
+            );  
+
+            console.log(  
+                await response.text()  
+            );  
+
+        } else {  
+
+            input.value = "";  
+
+            const list =  
+                document.getElementById(  
+                    "commentsList"  
+                );  
+
+            const comment =  
+                document.createElement("div");  
+
+            comment.style.padding = "10px";  
+            comment.style.borderBottom =  
+                "1px solid #333";  
+
+            comment.innerText =  
+                "👤 Foydalanuvchi: " +  
+                text;  
+
+            list.appendChild(comment);  
+
+        }  
+
+
+        button.disabled = false;  
+        button.innerText = "Yuborish";  
+    };  
+                    }
 
 function showVideo(index) {
 
-    const videos =
-        getVideos();
+const videos =  
+    getVideos();  
 
 
-    if (
-        index < 0 ||
-        index >= videos.length
-    ) {
-        return;
-    }
+if (  
+    index < 0 ||  
+    index >= videos.length  
+) {  
+
+    return;  
+
+}  
 
 
-    videos.forEach(function(box) {
+videos.forEach(  
+    function(box) {  
 
-        box.classList.remove(
-            "active"
-        );
-
-
-        const video =
-            box.querySelector("video");
+        box.classList.remove(  
+            "active"  
+        );  
 
 
-        if (video) {
-
-            video.pause();
-
-        }
-
-    });
+        const video =  
+            box.querySelector(  
+                "video"  
+            );  
 
 
-    current = index;
+        if (video) {  
+
+            video.pause();  
+
+        }  
+
+    }  
+);  
 
 
-    const box =
-        videos[current];
+current = index;  
 
 
-    box.classList.add("active");
+const box =  
+    videos[current];  
 
 
-    const video =
-        box.querySelector("video");
+box.classList.add(  
+    "active"  
+);  
 
 
-    if (video) {
+const video =  
+    box.querySelector(  
+        "video"  
+    );  
 
-        video.currentTime = 0;
 
-    }
+if (video) {  
+
+    video.currentTime = 0;  
 
 }
 
+}
 
 document.addEventListener(
-    "touchstart",
-    function(event) {
+"touchstart",
+function(event) {
 
-        startY =
-            event.touches[0].clientY;
+startY =  
+        event.touches[0].clientY;  
 
-    }
+}
+
 );
-
 
 document.addEventListener(
-    "touchend",
-    function(event) {
+"touchend",
+function(event) {
 
-        const endY =
-            event.changedTouches[0].clientY;
-
-
-        const distance =
-            startY - endY;
+const endY =  
+        event.changedTouches[0].clientY;  
 
 
-        if (
-            Math.abs(distance) < 60
-        ) {
-            return;
-        }
+    const distance =  
+        startY - endY;  
 
 
-        if (distance > 0) {
+    if (  
+        Math.abs(distance) < 60  
+    ) {  
 
-            showVideo(
-                current + 1
-            );
+        return;  
 
-        } else {
+    }  
 
-            showVideo(
-                current - 1
-            );
 
-        }
+    if (distance > 0) {  
 
-    }
+        showVideo(  
+            current + 1  
+        );  
+
+    } else {  
+
+        showVideo(  
+            current - 1  
+        );  
+
+    }  
+
+}
+
 );
-
 
 picker.addEventListener(
-    "change",
-    function() {
+"change",
+function() {
 
-        const file =
-            picker.files[0];
+const file =  
+        picker.files[0];  
 
 
-        if (!file) {
-            return;
-        }
+    if (!file) {  
 
+        return;  
 
-        if (
-            !file.type.startsWith(
-                "video/"
-            )
-        ) {
+    }  
 
-            alert(
-                "Faqat video tanlang!"
-            );
 
-            picker.value = "";
+    if (  
+        !file.type.startsWith(  
+            "video/"  
+        )  
+    ) {  
 
-            return;
-        }
+        alert(  
+            "Faqat video tanlang!"  
+        );  
 
+        picker.value = "";  
 
-        const fileName =
-            Date.now() +
-            "_" +
-            Math.random()
-                .toString(36)
-                .substring(2) +
-            "_" +
-            file.name.replace(
-                /[^a-zA-Z0-9._-]/g,
-                "_"
-            );
+        return;  
 
+    }  
 
-        const uploadURL =
-            SUPABASE_URL +
-            "/storage/v1/object/Videos/" +
-            fileName;
 
+    const fileName =  
+        Date.now() +  
+        "_" +  
+        Math.random()  
+            .toString(36)  
+            .substring(2) +  
+        "_" +  
+        file.name.replace(  
+            /[^a-zA-Z0-9._-]/g,  
+            "_"  
+        );  
 
-        const progress =
-            document.createElement(
-                "div"
-            );
 
+    const uploadURL =  
+        SUPABASE_URL +  
+        "/storage/v1/object/Videos/" +  
+        fileName;  
 
-        progress.style.position =
-            "fixed";
 
-        progress.style.top =
-            "50%";
+    const progress =  
+        document.createElement(  
+            "div"  
+        );  
 
-        progress.style.left =
-            "50%";
 
-        progress.style.transform =
-            "translate(-50%, -50%)";
+    progress.style.position =  
+        "fixed";  
 
-        progress.style.background =
-            "#111";
-        progress.style.color =
-            "#fff";
+    progress.style.top =  
+        "50%";  
 
-        progress.style.padding =
-            "20px 30px";
+    progress.style.left =  
+        "50%";  
 
-        progress.style.borderRadius =
-            "15px";
+    progress.style.transform =  
+        "translate(-50%, -50%)";  
 
-        progress.style.zIndex =
-            "99999";
+    progress.style.background =  
+        "#111";  
 
+    progress.style.color =  
+        "#fff";  
 
-        progress.innerText =
-            "Yuklanmoqda: 0%";
+    progress.style.padding =  
+        "20px 30px";  
 
+    progress.style.borderRadius =  
+        "15px";  
 
-        document.body.appendChild(
-            progress
-        );
+    progress.style.zIndex =  
+        "99999";  
 
 
-        const xhr =
-            new XMLHttpRequest();
+    progress.innerText =  
+        "Yuklanmoqda: 0%";  
 
 
-        xhr.open(
-            "POST",
-            uploadURL,
-            true
-        );
+    document.body.appendChild(  
+        progress  
+    );  
 
 
-        xhr.setRequestHeader(
-            "Authorization",
-            "Bearer " +
-            SUPABASE_KEY
-        );
+    const xhr =  
+        new XMLHttpRequest();  
 
 
-        xhr.setRequestHeader(
-            "apikey",
-            SUPABASE_KEY
-        );
+    xhr.open(  
+        "POST",  
+        uploadURL,  
+        true  
+    );  
 
 
-        xhr.setRequestHeader(
-            "Content-Type",
-            file.type
-        );
+    xhr.setRequestHeader(  
+        "Authorization",  
+        "Bearer " +  
+        SUPABASE_KEY  
+    );  
 
 
-        xhr.setRequestHeader(
-            "x-upsert",
-            "false"
-        );
+    xhr.setRequestHeader(  
+        "apikey",  
+        SUPABASE_KEY  
+    );  
 
 
-        xhr.upload.onprogress =
-            function(event) {
+    xhr.setRequestHeader(  
+        "Content-Type",  
+        file.type  
+    );  
 
-                if (
-                    event.lengthComputable
-                ) {
 
-                    const percent =
-                        Math.round(
-                            event.loaded /
-                            event.total *
-                            100
-                        );
+    xhr.setRequestHeader(  
+        "x-upsert",  
+        "false"  
+    );  
 
 
-                    progress.innerText =
-                        "Yuklanmoqda: " +
-                        percent +
-                        "%";
+    xhr.upload.onprogress =  
+        function(event) {  
 
-                }
+            if (  
+                event.lengthComputable  
+            ) {  
 
-            };
+                const percent =  
+                    Math.round(  
+                        event.loaded /  
+                        event.total *  
+                        100  
+                    );  
 
 
-        xhr.onload =
-            async function() {
+                progress.innerText =  
+                    "Yuklanmoqda: " +  
+                    percent +  
+                    "%";  
 
-                if (
-                    xhr.status >= 200 &&
-                    xhr.status < 300
-                ) {
+            }  
 
+        };  
 
-                    const publicURL =
-                        SUPABASE_URL +
-                        "/storage/v1/object/public/Videos/" +
-                        fileName;
 
+    xhr.onload =  
+        async function() {  
 
-                    progress.innerText =
-                        "Saqlanmoqda...";
+            if (  
+                xhr.status >= 200 &&  
+                xhr.status < 300  
+            ) {  
 
 
-                    const dbResponse =
-                        await fetch(
-                            SUPABASE_URL +
-                            "/rest/v1/videos",
-                            {
-                                method: "POST",
+                const publicURL =  
+                    SUPABASE_URL +  
+                    "/storage/v1/object/public/Videos/" +  
+                    fileName;  
 
-                                headers: {
 
-                                    "apikey":
-                                        SUPABASE_KEY,
+                progress.innerText =  
+                    "Saqlanmoqda...";  
 
-                                    "Authorization":
-                                        "Bearer " +
-                                        SUPABASE_KEY,
 
-                                    "Content-Type":
-                                        "application/json",
+                const dbResponse =  
+                    await fetch(  
+                        SUPABASE_URL +  
+                        "/rest/v1/videos",  
+                        {  
+                            method: "POST",  
 
-                                    "Prefer":
-                                        "return=minimal"
+                            headers: {  
 
-                                },
+                                "apikey":  
+                                    SUPABASE_KEY,  
 
-                                body:
-                                    JSON.stringify({
-                                        videos_url:
-                                            publicURL
-                                    })
+                                "Authorization":  
+                                    "Bearer " +  
+                                    SUPABASE_KEY,  
 
-                            }
-                        );
+                                "Content-Type":  
+                                    "application/json",  
 
+                                "Prefer":  
+                                    "return=minimal"  
 
-                    if (
-                        !dbResponse.ok
-                    ) {
+                            },  
 
-                        const error =
-                            await dbResponse.text();
+                            body:  
+                                JSON.stringify({  
+                                    videos_url:  
+                                        publicURL,  
 
+                                    likes:  
+                                        0  
 
-                        console.log(
-                            "DB ERROR:",
-                            dbResponse.status,
-                            error
-                        );
+                                })  
 
+                        }  
+                    );  
 
-                        progress.innerText =
-                            "Database xatosi: " +
-                            dbResponse.status;
 
+                if (  
+                    !dbResponse.ok  
+                ) {  
 
-                        setTimeout(
-                            function() {
+                    progress.innerText =  
+                        "Database xatosi: " +  
+                        dbResponse.status;  
 
-                                progress.remove();
 
-                            },
-                            4000
-                        );
+                    console.log(  
+                        await dbResponse.text()  
+                    );  
 
 
-                        return;
+                    setTimeout(  
+                        function() {  
 
-                    }
+                            progress.remove();  
 
+                        },  
+                        4000  
+                    );  
 
-                    progress.innerText =
-                        "Yuklandi! ✅";
 
+                    return;  
 
-                    addVideoToFeed(
-                        publicURL
-                    );
+                }  
 
 
-                    showVideo(
-                        getVideos().length - 1
-                    );
-                    setTimeout(
-                        function() {
+                progress.innerText =  
+                    "Yuklandi! ✅";  
 
-                            progress.remove();
 
-                        },
-                        1000
-                    );
+                addVideoToFeed({  
 
+                    id:  
+                        Date.now(),  
 
-                } else {
+                    videos_url:  
+                        publicURL,  
 
+                    likes:  
+                        0  
 
-                    progress.innerText =
-                        "Upload xatosi: " +
-                        xhr.status;
+                });  
 
 
-                    setTimeout(
-                        function() {
+                showVideo(  
+                    getVideos().length - 1  
+                );  
 
-                            progress.remove();
 
-                        },
-                        4000
-                    );
+                setTimeout(  
+                    function() {  
 
-                }
+                        progress.remove();  
 
-            };
+                    },  
+                    1000  
+                );  
 
 
-        xhr.onerror =
-            function() {
+            } else {  
 
-                progress.innerText =
-                    "Internet xatosi ❌";
 
+                progress.innerText =  
+                    "Upload xatosi: " +  
+                    xhr.status;  
 
-                setTimeout(
-                    function() {
 
-                        progress.remove();
+                setTimeout(  
+                    function() {  
 
-                    },
-                    3000
-                );
+                        progress.remove();  
 
-            };
+                    },  
+                    4000  
+                );  
 
+            }  
 
-        xhr.send(file);
+        };  
 
 
-        picker.value = "";
+    xhr.onerror =  
+        function() {  
 
-    }
+            progress.innerText =  
+                "Internet xatosi ❌";  
+
+
+            setTimeout(  
+                function() {  
+
+                    progress.remove();  
+
+                },  
+                3000  
+            );  
+
+        };  
+
+
+    xhr.send(file);  
+
+
+    picker.value = "";  
+
+}
+
 );
-
 
 loadVideos();
