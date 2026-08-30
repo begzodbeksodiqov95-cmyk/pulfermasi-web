@@ -52,14 +52,14 @@ async function loadVideos() {
         );
 
         if (!response.ok) {
-
-            console.log(
-                "Database xatosi:",
-                response.status,
-                await response.text()
-            );
-
-            return;
+    alert(
+        "Database xatosi: " +
+        response.status +
+        "\n" +
+        await response.text()
+    );
+    return;
+        }
         }
 
         const data = await response.json();
