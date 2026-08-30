@@ -1636,9 +1636,11 @@ profileButton.addEventListener(
                             );
 
 
-                            alert(
-                                "Profil saqlanmadi ❌"
-                            );
+                const errorText = await response.text();
+
+alert(
+    "XATO:\n" + errorText
+);
 
                             return;
                         }
