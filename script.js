@@ -156,66 +156,34 @@ commentButton.addEventListener(
 
     }
 );
-const shareButton =
+   const shareButton =
     box.querySelector(".share-button");
 
 shareButton.addEventListener(
     "click",
-    async function(event) {
+    function(event) {
 
         event.stopPropagation();
 
         const video =
             box.querySelector("video");
 
-        try {
+        const videoURL =
+            video.src;
 
-            const response =
-                await fetch(video.src);
-
-            const blob =
-                await response.blob();
-
-            const file =
-                new File(
-                    [blob],
-                    "PulFermasi-video.mp4",
-                    {
-                        type:
-                            blob.type ||
-                            "video/mp4"
-                    }
-                );
-
-            if (
-                navigator.canShare &&
-                navigator.canShare({
-                    files: [file]
-                })
-            ) {
-
-                await navigator.share({
-                    files: [file],
-                    title: "Pul Fermasi",
-                    text: "🎬 Pul Fermasi videosi"
-                });
-
-            } else {
-
-                alert(
-                    "Videoni fayl sifatida ulashish bu qurilmada ishlamaydi."
-                );
-
-            }
-
-        } catch (error) {
-
-            console.log(
-                "Ulashish xatosi:",
-                error
+        const shareURL =
+            "https://t.me/share/url" +
+            "?url=" +
+            encodeURIComponent(videoURL) +
+            "&text=" +
+            encodeURIComponent(
+                "🎬 Pul Fermasi videosi"
             );
 
-        }
+        window.open(
+            shareURL,
+            "_blank"
+        );
 
     }
 );
