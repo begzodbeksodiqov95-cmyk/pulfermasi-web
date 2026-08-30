@@ -5,7 +5,7 @@ const BUCKET = "Videos";
 const picker = document.getElementById("videoPicker");
 const feed = document.getElementById("feed");
 
-picker.addEventListener("change", function () {
+picker.addEventListener("change", async function () {
 
     const file = this.files[0];
 
@@ -13,13 +13,12 @@ picker.addEventListener("change", function () {
 
     if (!file.type.startsWith("video/")) {
         alert("Faqat video tanlang!");
+        picker.value = "";
         return;
     }
 
     // Yuklanmoqda oynasi
     const box = document.createElement("div");
-
-    box.id = "uploadBox";
 
     box.style.cssText = `
         position:fixed;
@@ -27,13 +26,14 @@ picker.addEventListener("change", function () {
         top:50%;
         transform:translate(-50%,-50%);
         z-index:99999;
-        background:#222;
+        background:rgba(20,20,20,.95);
         color:white;
         padding:25px 35px;
-        border-radius:15px;
+        border-radius:16px;
         text-align:center;
-        font-family:Arial;
+        font-family:Arial,sans-serif;
         min-width:220px;
+        box-shadow:0 5px 30px rgba(0,0,0,.5);
     `;
 
     box.innerHTML = `
@@ -42,34 +42,35 @@ picker.addEventListener("change", function () {
         </div>
 
         <div id="uploadPercent"
-             style="font-size:35px;font-weight:bold">
+             style="font-size:38px;font-weight:bold">
             0%
         </div>
     `;
 
     document.body.appendChild(box);
 
-    const percent =
-        document.getElementById("uploadPercent");
+    const percent = box.querySelector("#uploadPercent");
+
+    const extension =
+        file.name.includes(".")
+            ? file.name.substring(file.name.lastIndexOf("."))
+            : ".mp4";
 
     const fileName =
         Date.now() + "_" +
-        file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        Math.random().toString(36).substring(2, 8) +
+        extension;
 
-    const url =
-        SUPABASE_URL +
-        "/storage/v1/object/" +
-        BUCKET +
-        "/" +
-        encodeURIComponent(fileName);
+    const uploadUrl =
+        `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodeURIComponent(fileName)}`;
 
     const xhr = new XMLHttpRequest();
 
-    xhr.open("POST", url, true);
+    xhr.open("POST", uploadUrl, true);
 
     xhr.setRequestHeader(
         "Authorization",
-        "Bearer " + SUPABASE_KEY
+        `Bearer ${SUPABASE_KEY}`
     );
 
     xhr.setRequestHeader(
@@ -79,123 +80,155 @@ picker.addEventListener("change", function () {
 
     xhr.setRequestHeader(
         "Content-Type",
-        file.type
+        file.type || "video/mp4"
     );
 
-    xhr.upload.onprogress = function (event) {
+    xhr.setRequestHeader(
+        "x-upsert",
+        "false"
+    );
+
+    // FOIZ
+    xhr.upload.addEventListener("progress", function (event) {
 
         if (event.lengthComputable) {
 
-            const p =
+            const progress =
                 Math.round(
                     (event.loaded / event.total) * 100
                 );
 
-            percent.textContent = p + "%";
+            percent.textContent = progress + "%";
         }
-    };
+
+    });
 
     xhr.onload = function () {
 
-        console.log("STATUS:", xhr.status);
-        console.log("RESPONSE:", xhr.responseText);
+        console.log("Supabase status:", xhr.status);
+        console.log("Supabase response:", xhr.responseText);
 
         if (xhr.status >= 200 && xhr.status < 300) {
 
             percent.textContent = "100%";
 
-            setTimeout(function () {
-
-                box.innerHTML = `
-                    <div style="font-size:30px">
-                        ✅
-                    </div>
-
-                    <div style="font-size:18px;margin-top:8px">
-                        Yuklandi
-                    </div>
-                `;
-
-                setTimeout(function () {
-
-                    box.remove();
-
-                    showVideo(fileName);
-
-                }, 800);
-
-            }, 300);
-
-        } else {
-
             box.innerHTML = `
-                <div style="font-size:30px">
-                    ❌
+                <div style="font-size:32px">
+                    ✅
                 </div>
 
-                <div style="margin-top:8px">
-                    Yuklashda xato
-                </div>
-
-                <div style="font-size:12px;margin-top:10px">
-                    ${xhr.status}
+                <div style="font-size:18px;margin-top:8px">
+                    Yuklandi
                 </div>
             `;
 
-            console.log(
-                "Supabase xatosi:",
-                xhr.responseText
-            );
+            setTimeout(function () {
+
+                box.remove();
+
+                showVideo(fileName);
+
+            }, 800);
+
+        } else {
+
+            let message = "Yuklashda xato";
+
+            try {
+                const data = JSON.parse(xhr.responseText);
+
+                if (data.message) {
+                    message = data.message;
+                }
+
+                if (data.error) {
+                    message = data.error;
+                }
+
+            } catch (e) {}
+
+            box.innerHTML = `
+                <div style="font-size:32px">
+                    ❌
+                </div>
+
+                <div style="font-size:17px;margin-top:8px">
+                    ${message}
+                </div>
+
+                <div style="font-size:12px;margin-top:8px;opacity:.7">
+                    Xato kodi: ${xhr.status}
+                </div>
+            `;
+
         }
     };
 
     xhr.onerror = function () {
 
         box.innerHTML = `
-            <div style="font-size:30px">
+            <div style="font-size:32px">
                 ❌
             </div>
 
-            <div style="margin-top:8px">
-                Internet yoki server xatosi
+            <div style="font-size:17px;margin-top:8px">
+                Internet xatosi
             </div>
         `;
+
     };
 
+    xhr.ontimeout = function () {
+
+        box.innerHTML = `
+            <div style="font-size:32px">
+                ❌
+            </div>
+
+            <div style="font-size:17px;margin-top:8px">
+                Yuklash vaqti tugadi
+            </div>
+        `;
+
+    };
+
+    // Video yuklashni boshlash
     xhr.send(file);
 
     picker.value = "";
 });
 
 
+// Yuklangan videoni ekranga chiqarish
 function showVideo(fileName) {
 
-    const videoBox =
-        document.createElement("div");
+    // Oldingi aktiv videolarni o‘chirish
+    document
+        .querySelectorAll(".video.active")
+        .forEach(function (item) {
+            item.classList.remove("active");
+        });
+
+    const videoBox = document.createElement("div");
 
     videoBox.className = "video active";
 
-    const video =
-        document.createElement("video");
+    const video = document.createElement("video");
 
     video.src =
-        SUPABASE_URL +
-        "/storage/v1/object/public/" +
-        BUCKET +
-        "/" +
-        encodeURIComponent(fileName);
+        `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(fileName)}`;
 
-    video.controls = true;
     video.autoplay = true;
     video.loop = true;
     video.muted = true;
     video.playsInline = true;
+    video.controls = true;
 
     videoBox.appendChild(video);
 
     feed.appendChild(videoBox);
 
-    video.play().catch(function(error) {
-        console.log("Video play xatosi:", error);
+    video.play().catch(function (error) {
+        console.log("Video ishga tushmadi:", error);
     });
-}
+        }
