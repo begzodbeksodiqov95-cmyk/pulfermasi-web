@@ -50,11 +50,11 @@ box.innerHTML = `
 💬  
 <span>0</span>
 
-</div>  <div class="action">  
-            ↗️  
-            <span>Ulashish</span>  
-        </div>  
-
+</div>  
+<div class="action share-button">
+    ↗️
+    <span>Ulashish</span>
+</div>
     </div>  
 `;  
 
@@ -151,9 +151,29 @@ box.dataset.id,
 commentButton
 
 );
-
 }
+);
+const shareButton =
+    box.querySelector(".share-button");
 
+shareButton.addEventListener(
+    "click",
+    function(event) {
+
+        event.stopPropagation();
+
+        const videoURL =
+            item.videos_url;
+
+        const telegramShareURL =
+            "https://t.me/share/url?url=" +
+            encodeURIComponent(videoURL);
+
+        window.open(
+            telegramShareURL,
+            "_blank"
+        );
+    }
 );
 feed.appendChild(box);
 }
