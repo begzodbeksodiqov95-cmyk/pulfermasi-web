@@ -2,7 +2,6 @@ let current = 0;
 let startY = 0;
 
 const feed = document.getElementById("feed");
-const picker = document.getElementById("videoPicker");
 
 const SUPABASE_URL =
 "https://bbgruqvwkygjwqdocnsb.supabase.co";
@@ -10,13 +9,14 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 "sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat";
 
+
 async function getVideos() {
 
     try {
 
         const response = await fetch(
             SUPABASE_URL +
-            "/rest/v1/videos?select=*",
+            "/rest/v1/videos?select=id,videos_url,likes&order=id.desc",
             {
                 headers: {
                     "apikey": SUPABASE_KEY,
@@ -27,97 +27,133 @@ async function getVideos() {
         );
 
         if (!response.ok) {
-            throw new Error("Video olishda xato");
+            throw new Error(
+                "Supabase xato: " + response.status
+            );
         }
 
         const videos = await response.json();
 
         feed.innerHTML = "";
 
-        if (videos.length === 0) {
+        if (!videos.length) {
+            feed.innerHTML = `
+                <div style="
+                    color:white;
+                    text-align:center;
+                    padding-top:50%;
+                    font-size:18px;
+                ">
+                    Video topilmadi
+                </div>
+            `;
             return;
         }
 
+
         videos.forEach((item, index) => {
 
-            const div = document.createElement("div");
+            const div =
+                document.createElement("div");
 
             div.className =
                 "video" +
                 (index === 0 ? " active" : "");
 
+
             div.innerHTML = `
+
                 <video
-                    src="${item.video_url}"
+                    src="${item.videos_url}"
                     loop
                     playsinline
+                    preload="auto"
                     ${index === 0 ? "autoplay" : ""}
                 ></video>
 
-                <div class="info">
-                    <div class="username">
-                        @${item.username || "user"}
-                    </div>
-
-                    <div class="caption">
-                        ${item.caption || ""}
-                    </div>
-                </div>
 
                 <div class="actions">
 
                     <div class="action">
                         ❤️
-                        <span>${item.likes || 0}</span>
+                        <span>
+                            ${item.likes || 0}
+                        </span>
                     </div>
+
 
                     <div class="action">
                         💬
-                        <span>${item.comments || 0}</span>
+                        <span>
+                            0
+                        </span>
                     </div>
+
 
                     <div class="action">
                         ↗️
-                        <span>Ulashish</span>
+                        <span>
+                            Ulashish
+                        </span>
                     </div>
 
                 </div>
+
             `;
 
             feed.appendChild(div);
+
         });
+
 
         current = 0;
 
         playCurrent();
 
+
     } catch (error) {
 
         console.error(error);
 
+        feed.innerHTML = `
+            <div style="
+                color:white;
+                text-align:center;
+                padding:30px;
+            ">
+                Videolarni yuklashda xato
+                <br><br>
+                ${error.message}
+            </div>
+        `;
+
     }
+
 }
 
 
 function getVideoElements() {
+
     return document.querySelectorAll(".video");
+
 }
 
 
 function playCurrent() {
 
-    const videos = getVideoElements();
+    const videos =
+        getVideoElements();
+
 
     videos.forEach((item, index) => {
 
         const video =
             item.querySelector("video");
 
+
         if (index === current) {
 
             item.classList.add("active");
-
-            video.currentTime = 0;
 
             video.play().catch(() => {});
 
@@ -130,14 +166,17 @@ function playCurrent() {
         }
 
     });
+
 }
 
 
 function nextVideo() {
 
-    const videos = getVideoElements();
+    const videos =
+        getVideoElements();
 
     if (!videos.length) return;
+
 
     if (current < videos.length - 1) {
 
@@ -152,9 +191,11 @@ function nextVideo() {
 
 function previousVideo() {
 
-    const videos = getVideoElements();
+    const videos =
+        getVideoElements();
 
     if (!videos.length) return;
+
 
     if (current > 0) {
 
@@ -169,7 +210,7 @@ function previousVideo() {
 
 feed.addEventListener(
     "touchstart",
-    function (e) {
+    function(e) {
 
         startY =
             e.touches[0].clientY;
@@ -181,7 +222,7 @@ feed.addEventListener(
 
 feed.addEventListener(
     "touchend",
-    function (e) {
+    function(e) {
 
         const endY =
             e.changedTouches[0].clientY;
@@ -189,9 +230,11 @@ feed.addEventListener(
         const difference =
             startY - endY;
 
+
         if (Math.abs(difference) < 50) {
             return;
         }
+
 
         if (difference > 0) {
 
@@ -205,22 +248,6 @@ feed.addEventListener(
 
     },
     { passive: true }
-);
-
-
-picker.addEventListener(
-    "change",
-    async function () {
-
-        const file = this.files[0];
-
-        if (!file) return;
-
-        alert(
-            "Video tanlandi. Yuklash funksiyasini keyingi bosqichda ulaymiz."
-        );
-
-    }
 );
 
 
