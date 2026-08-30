@@ -4,29 +4,100 @@ let startY = 0;
 const feed = document.getElementById("feed");
 const picker = document.getElementById("videoPicker");
 
-// SUPABASE
-const SUPABASE_URL = "https://bbgruqvwkygjwqdocnsb.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat";
+const SUPABASE_URL =
+    "https://bbgruqvwkygjwqdocnsb.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat";
 
 
-// VIDEOLAR
 function getVideos() {
     return document.querySelectorAll(".video");
 }
 
 
-// VIDEONI KO‘RSATISH
+function addVideoToFeed(videoURL) {
+
+    const box = document.createElement("div");
+
+    box.className = "video";
+
+    box.innerHTML = `
+        <video
+            src="${videoURL}"
+            controls
+            playsinline
+            preload="metadata">
+        </video>
+    `;
+
+    feed.appendChild(box);
+}
+
+
+async function loadVideos() {
+
+    try {
+
+        const response = await fetch(
+            SUPABASE_URL +
+            "/rest/v1/videos?select=videos_url&order=timestamp.desc",
+            {
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization":
+                        "Bearer " + SUPABASE_KEY
+                }
+            }
+        );
+
+        if (!response.ok) {
+
+            console.log(
+                "Database xatosi:",
+                response.status,
+                await response.text()
+            );
+
+            return;
+        }
+
+        const data = await response.json();
+
+        data.forEach(function(item) {
+
+            if (item.videos_url) {
+                addVideoToFeed(item.videos_url);
+            }
+
+        });
+
+        if (getVideos().length > 0) {
+            showVideo(0);
+        }
+
+    } catch (error) {
+
+        console.log("Xato:", error);
+
+    }
+}
+
+
 function showVideo(index) {
 
     const videos = getVideos();
 
-    if (index < 0 || index >= videos.length) return;
+    if (index < 0 || index >= videos.length) {
+        return;
+    }
 
     videos.forEach(function(box) {
 
         box.classList.remove("active");
 
-        const video = box.querySelector("video");
+        const video =
+            box.querySelector("video");
 
         if (video) {
             video.pause();
@@ -40,7 +111,8 @@ function showVideo(index) {
 
     box.classList.add("active");
 
-    const video = box.querySelector("video");
+    const video =
+        box.querySelector("video");
 
     if (video) {
         video.currentTime = 0;
@@ -50,314 +122,179 @@ function showVideo(index) {
 }
 
 
-// SWIPE
-document.addEventListener("touchstart", function(event) {
+document.addEventListener(
+    "touchstart",
+    function(event) {
 
-    startY = event.touches[0].clientY;
-
-});
-
-
-document.addEventListener("touchend", function(event) {
-
-    const endY = event.changedTouches[0].clientY;
-
-    const distance = startY - endY;
-
-    if (Math.abs(distance) < 60) return;
-
-    if (distance > 0) {
-
-        showVideo(current + 1);
-
-    } else {
-
-        showVideo(current - 1);
+        startY =
+            event.touches[0].clientY;
 
     }
-
-});
-
-
-// REELSGA VIDEO QO‘SHISH
-function addVideoToFeed(videoURL) {
-
-    const box = document.createElement("div");
-
-    box.className = "video";
-
-    box.innerHTML = `
-
-        <video
-            src="${videoURL}"
-            controls
-            playsinline
-            preload="metadata">
-        </video>
-
-        <div class="info">
-
-            <div class="username">
-                @video_uz
-            </div>
-
-            <div class="caption">
-                Yangi video 🎬
-            </div>
-
-        </div>
-
-        <div class="actions">
-
-            <div class="action">
-                ❤️
-                <span>0</span>
-            </div>
-
-            <div class="action">
-                💬
-                <span>0</span>
-            </div>
-
-            <div class="action">
-                ↗️
-                <span>Ulashish</span>
-            </div>
-
-        </div>
-
-    `;
-
-    feed.appendChild(box);
-
-    showVideo(getVideos().length - 1);
-}
+);
 
 
-// SUPABASE'DAN VIDEOLAR
-async function loadVideos() {
+document.addEventListener(
+    "touchend",
+    function(event) {
 
-    try {
+        const endY =
+            event.changedTouches[0].clientY;
 
-        const response = await fetch(
-            SUPABASE_URL +
-            "/rest/v1/videos?select=videos_url&order=timestamp.desc",
-            {
-                method: "GET",
+        const distance =
+            startY - endY;
 
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization": "Bearer " + SUPABASE_KEY
-                }
-            }
-        );
+        if (Math.abs(distance) < 60) {
+            return;
+        }
+
+        if (distance > 0) {
+            showVideo(current + 1);
+        } else {
+            showVideo(current - 1);
+        }
+
+    }
+);
 
 
-        if (!response.ok) {
+picker.addEventListener(
+    "change",
+    function() {
 
-            console.log(
-                "Videolarni olishda xato:",
-                response.status,
-                await response.text()
-            );
+        const file = picker.files[0];
+
+        if (!file) {
+            return;
+        }
+
+
+        if (!file.type.startsWith("video/")) {
+
+            alert("Faqat video tanlang!");
+
+            picker.value = "";
 
             return;
         }
 
 
-        const data = await response.json();
+        const fileName =
+            Date.now() +
+            "_" +
+            Math.random()
+                .toString(36)
+                .substring(2) +
+            "_" +
+            file.name.replace(
+                /[^a-zA-Z0-9._-]/g,
+                "_"
+            );
 
 
-        data.forEach(function(item) {
-
-            if (
-                item.videos_url &&
-                !document.querySelector(
-                    'video[src="' + item.videos_url + '"]'
-                )
-            ) {
-
-                addVideoToFeed(item.videos_url);
-
-            }
-
-        });
+        const uploadURL =
+            SUPABASE_URL +
+            "/storage/v1/object/Videos/" +
+            fileName;
 
 
-    } catch (error) {
+        const progress =
+            document.createElement("div");
 
-        console.log(
-            "Internet xatosi:",
-            error
-        );
+        progress.style.position = "fixed";
+        progress.style.top = "50%";
+        progress.style.left = "50%";
+        progress.style.transform =
+            "translate(-50%, -50%)";
+        progress.style.background = "#111";
+        progress.style.color = "#fff";
+        progress.style.padding = "20px 30px";
+        progress.style.borderRadius = "15px";
+        progress.style.zIndex = "99999";
 
-    }
+        progress.innerText =
+            "Yuklanmoqda: 0%";
 
-}
-
-
-// VIDEO YUKLASH
-picker.addEventListener("change", function() {
-
-    const file = picker.files[0];
-
-    if (!file) return;
-
-
-    if (!file.type.startsWith("video/")) {
-
-        alert("Faqat video tanlang!");
-
-        picker.value = "";
-
-        return;
-    }
+        document.body.appendChild(progress);
 
 
-    // NOYOB FAYL NOMI
-    const fileName =
-        Date.now() +
-        "_" +
-        Math.random()
-            .toString(36)
-            .substring(2) +
-        "_" +
-        file.name.replace(
-            /[^a-zA-Z0-9._-]/g,
-            "_"
+        const xhr =
+            new XMLHttpRequest();
+
+
+        xhr.open(
+            "POST",
+            uploadURL,
+            true
         );
 
 
-    // STORAGE UPLOAD URL
-    const uploadURL =
-        SUPABASE_URL +
-        "/storage/v1/object/Videos/" +
-        fileName;
+        xhr.setRequestHeader(
+            "Authorization",
+            "Bearer " + SUPABASE_KEY
+        );
+
+        xhr.setRequestHeader(
+            "apikey",
+            SUPABASE_KEY
+        );
+
+        xhr.setRequestHeader(
+            "Content-Type",
+            file.type
+        );
+
+        xhr.setRequestHeader(
+            "x-upsert",
+            "false"
+        );
 
 
-    // PROGRESS OYNASI
-    const progress =
-        document.createElement("div");
+        xhr.upload.onprogress =
+            function(event) {
+
+                if (event.lengthComputable) {
+
+                    const percent =
+                        Math.round(
+                            event.loaded /
+                            event.total *
+                            100
+                        );
+
+                    progress.innerText =
+                        "Yuklanmoqda: " +
+                        percent +
+                        "%";
+                }
+            };
 
 
-    progress.style.position = "fixed";
-    progress.style.top = "50%";
-    progress.style.left = "50%";
-    progress.style.transform =
-        "translate(-50%, -50%)";
-    progress.style.background = "#111";
-    progress.style.color = "#fff";
-    progress.style.padding =
-        "20px 30px";
-    progress.style.borderRadius =
-        "15px";
-    progress.style.zIndex =
-        "99999";
-    progress.style.fontSize =
-        "18px";
-    progress.style.textAlign =
-        "center";
+        xhr.onload =
+            async function() {
+
+                if (
+                    xhr.status >= 200 &&
+                    xhr.status < 300
+                ) {
+
+                    const publicURL =
+                        SUPABASE_URL +
+                        "/storage/v1/object/public/Videos/" +
+                        fileName;
 
 
-    progress.innerText =
-        "Yuklanmoqda: 0%";
+                    progress.innerText =
+                        "Saqlanmoqda...";
 
-
-    document.body.appendChild(progress);
-
-
-    const xhr =
-        new XMLHttpRequest();
-
-
-    xhr.open(
-        "POST",
-        uploadURL,
-        true
-    );
-
-
-    xhr.setRequestHeader(
-        "Authorization",
-        "Bearer " + SUPABASE_KEY
-    );
-
-
-    xhr.setRequestHeader(
-        "apikey",
-        SUPABASE_KEY
-    );
-
-
-    xhr.setRequestHeader(
-        "Content-Type",
-        file.type
-    );
-
-
-    xhr.setRequestHeader(
-        "x-upsert",
-        "false"
-    );
-
-
-    // YUKLANISH FOIZI
-    xhr.upload.onprogress =
-        function(event) {
-
-            if (
-                event.lengthComputable
-            ) {
-
-                const percent =
-                    Math.round(
-                        (event.loaded /
-                            event.total) *
-                        100
-                    );
-
-
-                progress.innerText =
-                    "Yuklanmoqda: " +
-                    percent +
-                    "%";
-            }
-
-        };
-
-
-    // UPLOAD NATIJASI
-    xhr.onload =
-        async function() {
-
-            if (
-                xhr.status >= 200 &&
-                xhr.status < 300
-            ) {
-
-                const publicURL =
-                    SUPABASE_URL +
-                    "/storage/v1/object/public/Videos/" +
-                    fileName;
-
-
-                progress.innerText =
-                    "Yuklandi! ✅";
-
-
-                // DATABASEGA URL YOZISH
-                try {
 
                     const dbResponse =
                         await fetch(
                             SUPABASE_URL +
                             "/rest/v1/videos",
                             {
-
                                 method: "POST",
 
                                 headers: {
-
                                     "apikey":
                                         SUPABASE_KEY,
 
@@ -370,150 +307,97 @@ picker.addEventListener("change", function() {
 
                                     "Prefer":
                                         "return=minimal"
-
                                 },
 
-
                                 body: JSON.stringify({
-
                                     videos_url:
                                         publicURL
-
                                 })
-
                             }
                         );
 
 
                     if (!dbResponse.ok) {
 
-                        const errorText =
+                        const error =
                             await dbResponse.text();
 
-
                         console.log(
-                            "Database xatosi:",
+                            "DB ERROR:",
                             dbResponse.status,
-                            errorText
+                            error
                         );
 
-
                         progress.innerText =
-                            "Video yuklandi, " +
-                            "lekin saqlashda xato ❌";
-
+                            "Database xatosi: " +
+                            dbResponse.status;
 
                         setTimeout(
                             function() {
-
                                 progress.remove();
-
                             },
-                            3000
+                            4000
                         );
-
 
                         return;
                     }
 
 
-                    // REELSDA KO‘RSATISH
+                    progress.innerText =
+                        "Yuklandi! ✅";
+
+
+                    addVideoToFeed(
+                        publicURL
+                    );
+
+
                     setTimeout(
                         function() {
-
                             progress.remove();
-
-                            addVideoToFeed(
-                                publicURL
-                            );
-
                         },
-                        500
+                        1000
                     );
 
 
-                } catch (error) {
-
-                    console.log(
-                        "Database internet xatosi:",
-                        error
-                    );
-
+                } else {
 
                     progress.innerText =
-                        "Video yuklandi, " +
-                        "lekin saqlashda xato ❌";
-
+                        "Upload xatosi: " +
+                        xhr.status;
 
                     setTimeout(
                         function() {
-
                             progress.remove();
-
                         },
-                        3000
+                        4000
                     );
-
                 }
+            };
 
 
-            } else {
+        xhr.onerror =
+            function() {
 
                 progress.innerText =
-                    "XATO " +
-                    xhr.status +
-                    ": " +
-                    xhr.responseText;
-
-
-                console.log(
-                    "Storage xatosi:",
-                    xhr.status,
-                    xhr.responseText
-                );
-
+                    "Internet xatosi ❌";
 
                 setTimeout(
                     function() {
-
                         progress.remove();
-
                     },
-                    4000
+                    3000
                 );
-
-            }
-
-        };
+            };
 
 
-    // INTERNET XATOSI
-    xhr.onerror =
-        function() {
+        xhr.send(file);
 
-            progress.innerText =
-                "Internet/server xatosi ❌";
+        picker.value = "";
 
-
-            setTimeout(
-                function() {
-
-                    progress.remove();
-
-                },
-                3000
-            );
-
-        };
+    }
+);
 
 
-    xhr.send(file);
-
-
-    picker.value = "";
-
-});
-
-
-// ILOVA OCHILGANDA VIDEOLARNI OLISH
+// ILOVA OCHILGANDA
 loadVideos();
