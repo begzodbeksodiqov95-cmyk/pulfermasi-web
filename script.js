@@ -140,7 +140,19 @@ function addVideoToFeed(item) {
         }
     );
 
+const commentButton =
+    box.querySelector(".comment-button");
 
+commentButton.addEventListener(
+    "click",
+    function(event) {
+
+        event.stopPropagation();
+
+        alert("💬 Kommentlar oynasi");
+
+    }
+);
     feed.appendChild(box);
 }
 
