@@ -1049,37 +1049,153 @@ const file =
 
 );
 
-loadVideos();
-// ===============================
-// PROFIL OYNASI
+loadVideos();// ===============================
+// PROFIL OYNASI - SUPABASE
 // ===============================
 
 const profileButton =
     document.getElementById("profileButton");
 
+
+// Telegram foydalanuvchi ID sini olish
+function getTelegramId() {
+
+    if (
+        window.Telegram &&
+        window.Telegram.WebApp &&
+        window.Telegram.WebApp.initDataUnsafe &&
+        window.Telegram.WebApp.initDataUnsafe.user
+    ) {
+
+        return String(
+            window.Telegram.WebApp.initDataUnsafe.user.id
+        );
+
+    }
+
+    return null;
+}
+
+
+// Profilni bazadan olish
+async function loadProfileData() {
+
+    const telegramId =
+        getTelegramId();
+
+    if (!telegramId) {
+
+        console.log(
+            "Telegram ID topilmadi"
+        );
+
+        return null;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/profiles" +
+                "?telegram_id=eq." +
+                encodeURIComponent(telegramId) +
+                "&select=*",
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            console.log(
+                "Profilni olish xatosi:",
+                await response.text()
+            );
+
+            return null;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (data.length > 0) {
+
+            return data[0];
+
+        }
+
+
+        return null;
+
+    } catch (error) {
+
+        console.log(
+            "Profil xatosi:",
+            error
+        );
+
+        return null;
+    }
+}
+
+
 profileButton.addEventListener(
     "click",
-    function () {
+    async function () {
 
         const oldProfile =
-            document.getElementById("profileModal");
+            document.getElementById(
+                "profileModal"
+            );
 
         if (oldProfile) {
             oldProfile.remove();
         }
 
+
         const modal =
             document.createElement("div");
 
-        modal.id = "profileModal";
+        modal.id =
+            "profileModal";
 
-        modal.style.position = "fixed";
-        modal.style.inset = "0";
-        modal.style.background = "#111";
-        modal.style.color = "#fff";
-        modal.style.zIndex = "100000";
-        modal.style.padding = "20px";
-        modal.style.overflowY = "auto";
+
+        modal.style.position =
+            "fixed";
+
+        modal.style.inset =
+            "0";
+
+        modal.style.background =
+            "#111";
+
+        modal.style.color =
+            "#fff";
+
+        modal.style.zIndex =
+            "100000";
+
+        modal.style.padding =
+            "20px";
+
+        modal.style.overflowY =
+            "auto";
+
 
         modal.innerHTML = `
 
@@ -1092,6 +1208,7 @@ profileButton.addEventListener(
                 color:white;
                 font-size:30px;
             ">‹</button>
+
 
             <div style="
                 text-align:center;
@@ -1114,7 +1231,9 @@ profileButton.addEventListener(
                     👤
                 </div>
 
+
                 <h2>Profil</h2>
+
 
                 <div style="
                     color:#888;
@@ -1130,9 +1249,11 @@ profileButton.addEventListener(
                 margin-top:30px;
             ">
 
+
                 <label>
                     Ism
                 </label>
+
 
                 <input
                     id="profileName"
@@ -1157,6 +1278,7 @@ profileButton.addEventListener(
                     Username
                 </label>
 
+
                 <input
                     id="profileUsername"
                     type="text"
@@ -1180,6 +1302,7 @@ profileButton.addEventListener(
                     Bio
                 </label>
 
+
                 <textarea
                     id="profileBio"
                     placeholder="O'zingiz haqingizda..."
@@ -1197,6 +1320,7 @@ profileButton.addEventListener(
                         resize:none;
                     "
                 ></textarea>
+
 
                 <div style="
                     text-align:right;
@@ -1221,6 +1345,7 @@ profileButton.addEventListener(
                     ">
                     🖼 Profil rasmi yuklash
                 </label>
+
 
                 <input
                     id="profileImagePicker"
@@ -1249,44 +1374,70 @@ profileButton.addEventListener(
             </div>
         `;
 
-        document.body.appendChild(modal);
+
+        document.body.appendChild(
+            modal
+        );
 
 
-        // Oldingi ma'lumotlarni olish
-        document.getElementById("profileName").value =
-            localStorage.getItem("profileName") || "";
+        // ===============================
+        // BAZADAN PROFILNI YUKLASH
+        // ===============================
 
-        document.getElementById("profileUsername").value =
-            localStorage.getItem("profileUsername") || "";
-
-        document.getElementById("profileBio").value =
-            localStorage.getItem("profileBio") || "";
+        const profile =
+            await loadProfileData();
 
 
-        // Rasmni ko'rsatish
-        const savedImage =
-            localStorage.getItem("profileImage");
-
-        if (savedImage) {
+        if (profile) {
 
             document.getElementById(
-                "profileImage"
-            ).innerHTML = `
-                <img
-                    src="${savedImage}"
-                    style="
-                        width:100%;
-                        height:100%;
-                        object-fit:cover;
-                    "
-                >
-            `;
+                "profileName"
+            ).value =
+                profile.display_name || "";
+
+
+            document.getElementById(
+                "profileUsername"
+            ).value =
+                profile.username || "";
+
+
+            document.getElementById(
+                "profileBio"
+            ).value =
+                profile.bio || "";
+
+
+            if (profile.avatar_url) {
+
+                document.getElementById(
+                    "profileImage"
+                ).innerHTML = `
+
+                    <img
+                        src="${profile.avatar_url}"
+                        style="
+                            width:100%;
+                            height:100%;
+                            object-fit:cover;
+                        "
+                    >
+
+                `;
+
+            }
+
         }
 
 
-        // Rasm tanlash
+        // ===============================
+        // RASM TANLASH
+        // ===============================
+
         document
-            .getElementById("profileImagePicker")
+            .getElementById(
+                "profileImagePicker"
+            )
             .addEventListener(
                 "change",
                 function () {
@@ -1298,19 +1449,24 @@ profileButton.addEventListener(
                         return;
                     }
 
+
                     if (
                         !file.type.startsWith(
                             "image/"
                         )
                     ) {
+
                         alert(
                             "Faqat rasm tanlang!"
                         );
+
                         return;
                     }
 
+
                     const reader =
                         new FileReader();
+
 
                     reader.onload =
                         function (event) {
@@ -1318,14 +1474,11 @@ profileButton.addEventListener(
                             const image =
                                 event.target.result;
 
-                            localStorage.setItem(
-                                "profileImage",
-                                image
-                            );
 
                             document.getElementById(
                                 "profileImage"
                             ).innerHTML = `
+
                                 <img
                                     src="${image}"
                                     style="
@@ -1334,20 +1487,45 @@ profileButton.addEventListener(
                                         object-fit:cover;
                                     "
                                 >
+
                             `;
+
                         };
 
-                    reader.readAsDataURL(file);
+
+                    reader.readAsDataURL(
+                        file
+                    );
+
                 }
             );
 
 
-        // Profilni saqlash
+        // ===============================
+        // PROFILNI BAZAGA SAQLASH
+        // ===============================
+
         document
-            .getElementById("saveProfile")
+            .getElementById(
+                "saveProfile"
+            )
             .addEventListener(
                 "click",
-                function () {
+                async function () {
+
+                    const telegramId =
+                        getTelegramId();
+
+
+                    if (!telegramId) {
+
+                        alert(
+                            "Telegram foydalanuvchi ID topilmadi ❌"
+                        );
+
+                        return;
+                    }
+
 
                     const name =
                         document
@@ -1357,13 +1535,15 @@ profileButton.addEventListener(
                             .value
                             .trim();
 
-                    const username =
+
+                    let username =
                         document
                             .getElementById(
                                 "profileUsername"
                             )
                             .value
                             .trim();
+
 
                     const bio =
                         document
@@ -1374,34 +1554,138 @@ profileButton.addEventListener(
                             .trim();
 
 
-                    localStorage.setItem(
-                        "profileName",
-                        name
-                    );
+                    // @ belgisi bo'lmasa qo'shamiz
+                    if (
+                        username &&
+                        !username.startsWith("@")
+                    ) {
 
-                    localStorage.setItem(
-                        "profileUsername",
-                        username
-                    );
+                        username =
+                            "@" +
+                            username;
 
-                    localStorage.setItem(
-                        "profileBio",
-                        bio
-                    );
+                    }
 
 
-                    alert(
-                        "Profil ma'lumotlari saqlandi ✅"
-                    );
+                    const saveButton =
+                        document.getElementById(
+                            "saveProfile"
+                        );
 
-                    modal.remove();
+
+                    saveButton.disabled =
+                        true;
+
+
+                    saveButton.innerText =
+                        "Saqlanmoqda...";
+
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                SUPABASE_URL +
+                                "/rest/v1/profiles?on_conflict=telegram_id",
+                                {
+                                    method: "POST",
+
+                                    headers: {
+
+                                        "apikey":
+                                            SUPABASE_KEY,
+
+                                        "Authorization":
+                                            "Bearer " +
+                                            SUPABASE_KEY,
+
+                                        "Content-Type":
+                                            "application/json",
+
+                                        "Prefer":
+                                            "resolution=merge-duplicates"
+
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+
+                                            telegram_id:
+                                                telegramId,
+
+                                            username:
+                                                username,
+
+                                            display_name:
+                                                name,
+
+                                            bio:
+                                                bio
+
+                                        })
+
+                                }
+                            );
+
+
+                        if (!response.ok) {
+
+                            console.log(
+                                "Profil saqlash xatosi:",
+                                await response.text()
+                            );
+
+
+                            alert(
+                                "Profil saqlanmadi ❌"
+                            );
+
+                            return;
+                        }
+
+
+                        alert(
+                            "Profil ma'lumotlari saqlandi ✅"
+                        );
+
+
+                        modal.remove();
+
+
+                    } catch (error) {
+
+                        console.log(
+                            "Xato:",
+                            error
+                        );
+
+
+                        alert(
+                            "Internet xatosi ❌"
+                        );
+
+                    } finally {
+
+                        saveButton.disabled =
+                            false;
+
+                        saveButton.innerText =
+                            "💾 Saqlash";
+
+                    }
+
                 }
             );
 
 
-        // Orqaga qaytish
+        // ===============================
+        // ORQAGA
+        // ===============================
+
         document
-            .getElementById("closeProfile")
+            .getElementById(
+                "closeProfile"
+            )
             .addEventListener(
                 "click",
                 function () {
@@ -1413,3 +1697,4 @@ profileButton.addEventListener(
 
     }
 );
+
