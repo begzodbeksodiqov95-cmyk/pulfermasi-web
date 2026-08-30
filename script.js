@@ -1,234 +1,516 @@
-const SUPABASE_URL = "https://bbgruqvwkygjwqdocnsb.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat";
-const BUCKET = "Videos";
+let current = 0;
+let startY = 0;
 
-const picker = document.getElementById("videoPicker");
 const feed = document.getElementById("feed");
+const picker = document.getElementById("videoPicker");
 
-picker.addEventListener("change", async function () {
+const SUPABASE_URL =
+    "https://bbgruqvwkygjwqdocnsb.supabase.co";
 
-    const file = this.files[0];
+const SUPABASE_KEY =
+    "sb_publishable_Aa5uSwt_KndueGLGEhGRSA_Z2qfJGat";
 
-    if (!file) return;
 
-    if (!file.type.startsWith("video/")) {
-        alert("Faqat video tanlang!");
-        picker.value = "";
+function getVideos() {
+    return document.querySelectorAll(".video");
+}
+
+
+function addVideoToFeed(videoURL) {
+
+    const box = document.createElement("div");
+
+    box.className = "video";
+
+    box.innerHTML = 
+        <video
+            src="${videoURL}"
+            controls
+            playsinline
+            preload="metadata">
+        </video>
+    ;
+
+    feed.appendChild(box);
+}
+
+
+async function loadVideos() {
+
+    try {
+
+        const response = await fetch(
+            SUPABASE_URL +
+            "/rest/v1/videos?select=videos_url",
+            {
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization":
+                        "Bearer " + SUPABASE_KEY
+                }
+            }
+        );
+
+
+        if (!response.ok) {
+
+            alert(
+                "Database xatosi: " +
+                response.status
+            );
+
+            return;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        data.forEach(function(item) {
+
+            if (item.videos_url) {
+
+                addVideoToFeed(
+                    item.videos_url
+                );
+
+            }
+
+        });
+
+
+        if (getVideos().length > 0) {
+
+            showVideo(0);
+
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Xato:",
+            error
+        );
+
+    }
+}
+
+
+function showVideo(index) {
+
+    const videos =
+        getVideos();
+
+
+    if (
+        index < 0 ||
+        index >= videos.length
+    ) {
         return;
     }
 
-    // Yuklanmoqda oynasi
-    const box = document.createElement("div");
 
-    box.style.cssText = `
-        position:fixed;
-        left:50%;
-        top:50%;
-        transform:translate(-50%,-50%);
-        z-index:99999;
-        background:rgba(20,20,20,.95);
-        color:white;
-        padding:25px 35px;
-        border-radius:16px;
-        text-align:center;
-        font-family:Arial,sans-serif;
-        min-width:220px;
-        box-shadow:0 5px 30px rgba(0,0,0,.5);
-    `;
+    videos.forEach(function(box) {
 
-    box.innerHTML = `
-        <div style="font-size:18px;margin-bottom:10px">
-            Yuklanmoqda...
-        </div>
+        box.classList.remove(
+            "active"
+        );
 
-        <div id="uploadPercent"
-             style="font-size:38px;font-weight:bold">
-            0%
-        </div>
-    `;
 
-    document.body.appendChild(box);
+        const video =
+            box.querySelector("video");
 
-    const percent = box.querySelector("#uploadPercent");
 
-    const extension =
-        file.name.includes(".")
-            ? file.name.substring(file.name.lastIndexOf("."))
-            : ".mp4";
+        if (video) {
 
-    const fileName =
-        Date.now() + "_" +
-        Math.random().toString(36).substring(2, 8) +
-        extension;
+            video.pause();
 
-    const uploadUrl =
-        `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodeURIComponent(fileName)}`;
-
-    const xhr = new XMLHttpRequest();
-
-    xhr.open("POST", uploadUrl, true);
-
-    xhr.setRequestHeader(
-        "Authorization",
-        `Bearer ${SUPABASE_KEY}`
-    );
-
-    xhr.setRequestHeader(
-        "apikey",
-        SUPABASE_KEY
-    );
-
-    xhr.setRequestHeader(
-        "Content-Type",
-        file.type || "video/mp4"
-    );
-
-    xhr.setRequestHeader(
-        "x-upsert",
-        "false"
-    );
-
-    // FOIZ
-    xhr.upload.addEventListener("progress", function (event) {
-
-        if (event.lengthComputable) {
-
-            const progress =
-                Math.round(
-                    (event.loaded / event.total) * 100
-                );
-
-            percent.textContent = progress + "%";
         }
 
     });
 
-    xhr.onload = function () {
 
-        console.log("Supabase status:", xhr.status);
-        console.log("Supabase response:", xhr.responseText);
+    current = index;
 
-        if (xhr.status >= 200 && xhr.status < 300) {
 
-            percent.textContent = "100%";
+    const box =
+        videos[current];
 
-            box.innerHTML = `
-                <div style="font-size:32px">
-                    ✅
-                </div>
 
-                <div style="font-size:18px;margin-top:8px">
-                    Yuklandi
-                </div>
-            `;
+    box.classList.add("active");
 
-            setTimeout(function () {
 
-                box.remove();
+    const video =
+        box.querySelector("video");
 
-                showVideo(fileName);
 
-            }, 800);
+    if (video) {
+
+        video.currentTime = 0;
+
+    }
+
+}
+
+
+document.addEventListener(
+    "touchstart",
+    function(event) {
+
+        startY =
+            event.touches[0].clientY;
+
+    }
+);
+
+
+document.addEventListener(
+    "touchend",
+    function(event) {
+
+        const endY =
+            event.changedTouches[0].clientY;
+
+
+        const distance =
+            startY - endY;
+
+
+        if (
+            Math.abs(distance) < 60
+        ) {
+            return;
+        }
+
+
+        if (distance > 0) {
+
+            showVideo(
+                current + 1
+            );
 
         } else {
 
-            let message = "Yuklashda xato";
-
-            try {
-                const data = JSON.parse(xhr.responseText);
-
-                if (data.message) {
-                    message = data.message;
-                }
-
-                if (data.error) {
-                    message = data.error;
-                }
-
-            } catch (e) {}
-
-            box.innerHTML = `
-                <div style="font-size:32px">
-                    ❌
-                </div>
-
-                <div style="font-size:17px;margin-top:8px">
-                    ${message}
-                </div>
-
-                <div style="font-size:12px;margin-top:8px;opacity:.7">
-                    Xato kodi: ${xhr.status}
-                </div>
-            `;
+            showVideo(
+                current - 1
+            );
 
         }
-    };
 
-    xhr.onerror = function () {
-
-        box.innerHTML = `
-            <div style="font-size:32px">
-                ❌
-            </div>
-
-            <div style="font-size:17px;margin-top:8px">
-                Internet xatosi
-            </div>
-        `;
-
-    };
-
-    xhr.ontimeout = function () {
-
-        box.innerHTML = `
-            <div style="font-size:32px">
-                ❌
-            </div>
-
-            <div style="font-size:17px;margin-top:8px">
-                Yuklash vaqti tugadi
-            </div>
-        `;
-
-    };
-
-    // Video yuklashni boshlash
-    xhr.send(file);
-
-    picker.value = "";
-});
+    }
+);
 
 
-// Yuklangan videoni ekranga chiqarish
-function showVideo(fileName) {
+picker.addEventListener(
+    "change",
+    function() {
 
-    // Oldingi aktiv videolarni o‘chirish
-    document
-        .querySelectorAll(".video.active")
-        .forEach(function (item) {
-            item.classList.remove("active");
-        });
+        const file =
+            picker.files[0];
 
-    const videoBox = document.createElement("div");
 
-    videoBox.className = "video active";
-
-    const video = document.createElement("video");
-
-    video.src =
-        `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(fileName)}`;
-
-    video.autoplay = true;
-    video.loop = true;
-    video.muted = true;
-    video.playsInline = true;
-    video.controls = true;
-
-    videoBox.appendChild(video);
-
-    feed.appendChild(videoBox);
-
-    video.play().catch(function (error) {
-        console.log("Video ishga tushmadi:", error);
-    });
+        if (!file) {
+            return;
         }
+
+
+        if (
+            !file.type.startsWith(
+                "video/"
+            )
+        ) {
+
+            alert(
+                "Faqat video tanlang!"
+            );
+
+            picker.value = "";
+
+            return;
+        }
+
+
+        const fileName =
+            Date.now() +
+            "_" +
+            Math.random()
+                .toString(36)
+                .substring(2) +
+            "_" +
+            file.name.replace(
+                /[^a-zA-Z0-9._-]/g,
+                "_"
+            );
+
+
+        const uploadURL =
+            SUPABASE_URL +
+            "/storage/v1/object/Videos/" +
+            fileName;
+
+
+        const progress =
+            document.createElement(
+                "div"
+            );
+
+
+        progress.style.position =
+            "fixed";
+
+        progress.style.top =
+            "50%";
+
+        progress.style.left =
+            "50%";
+
+        progress.style.transform =
+            "translate(-50%, -50%)";
+
+        progress.style.background =
+            "#111";
+        progress.style.color =
+            "#fff";
+
+        progress.style.padding =
+            "20px 30px";
+
+        progress.style.borderRadius =
+            "15px";
+
+        progress.style.zIndex =
+            "99999";
+
+
+        progress.innerText =
+            "Yuklanmoqda: 0%";
+
+
+        document.body.appendChild(
+            progress
+        );
+
+
+        const xhr =
+            new XMLHttpRequest();
+
+
+        xhr.open(
+            "POST",
+            uploadURL,
+            true
+        );
+
+
+        xhr.setRequestHeader(
+            "Authorization",
+            "Bearer " +
+            SUPABASE_KEY
+        );
+
+
+        xhr.setRequestHeader(
+            "apikey",
+            SUPABASE_KEY
+        );
+
+
+        xhr.setRequestHeader(
+            "Content-Type",
+            file.type
+        );
+
+
+        xhr.setRequestHeader(
+            "x-upsert",
+            "false"
+        );
+
+
+        xhr.upload.onprogress =
+            function(event) {
+
+                if (
+                    event.lengthComputable
+                ) {
+
+                    const percent =
+                        Math.round(
+                            event.loaded /
+                            event.total *
+                            100
+                        );
+
+
+                    progress.innerText =
+                        "Yuklanmoqda: " +
+                        percent +
+                        "%";
+
+                }
+
+            };
+
+
+        xhr.onload =
+            async function() {
+
+                if (
+                    xhr.status >= 200 &&
+                    xhr.status < 300
+                ) {
+
+
+                    const publicURL =
+                        SUPABASE_URL +
+                        "/storage/v1/object/public/Videos/" +
+                        fileName;
+
+
+                    progress.innerText =
+                        "Saqlanmoqda...";
+
+
+                    const dbResponse =
+                        await fetch(
+                            SUPABASE_URL +
+                            "/rest/v1/videos",
+                            {
+                                method: "POST",
+
+                                headers: {
+
+                                    "apikey":
+                                        SUPABASE_KEY,
+
+                                    "Authorization":
+                                        "Bearer " +
+                                        SUPABASE_KEY,
+
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Prefer":
+                                        "return=minimal"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+                                        videos_url:
+                                            publicURL
+                                    })
+
+                            }
+                        );
+
+
+                    if (
+                        !dbResponse.ok
+                    ) {
+
+                        const error =
+                            await dbResponse.text();
+
+
+                        console.log(
+                            "DB ERROR:",
+                            dbResponse.status,
+                            error
+                        );
+
+
+                        progress.innerText =
+                            "Database xatosi: " +
+                            dbResponse.status;
+
+
+                        setTimeout(
+                            function() {
+
+                                progress.remove();
+
+                            },
+                            4000
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    progress.innerText =
+                        "Yuklandi! ✅";
+
+
+                    addVideoToFeed(
+                        publicURL
+                    );
+
+
+                    showVideo(
+                        getVideos().length - 1
+                    );
+                    setTimeout(
+                        function() {
+
+                            progress.remove();
+
+                        },
+                        1000
+                    );
+
+
+                } else {
+
+
+                    progress.innerText =
+                        "Upload xatosi: " +
+                        xhr.status;
+
+
+                    setTimeout(
+                        function() {
+
+                            progress.remove();
+
+                        },
+                        4000
+                    );
+
+                }
+
+            };
+
+
+        xhr.onerror =
+            function() {
+
+                progress.innerText =
+                    "Internet xatosi ❌";
+
+
+                setTimeout(
+                    function() {
+
+                        progress.remove();
+
+                    },
+                    3000
+                );
+
+            };
+
+
+        xhr.send(file);
+
+
+        picker.value = "";
+
+    }
+);
+
+
+loadVideos();
