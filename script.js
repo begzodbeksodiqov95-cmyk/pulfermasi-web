@@ -1169,7 +1169,7 @@ profileButton.addEventListener(
                 </div>
 
 
-                <button
+                <button id="editProfileButton"
                     style="
                         margin-top:25px;
                         padding:12px 25px;
