@@ -16,20 +16,125 @@ function getVideos() {
 }
 
 
-function addVideoToFeed(videoURL) {
+function addVideoToFeed(item) {
 
     const box = document.createElement("div");
 
     box.className = "video";
 
+    const likes =
+        item.likes === null ||
+        item.likes === undefined
+            ? 0
+            : item.likes;
+
     box.innerHTML = `
         <video
-            src="${videoURL}"
+            src="${item.videos_url}"
             controls
             playsinline
             preload="metadata">
         </video>
+
+        <div class="info">
+            <div class="username">@video_uz</div>
+            <div class="caption">🎬 Video</div>
+        </div>
+
+        <div class="actions">
+
+            <div class="action like-button">
+                ❤️
+                <span>${likes}</span>
+            </div>
+
+            <div class="action">
+                💬
+                <span>0</span>
+            </div>
+
+            <div class="action">
+                ↗️
+                <span>Ulashish</span>
+            </div>
+
+        </div>
     `;
+
+    box.dataset.id = item.id;
+
+    const likeButton =
+        box.querySelector(".like-button");
+
+    likeButton.addEventListener(
+        "click",
+        async function(event) {
+
+            event.stopPropagation();
+
+            const videoId =
+                box.dataset.id;
+
+            const countElement =
+                likeButton.querySelector("span");
+
+            let currentLikes =
+                Number(
+                    countElement.innerText
+                );
+
+            currentLikes++;
+
+            countElement.innerText =
+                currentLikes;
+
+            const response =
+                await fetch(
+                    SUPABASE_URL +
+                    "/rest/v1/videos?id=eq." +
+                    videoId,
+                    {
+                        method: "PATCH",
+
+                        headers: {
+                            "apikey":
+                                SUPABASE_KEY,
+
+                            "Authorization":
+                                "Bearer " +
+                                SUPABASE_KEY,
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Prefer":
+                                "return=minimal"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                likes:
+                                    currentLikes
+                            })
+                    }
+                );
+
+            if (!response.ok) {
+
+                currentLikes--;
+
+                countElement.innerText =
+                    currentLikes;
+
+                console.log(
+                    "Like xatosi:",
+                    await response.text()
+                );
+
+            }
+
+        }
+    );
 
     feed.appendChild(box);
 }
@@ -39,17 +144,21 @@ async function loadVideos() {
 
     try {
 
-        const response = await fetch(
-            SUPABASE_URL +
-            "/rest/v1/videos?select=videos_url",
-            {
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization":
-                        "Bearer " + SUPABASE_KEY
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/videos?select=id,videos_url,likes",
+                {
+                    headers: {
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+                    }
                 }
-            }
-        );
+            );
 
 
         if (!response.ok) {
@@ -67,20 +176,26 @@ async function loadVideos() {
             await response.json();
 
 
-        data.forEach(function(item) {
+        data.forEach(
+            function(item) {
 
-            if (item.videos_url) {
-
-                addVideoToFeed(
+                if (
                     item.videos_url
-                );
+                ) {
+
+                    addVideoToFeed(
+                        item
+                    );
+
+                }
 
             }
+        );
 
-        });
 
-
-        if (getVideos().length > 0) {
+        if (
+            getVideos().length > 0
+        ) {
 
             showVideo(0);
 
@@ -107,28 +222,32 @@ function showVideo(index) {
         index < 0 ||
         index >= videos.length
     ) {
+
         return;
+
     }
 
 
-    videos.forEach(function(box) {
+    videos.forEach(
+        function(box) {
 
-        box.classList.remove(
-            "active"
-        );
+            box.classList.remove(
+                "active"
+            );
 
+            const video =
+                box.querySelector(
+                    "video"
+                );
 
-        const video =
-            box.querySelector("video");
+            if (video) {
 
+                video.pause();
 
-        if (video) {
-
-            video.pause();
+            }
 
         }
-
-    });
+    );
 
 
     current = index;
@@ -138,11 +257,15 @@ function showVideo(index) {
         videos[current];
 
 
-    box.classList.add("active");
+    box.classList.add(
+        "active"
+    );
 
 
     const video =
-        box.querySelector("video");
+        box.querySelector(
+            "video"
+        );
 
 
     if (video) {
@@ -180,7 +303,9 @@ document.addEventListener(
         if (
             Math.abs(distance) < 60
         ) {
+
             return;
+
         }
 
 
@@ -211,7 +336,9 @@ picker.addEventListener(
 
 
         if (!file) {
+
             return;
+
         }
 
 
@@ -228,6 +355,7 @@ picker.addEventListener(
             picker.value = "";
 
             return;
+
         }
 
 
@@ -400,7 +528,10 @@ picker.addEventListener(
                                 body:
                                     JSON.stringify({
                                         videos_url:
-                                            publicURL
+                                            publicURL,
+
+                                        likes:
+                                            0
                                     })
 
                             }
@@ -411,21 +542,13 @@ picker.addEventListener(
                         !dbResponse.ok
                     ) {
 
-                        const error =
-                            await dbResponse.text();
-
-
-                        console.log(
-                            "DB ERROR:",
-                            dbResponse.status,
-                            error
-                        );
-
-
                         progress.innerText =
                             "Database xatosi: " +
                             dbResponse.status;
 
+                        console.log(
+                            await dbResponse.text()
+                        );
 
                         setTimeout(
                             function() {
@@ -436,7 +559,6 @@ picker.addEventListener(
                             4000
                         );
 
-
                         return;
 
                     }
@@ -446,9 +568,18 @@ picker.addEventListener(
                         "Yuklandi! ✅";
 
 
-                    addVideoToFeed(
-                        publicURL
-                    );
+                    addVideoToFeed({
+
+                        id:
+                            Date.now(),
+
+                        videos_url:
+                            publicURL,
+
+                        likes:
+                            0
+
+                    });
 
 
                     showVideo(
@@ -467,7 +598,6 @@ picker.addEventListener(
 
 
                 } else {
-
 
                     progress.innerText =
                         "Upload xatosi: " +
