@@ -1050,3 +1050,366 @@ const file =
 );
 
 loadVideos();
+// ===============================
+// PROFIL OYNASI
+// ===============================
+
+const profileButton =
+    document.getElementById("profileButton");
+
+profileButton.addEventListener(
+    "click",
+    function () {
+
+        const oldProfile =
+            document.getElementById("profileModal");
+
+        if (oldProfile) {
+            oldProfile.remove();
+        }
+
+        const modal =
+            document.createElement("div");
+
+        modal.id = "profileModal";
+
+        modal.style.position = "fixed";
+        modal.style.inset = "0";
+        modal.style.background = "#111";
+        modal.style.color = "#fff";
+        modal.style.zIndex = "100000";
+        modal.style.padding = "20px";
+        modal.style.overflowY = "auto";
+
+        modal.innerHTML = `
+
+            <button id="closeProfile" style="
+                position:absolute;
+                top:15px;
+                left:15px;
+                background:none;
+                border:0;
+                color:white;
+                font-size:30px;
+            ">‹</button>
+
+            <div style="
+                text-align:center;
+                margin-top:20px;
+            ">
+
+                <div id="profileImage"
+                    style="
+                        width:90px;
+                        height:90px;
+                        border-radius:50%;
+                        background:#333;
+                        margin:0 auto 15px;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:40px;
+                        overflow:hidden;
+                    ">
+                    👤
+                </div>
+
+                <h2>Profil</h2>
+
+                <div style="
+                    color:#888;
+                    margin-top:5px;
+                ">
+                    Profilingizni sozlang
+                </div>
+
+            </div>
+
+
+            <div style="
+                margin-top:30px;
+            ">
+
+                <label>
+                    Ism
+                </label>
+
+                <input
+                    id="profileName"
+                    type="text"
+                    placeholder="Ismingiz"
+                    maxlength="30"
+                    style="
+                        width:100%;
+                        margin-top:8px;
+                        margin-bottom:18px;
+                        padding:14px;
+                        border-radius:12px;
+                        border:1px solid #444;
+                        background:#222;
+                        color:white;
+                        outline:none;
+                    "
+                >
+
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    id="profileUsername"
+                    type="text"
+                    placeholder="@username"
+                    maxlength="30"
+                    style="
+                        width:100%;
+                        margin-top:8px;
+                        margin-bottom:18px;
+                        padding:14px;
+                        border-radius:12px;
+                        border:1px solid #444;
+                        background:#222;
+                        color:white;
+                        outline:none;
+                    "
+                >
+
+
+                <label>
+                    Bio
+                </label>
+
+                <textarea
+                    id="profileBio"
+                    placeholder="O'zingiz haqingizda..."
+                    maxlength="50"
+                    style="
+                        width:100%;
+                        height:90px;
+                        margin-top:8px;
+                        padding:14px;
+                        border-radius:12px;
+                        border:1px solid #444;
+                        background:#222;
+                        color:white;
+                        outline:none;
+                        resize:none;
+                    "
+                ></textarea>
+
+                <div style="
+                    text-align:right;
+                    color:#888;
+                    font-size:12px;
+                    margin-top:4px;
+                ">
+                    Maksimum 50 ta belgi
+                </div>
+
+
+                <label
+                    for="profileImagePicker"
+                    style="
+                        display:block;
+                        margin-top:20px;
+                        padding:14px;
+                        background:#222;
+                        border-radius:12px;
+                        text-align:center;
+                        cursor:pointer;
+                    ">
+                    🖼 Profil rasmi yuklash
+                </label>
+
+                <input
+                    id="profileImagePicker"
+                    type="file"
+                    accept="image/*"
+                    style="display:none;"
+                >
+
+
+                <button
+                    id="saveProfile"
+                    style="
+                        width:100%;
+                        margin-top:20px;
+                        padding:15px;
+                        border:0;
+                        border-radius:12px;
+                        background:white;
+                        color:black;
+                        font-size:16px;
+                        font-weight:bold;
+                    ">
+                    💾 Saqlash
+                </button>
+
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+
+        // Oldingi ma'lumotlarni olish
+        document.getElementById("profileName").value =
+            localStorage.getItem("profileName") || "";
+
+        document.getElementById("profileUsername").value =
+            localStorage.getItem("profileUsername") || "";
+
+        document.getElementById("profileBio").value =
+            localStorage.getItem("profileBio") || "";
+
+
+        // Rasmni ko'rsatish
+        const savedImage =
+            localStorage.getItem("profileImage");
+
+        if (savedImage) {
+
+            document.getElementById(
+                "profileImage"
+            ).innerHTML = `
+                <img
+                    src="${savedImage}"
+                    style="
+                        width:100%;
+                        height:100%;
+                        object-fit:cover;
+                    "
+                >
+            `;
+        }
+
+
+        // Rasm tanlash
+        document
+            .getElementById("profileImagePicker")
+            .addEventListener(
+                "change",
+                function () {
+
+                    const file =
+                        this.files[0];
+
+                    if (!file) {
+                        return;
+                    }
+
+                    if (
+                        !file.type.startsWith(
+                            "image/"
+                        )
+                    ) {
+                        alert(
+                            "Faqat rasm tanlang!"
+                        );
+                        return;
+                    }
+
+                    const reader =
+                        new FileReader();
+
+                    reader.onload =
+                        function (event) {
+
+                            const image =
+                                event.target.result;
+
+                            localStorage.setItem(
+                                "profileImage",
+                                image
+                            );
+
+                            document.getElementById(
+                                "profileImage"
+                            ).innerHTML = `
+                                <img
+                                    src="${image}"
+                                    style="
+                                        width:100%;
+                                        height:100%;
+                                        object-fit:cover;
+                                    "
+                                >
+                            `;
+                        };
+
+                    reader.readAsDataURL(file);
+                }
+            );
+
+
+        // Profilni saqlash
+        document
+            .getElementById("saveProfile")
+            .addEventListener(
+                "click",
+                function () {
+
+                    const name =
+                        document
+                            .getElementById(
+                                "profileName"
+                            )
+                            .value
+                            .trim();
+
+                    const username =
+                        document
+                            .getElementById(
+                                "profileUsername"
+                            )
+                            .value
+                            .trim();
+
+                    const bio =
+                        document
+                            .getElementById(
+                                "profileBio"
+                            )
+                            .value
+                            .trim();
+
+
+                    localStorage.setItem(
+                        "profileName",
+                        name
+                    );
+
+                    localStorage.setItem(
+                        "profileUsername",
+                        username
+                    );
+
+                    localStorage.setItem(
+                        "profileBio",
+                        bio
+                    );
+
+
+                    alert(
+                        "Profil ma'lumotlari saqlandi ✅"
+                    );
+
+                    modal.remove();
+                }
+            );
+
+
+        // Orqaga qaytish
+        document
+            .getElementById("closeProfile")
+            .addEventListener(
+                "click",
+                function () {
+
+                    modal.remove();
+
+                }
+            );
+
+    }
+);
