@@ -16,6 +16,8 @@ function getVideos() {
 }
 
 
+/* VIDEO QO'SHISH */
+
 function addVideoToFeed(item) {
 
     const box = document.createElement("div");
@@ -48,7 +50,7 @@ function addVideoToFeed(item) {
                 <span>${likes}</span>
             </div>
 
-            <div class="action">
+            <div class="action comment-button">
                 💬
                 <span>0</span>
             </div>
@@ -62,6 +64,9 @@ function addVideoToFeed(item) {
     `;
 
     box.dataset.id = item.id;
+
+
+    /* LIKE */
 
     const likeButton =
         box.querySelector(".like-button");
@@ -87,6 +92,7 @@ function addVideoToFeed(item) {
 
             countElement.innerText =
                 currentLikes;
+
 
             const response =
                 await fetch(
@@ -119,6 +125,7 @@ function addVideoToFeed(item) {
                     }
                 );
 
+
             if (!response.ok) {
 
                 currentLikes--;
@@ -136,9 +143,545 @@ function addVideoToFeed(item) {
         }
     );
 
+
+    /* KOMMENT */
+
+    const commentButton =
+        box.querySelector(
+            ".comment-button"
+        );
+
+    commentButton.addEventListener(
+        "click",
+        function(event) {
+
+            event.stopPropagation();
+
+            openComments(
+                box.dataset.id,
+                commentButton
+            );
+
+        }
+    );
+
+
     feed.appendChild(box);
+
+
+    loadCommentCount(
+        box.dataset.id,
+        commentButton
+    );
 }
 
+
+/* KOMMENT SONI */
+
+async function loadCommentCount(
+    videoId,
+    button
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/comments?select=id&video_id=eq." +
+                videoId,
+                {
+                    headers: {
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY,
+
+                        "Prefer":
+                            "count=exact"
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const range =
+            response.headers.get(
+                "content-range"
+            );
+
+
+        if (range) {
+
+            const total =
+                range.split("/")[1];
+
+            if (total !== "*") {
+
+                button.querySelector(
+                    "span"
+                ).innerText =
+                    total;
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Komment soni xatosi:",
+            error
+        );
+
+    }
+}
+
+
+/* KOMMENT OYNASI */
+
+async function openComments(
+    videoId,
+    commentButton
+) {
+
+    const old =
+        document.getElementById(
+            "commentsModal"
+        );
+
+    if (old) {
+        old.remove();
+    }
+
+
+    const modal =
+        document.createElement(
+            "div"
+        );
+
+
+    modal.id =
+        "commentsModal";
+
+
+    modal.style.position =
+        "fixed";
+
+    modal.style.left = "0";
+    modal.style.right = "0";
+    modal.style.bottom = "0";
+
+    modal.style.height =
+        "70%";
+
+    modal.style.background =
+        "#111";
+
+    modal.style.color =
+        "#fff";
+
+    modal.style.zIndex =
+        "100000";
+
+    modal.style.borderRadius =
+        "20px 20px 0 0";
+
+    modal.style.display =
+        "flex";
+
+    modal.style.flexDirection =
+        "column";
+
+
+    modal.innerHTML = `
+
+        <div style="
+            padding:15px;
+            text-align:center;
+            border-bottom:1px solid #333;
+            font-weight:bold;
+            position:relative;
+        ">
+
+            💬 Kommentlar
+
+            <button
+                id="closeComments"
+                style="
+                    position:absolute;
+                    right:15px;
+                    top:10px;
+                    border:0;
+                    background:none;
+                    color:white;
+                    font-size:25px;
+                "
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div
+            id="commentsList"
+            style="
+                flex:1;
+                overflow-y:auto;
+                padding:15px;
+            "
+        >
+            Yuklanmoqda...
+        </div>
+
+
+        <div style="
+            display:flex;
+            gap:8px;
+            padding:10px;
+            border-top:1px solid #333;
+        ">
+
+            <input
+                id="commentInput"
+                type="text"
+                maxlength="500"
+                placeholder="Komment yozing..."
+                style="
+                    flex:1;
+                    padding:12px;
+                    border-radius:20px;
+                    border:1px solid #444;
+                    background:#222;
+                    color:white;
+                    outline:none;
+                "
+            >
+
+            <button
+                id="sendComment"
+                style="
+                    border:0;
+                    border-radius:20px;
+                    padding:0 18px;
+                    background:white;
+                    color:black;
+                    font-weight:bold;
+                "
+            >
+                Yuborish
+            </button>
+
+        </div>
+    `;
+
+
+    document.body.appendChild(
+        modal
+    );
+
+
+    document
+        .getElementById(
+            "closeComments"
+        )
+        .addEventListener(
+            "click",
+            function() {
+
+                modal.remove();
+
+            }
+        );
+
+
+    const input =
+        document.getElementById(
+            "commentInput"
+        );
+
+    const send =
+        document.getElementById(
+            "sendComment"
+        );
+
+
+    send.addEventListener(
+        "click",
+        async function() {
+
+            const text =
+                input.value.trim();
+
+
+            if (!text) {
+                return;
+            }
+
+
+            send.disabled =
+                true;
+
+            send.innerText =
+                "Yuborilmoqda...";
+
+
+            const response =
+                await fetch(
+                    SUPABASE_URL +
+                    "/rest/v1/comments",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "apikey":
+                                SUPABASE_KEY,
+
+                            "Authorization":
+                                "Bearer " +
+                                SUPABASE_KEY,
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Prefer":
+                                "return=minimal"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                video_id:
+                                    Number(
+                                        videoId
+                                    ),
+
+                                comment_text:
+                                    text
+                            })
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                alert(
+                    "Komment yuborilmadi ❌"
+                );
+
+                console.log(
+                    await response.text()
+                );
+
+            } else {
+
+                input.value = "";
+
+                await loadComments(
+                    videoId
+                );
+
+                await loadCommentCount(
+                    videoId,
+                    commentButton
+                );
+
+            }
+
+
+            send.disabled =
+                false;
+
+            send.innerText =
+                "Yuborish";
+
+        }
+    );
+
+
+    input.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                send.click();
+
+            }
+
+        }
+    );
+
+
+    await loadComments(
+        videoId
+    );
+}
+
+
+/* KOMMENTLARNI YUKLASH */
+
+async function loadComments(
+    videoId
+) {
+
+    const list =
+        document.getElementById(
+            "commentsList"
+        );
+
+
+    if (!list) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/comments?select=id,comment_text,created_at&video_id=eq." +
+                videoId +
+                "&order=created_at.asc",
+                {
+                    headers: {
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            list.innerText =
+                "Kommentlarni yuklab bo‘lmadi.";
+
+            console.log(
+                await response.text()
+            );
+
+            return;
+
+        }
+
+
+        const comments =
+            await response.json();
+
+
+        if (
+            comments.length === 0
+        ) {
+
+            list.innerHTML = `
+                <div style="
+                    text-align:center;
+                    color:#888;
+                    padding:30px;
+                ">
+                    Hali komment yo‘q.
+                    <br>
+                    Birinchi bo‘lib yozing! 💬
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        list.innerHTML = "";
+
+
+        comments.forEach(
+            function(comment) {
+
+                const item =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                item.style.padding =
+                    "10px 0";
+
+                item.style.borderBottom =
+                    "1px solid #222";
+
+
+                item.innerHTML = `
+                    <div style="
+                        font-weight:bold;
+                        margin-bottom:5px;
+                    ">
+                        👤 Foydalanuvchi
+                    </div>
+
+                    <div style="
+                        color:#ddd;
+                        word-break:break-word;
+                    ">
+                        ${escapeHTML(
+                            comment.comment_text
+                        )}
+                    </div>
+                `;
+
+
+                list.appendChild(
+                    item
+                );
+
+            }
+        );
+
+
+        list.scrollTop =
+            list.scrollHeight;
+
+
+    } catch (error) {
+
+        console.log(
+            "Komment xatosi:",
+            error
+        );
+
+    }
+}
+
+
+/* XAVFSIZ MATN */
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+}
+
+
+/* VIDEOLARNI YUKLASH */
 
 async function loadVideos() {
 
@@ -169,6 +712,7 @@ async function loadVideos() {
             );
 
             return;
+
         }
 
 
@@ -212,6 +756,8 @@ async function loadVideos() {
 }
 
 
+/* VIDEO ALMASHTIRISH */
+
 function showVideo(index) {
 
     const videos =
@@ -235,10 +781,12 @@ function showVideo(index) {
                 "active"
             );
 
+
             const video =
                 box.querySelector(
                     "video"
                 );
+
 
             if (video) {
 
@@ -277,9 +825,22 @@ function showVideo(index) {
 }
 
 
+/* SURISH */
+
 document.addEventListener(
     "touchstart",
     function(event) {
+
+        if (
+            event.target.closest(
+                "#commentsModal"
+            )
+        ) {
+
+            return;
+
+        }
+
 
         startY =
             event.touches[0].clientY;
@@ -291,6 +852,17 @@ document.addEventListener(
 document.addEventListener(
     "touchend",
     function(event) {
+
+        if (
+            event.target.closest(
+                "#commentsModal"
+            )
+        ) {
+
+            return;
+
+        }
+
 
         const endY =
             event.changedTouches[0].clientY;
@@ -309,7 +881,9 @@ document.addEventListener(
         }
 
 
-        if (distance > 0) {
+        if (
+            distance > 0
+        ) {
 
             showVideo(
                 current + 1
@@ -326,6 +900,8 @@ document.addEventListener(
     }
 );
 
+
+/* VIDEO YUKLASH */
 
 picker.addEventListener(
     "change",
@@ -527,123 +1103,4 @@ picker.addEventListener(
 
                                 body:
                                     JSON.stringify({
-                                        videos_url:
-                                            publicURL,
-
-                                        likes:
-                                            0
-                                    })
-
-                            }
-                        );
-
-
-                    if (
-                        !dbResponse.ok
-                    ) {
-
-                        progress.innerText =
-                            "Database xatosi: " +
-                            dbResponse.status;
-
-                        console.log(
-                            await dbResponse.text()
-                        );
-
-                        setTimeout(
-                            function() {
-
-                                progress.remove();
-
-                            },
-                            4000
-                        );
-
-                        return;
-
-                    }
-
-
-                    progress.innerText =
-                        "Yuklandi! ✅";
-
-
-                    addVideoToFeed({
-
-                        id:
-                            Date.now(),
-
-                        videos_url:
-                            publicURL,
-
-                        likes:
-                            0
-
-                    });
-
-
-                    showVideo(
-                        getVideos().length - 1
-                    );
-
-
-                    setTimeout(
-                        function() {
-
-                            progress.remove();
-
-                        },
-                        1000
-                    );
-
-
-                } else {
-
-                    progress.innerText =
-                        "Upload xatosi: " +
-                        xhr.status;
-
-
-                    setTimeout(
-                        function() {
-
-                            progress.remove();
-
-                        },
-                        4000
-                    );
-
-                }
-
-            };
-
-
-        xhr.onerror =
-            function() {
-
-                progress.innerText =
-                    "Internet xatosi ❌";
-
-
-                setTimeout(
-                    function() {
-
-                        progress.remove();
-
-                    },
-                    3000
-                );
-
-            };
-
-
-        xhr.send(file);
-
-
-        picker.value = "";
-
-    }
-);
-
-
-loadVideos();
+                                 
