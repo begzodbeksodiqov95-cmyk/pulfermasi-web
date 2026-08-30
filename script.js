@@ -149,7 +149,10 @@ commentButton.addEventListener(
 
         event.stopPropagation();
 
-        alert("💬 Kommentlar oynasi");
+        openComments(
+    box.dataset.id,
+    commentButton
+);
 
     }
 );
@@ -228,7 +231,175 @@ async function loadVideos() {
     }
 }
 
+function openComments(videoId, commentButton) {
 
+    const modal = document.createElement("div");
+
+    modal.style.position = "fixed";
+    modal.style.left = "0";
+    modal.style.right = "0";
+    modal.style.bottom = "0";
+    modal.style.height = "70%";
+    modal.style.background = "#111";
+    modal.style.color = "#fff";
+    modal.style.zIndex = "99999";
+    modal.style.borderRadius = "20px 20px 0 0";
+    modal.style.padding = "15px";
+    modal.style.boxSizing = "border-box";
+
+    modal.innerHTML = `
+        <div style="
+            text-align:center;
+            font-size:20px;
+            font-weight:bold;
+            margin-bottom:15px;
+        ">
+            💬 Kommentlar
+        </div>
+
+        <button id="closeComments" style="
+            position:absolute;
+            right:15px;
+            top:10px;
+            background:none;
+            border:0;
+            color:white;
+            font-size:25px;
+        ">×</button>
+
+        <div id="commentsList" style="
+            height:calc(100% - 110px);
+            overflow-y:auto;
+        ">
+            Hali komment yo‘q.
+        </div>
+
+        <div style="
+            position:absolute;
+            bottom:10px;
+            left:10px;
+            right:10px;
+            display:flex;
+            gap:8px;
+        ">
+            <input id="commentInput"
+                placeholder="Komment yozing..."
+                style="
+                    flex:1;
+                    padding:12px;
+                    border-radius:20px;
+                    border:1px solid #555;
+                    background:#222;
+                    color:white;
+                ">
+
+            <button id="sendComment" style="
+                padding:10px 16px;
+                border:0;
+                border-radius:20px;
+            ">
+                Yuborish
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+
+    document
+        .getElementById("closeComments")
+        .onclick = function() {
+            modal.remove();
+        };
+
+
+    document
+        .getElementById("sendComment")
+        .onclick = async function() {
+
+            const input =
+                document.getElementById("commentInput");
+
+            const text =
+                input.value.trim();
+
+            if (!text) {
+                return;
+            }
+
+            const button =
+                document.getElementById("sendComment");
+
+            button.disabled = true;
+            button.innerText = "...";
+
+
+            const response = await fetch(
+                SUPABASE_URL +
+                "/rest/v1/comments",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "apikey": SUPABASE_KEY,
+                        "Authorization":
+                            "Bearer " + SUPABASE_KEY,
+                        "Content-Type":
+                            "application/json",
+                        "Prefer":
+                            "return=minimal"
+                    },
+
+                    body: JSON.stringify({
+                        video_id:
+                            Number(videoId),
+
+                        comment_text:
+                            text
+                    })
+                }
+            );
+
+
+            if (!response.ok) {
+
+                alert(
+                    "Komment yuborilmadi ❌"
+                );
+
+                console.log(
+                    await response.text()
+                );
+
+            } else {
+
+                input.value = "";
+
+                const list =
+                    document.getElementById(
+                        "commentsList"
+                    );
+
+                const comment =
+                    document.createElement("div");
+
+                comment.style.padding = "10px";
+                comment.style.borderBottom =
+                    "1px solid #333";
+
+                comment.innerText =
+                    "👤 Foydalanuvchi: " +
+                    text;
+
+                list.appendChild(comment);
+
+            }
+
+
+            button.disabled = false;
+            button.innerText = "Yuborish";
+        };
+                        }
 function showVideo(index) {
 
     const videos =
