@@ -233,7 +233,17 @@ async function loadVideos() {
 
 function openComments(videoId, commentButton) {
 
-    const modal = document.createElement("div");
+    const oldModal =
+        document.getElementById("commentsModal");
+
+    if (oldModal) {
+        oldModal.remove();
+    }
+
+    const modal =
+        document.createElement("div");
+
+    modal.id = "commentsModal";
 
     modal.style.position = "fixed";
     modal.style.left = "0";
@@ -271,7 +281,14 @@ function openComments(videoId, commentButton) {
             height:calc(100% - 110px);
             overflow-y:auto;
         ">
-            Hali komment yo‘q.
+            <div id="noComments"
+                style="
+                    text-align:center;
+                    color:#888;
+                    padding:30px;
+                ">
+                Hali komment yo‘q.
+            </div>
         </div>
 
         <div style="
@@ -282,7 +299,9 @@ function openComments(videoId, commentButton) {
             display:flex;
             gap:8px;
         ">
-            <input id="commentInput"
+
+            <input
+                id="commentInput"
                 placeholder="Komment yozing..."
                 style="
                     flex:1;
@@ -291,34 +310,145 @@ function openComments(videoId, commentButton) {
                     border:1px solid #555;
                     background:#222;
                     color:white;
-                ">
+                    outline:none;
+                "
+            >
 
-            <button id="sendComment" style="
-                padding:10px 16px;
-                border:0;
-                border-radius:20px;
-            ">
+            <button
+                id="sendComment"
+                style="
+                    padding:10px 16px;
+                    border:0;
+                    border-radius:20px;
+                "
+            >
                 Yuborish
             </button>
+
         </div>
     `;
 
     document.body.appendChild(modal);
 
 
-    document
-        .getElementById("closeComments")
-        .onclick = function() {
-            modal.remove();
-        };
+    const list =
+        document.getElementById("commentsList");
+
+    const input =
+        document.getElementById("commentInput");
+
+    const sendButton =
+        document.getElementById("sendComment");
 
 
-    document
-        .getElementById("sendComment")
-        .onclick = async function() {
+    function addComment(text) {
 
-            const input =
-                document.getElementById("commentInput");
+        const noComments =
+            document.getElementById("noComments");
+
+        if (noComments) {
+            noComments.remove();
+        }
+
+        const comment =
+            document.createElement("div");
+
+        comment.style.padding = "12px 5px";
+        comment.style.borderBottom =
+            "1px solid #333";
+        comment.style.wordBreak =
+            "break-word";
+
+        comment.innerHTML = `
+            <div style="
+                font-weight:bold;
+                margin-bottom:5px;
+            ">
+                👤 Foydalanuvchi
+            </div>
+
+            <div></div>
+        `;
+
+        comment
+            .querySelector("div:last-child")
+            .textContent = text;
+
+        list.appendChild(comment);
+    }
+
+
+    async function loadComments() {
+
+        try {
+
+            const response =
+                await fetch(
+                    SUPABASE_URL +
+                    "/rest/v1/comments" +
+                    "?select=comment_text" +
+                    "&video_id=eq." +
+                    Number(videoId),
+                    {
+                        headers: {
+                            "apikey":
+                                SUPABASE_KEY,
+
+                            "Authorization":
+                                "Bearer " +
+                                SUPABASE_KEY
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                console.log(
+                    "Kommentlarni olish xatosi:",
+                    await response.text()
+                );
+
+                return;
+            }
+
+
+            const comments =
+                await response.json();
+
+
+            if (comments.length > 0) {
+
+                comments.forEach(
+                    function(item) {
+
+                        if (item.comment_text) {
+
+                            addComment(
+                                item.comment_text
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+
+        } catch (error) {
+
+            console.log(
+                "Komment xatosi:",
+                error
+            );
+
+        }
+
+    }
+
+
+    sendButton.onclick =
+        async function() {
 
             const text =
                 input.value.trim();
@@ -327,79 +457,138 @@ function openComments(videoId, commentButton) {
                 return;
             }
 
-            const button =
-                document.getElementById("sendComment");
+            sendButton.disabled = true;
 
-            button.disabled = true;
-            button.innerText = "...";
+            sendButton.innerText =
+                "Yuborilmoqda...";
 
 
-            const response = await fetch(
-                SUPABASE_URL +
-                "/rest/v1/comments",
-                {
-                    method: "POST",
+            try {
 
-                    headers: {
-                        "apikey": SUPABASE_KEY,
-                        "Authorization":
-                            "Bearer " + SUPABASE_KEY,
-                        "Content-Type":
-                            "application/json",
-                        "Prefer":
-                            "return=minimal"
-                    },
+                const response =
+                    await fetch(
+                        SUPABASE_URL +
+                        "/rest/v1/comments",
+                        {
+                            method: "POST",
 
-                    body: JSON.stringify({
-                        video_id:
-                            Number(videoId),
+                            headers: {
+                                "apikey":
+                                    SUPABASE_KEY,
 
-                        comment_text:
-                            text
-                    })
+                                "Authorization":
+                                    "Bearer " +
+                                    SUPABASE_KEY,
+
+                                "Content-Type":
+                                    "application/json",
+
+                                "Prefer":
+                                    "return=minimal"
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    video_id:
+                                        Number(videoId),
+
+                                    comment_text:
+                                        text
+                                })
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    console.log(
+                        "Komment xatosi:",
+                        await response.text()
+                    );
+
+                    alert(
+                        "Komment yuborilmadi ❌"
+                    );
+
+                    return;
                 }
-            );
 
 
-            if (!response.ok) {
-
-                alert(
-                    "Komment yuborilmadi ❌"
-                );
-
-                console.log(
-                    await response.text()
-                );
-
-            } else {
+                addComment(text);
 
                 input.value = "";
 
-                const list =
-                    document.getElementById(
-                        "commentsList"
+                list.scrollTop =
+                    list.scrollHeight;
+
+
+                const countElement =
+                    commentButton.querySelector(
+                        "span"
                     );
 
-                const comment =
-                    document.createElement("div");
+                if (countElement) {
 
-                comment.style.padding = "10px";
-                comment.style.borderBottom =
-                    "1px solid #333";
+                    let count =
+                        Number(
+                            countElement.innerText
+                        ) || 0;
 
-                comment.innerText =
-                    "👤 Foydalanuvchi: " +
-                    text;
+                    count++;
 
-                list.appendChild(comment);
+                    countElement.innerText =
+                        count;
+                }
+
+
+            } catch (error) {
+
+                console.log(
+                    "Xato:",
+                    error
+                );
+
+                alert(
+                    "Internet xatosi ❌"
+                );
+
+            } finally {
+
+                sendButton.disabled = false;
+
+                sendButton.innerText =
+                    "Yuborish";
+            }
+
+        };
+
+
+    input.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+
+                sendButton.click();
 
             }
 
+        }
+    );
 
-            button.disabled = false;
-            button.innerText = "Yuborish";
+
+    document
+        .getElementById("closeComments")
+        .onclick =
+        function() {
+
+            modal.remove();
+
         };
-                        }
+
+
+    loadComments();
+}
 function showVideo(index) {
 
     const videos =
