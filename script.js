@@ -1378,709 +1378,45 @@ profileButton.addEventListener(
 // ===============================
 // ALOHIDA PROFIL TAHRIRLASH
 // ===============================
-const editButton = document.getElementById("editProfile");
 
-if (editButton) {
+const editButton =
+    document.getElementById("editProfile");
 
-    editButton.addEventListener("click", function() {
 
-    const editModal = document.createElement("div");
+// ===============================
+// TELEGRAM ID OLISH
+// ===============================
 
-    editModal.id = "editProfileModal";
+function getTelegramId() {
 
-    editModal.style.cssText = `
-        position:fixed;
-        inset:0;
-        z-index:99999;
-        background:#000;
-        color:white;
-        overflow-y:auto;
-        padding:20px;
-    `;
+    return (
+        window.Telegram &&
+        window.Telegram.WebApp &&
+        window.Telegram.WebApp.initDataUnsafe &&
+        window.Telegram.WebApp.initDataUnsafe.user
+    )
+        ? String(
+            window.Telegram.WebApp
+                .initDataUnsafe
+                .user.id
+        )
+        : null;
+}
 
-    editModal.innerHTML = `
 
-        <button id="closeEditProfile" style="
-            background:none;
-            border:0;
-            color:white;
-            font-size:32px;
-            margin-bottom:20px;
-        ">‹</button>
-
-        <h2 style="
-            margin:0 0 25px 0;
-            font-size:22px;
-        ">
-            Profilni tahrirlash
-        </h2>
-
-        <div style="
-            text-align:center;
-            margin-bottom:25px;
-        ">
-
-            <div id="editProfileImage" style="
-                width:110px;
-                height:110px;
-                margin:auto;
-                border-radius:50%;
-                background:#333;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                overflow:hidden;
-                font-size:45px;
-            ">
-                👤
-            </div>
-
-            <label for="editProfileImagePicker"
-                style="
-                    display:inline-block;
-                    margin-top:15px;
-                    padding:11px 16px;
-                    background:#222;
-                    border-radius:10px;
-                ">
-                🖼 Rasmni o‘zgartirish
-            </label>
-
-            <input
-                id="editProfileImagePicker"
-                type="file"
-                accept="image/*"
-                style="display:none;"
-            >
-
-        </div>
-
-        <label>Ism</label>
-
-        <input
-            id="editProfileName"
-            type="text"
-            maxlength="30"
-            placeholder="Ismingiz"
-            style="
-                width:100%;
-                margin:8px 0 18px;
-                padding:14px;
-                border-radius:12px;
-                border:1px solid #444;
-                background:#222;
-                color:white;
-                outline:none;
-            "
-        >
-
-        <label>Username</label>
-
-        <input
-            id="editProfileUsername"
-            type="text"
-            maxlength="30"
-            placeholder="@username"
-            style="
-                width:100%;
-                margin:8px 0 18px;
-                padding:14px;
-                border-radius:12px;
-                border:1px solid #444;
-                background:#222;
-                color:white;
-                outline:none;
-            "
-        >
-
-        <label>Bio</label>
-
-        <textarea
-            id="editProfileBio"
-            maxlength="50"
-            placeholder="O‘zingiz haqingizda..."
-            style="
-                width:100%;
-                height:90px;
-                margin:8px 0 5px;
-                padding:14px;
-                border-radius:12px;
-                border:1px solid #444;
-                background:#222;
-                color:white;
-                outline:none;
-                resize:none;
-            "
-        ></textarea>
-
-        <div style="
-            text-align:right;
-            color:#888;
-            font-size:12px;
-        ">
-            Maksimum 50 ta belgi
-        </div>
-
-        <button
-            id="saveEditedProfile"
-            style="
-                width:100%;
-                margin-top:20px;
-                padding:15px;
-                border:0;
-                border-radius:12px;
-                background:white;
-                color:black;
-                font-size:16px;
-                font-weight:bold;
-            "
-        >
-            💾 Saqlash
-        </button>
-
-    `;
-
-    document.body.appendChild(editModal);
-
-
-    // ===============================
-    // HOZIRGI MA'LUMOTLARNI OLISH
-    // ===============================
-
-    const currentName =
-        document.getElementById(
-            "profileDisplayName"
-        ).innerText;
-
-    const currentUsername =
-        document.getElementById(
-            "profileDisplayUsername"
-        ).innerText;
-
-    const currentBio =
-        document.getElementById(
-            "profileDisplayBio"
-        ).innerText;
-
-
-    document.getElementById(
-        "editProfileName"
-    ).value =
-        currentName === "Ism"
-        ? ""
-        : currentName;
-
-
-    document.getElementById(
-        "editProfileUsername"
-    ).value =
-        currentUsername === "@username"
-        ? ""
-        : currentUsername;
-
-
-    document.getElementById(
-        "editProfileBio"
-    ).value =
-        currentBio;
-
-
-    // ===============================
-    // ESKI RASMNI KO‘RSATISH
-    // ===============================
-
-    const oldImage =
-        document.querySelector(
-            "#profileImage img"
-        );
-
-    if (oldImage) {
-
-        document.getElementById(
-            "editProfileImage"
-        ).innerHTML = `
-
-            <img
-                src="${oldImage.src}"
-                style="
-                    width:100%;
-                    height:100%;
-                    object-fit:cover;
-                "
-            >
-
-        `;
-    }
-
-
-    // ===============================
-    // ORQAGA
-    // ===============================
-
-    document.getElementById(
-        "closeEditProfile"
-    ).onclick = function () {
-
-        editModal.remove();
-
-    };
-
-
-    // ===============================
-    // RASM TANLASH
-    // ===============================
-
-    document.getElementById(
-        "editProfileImagePicker"
-    ).onchange = function () {
-
-        const file = this.files[0];
-
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-
-            alert("Faqat rasm tanlang!");
-
-            this.value = "";
-
-            return;
-        }
-
-
-        const reader =
-            new FileReader();
-
-
-        reader.onload =
-            function (event) {
-
-                document.getElementById(
-                    "editProfileImage"
-                ).innerHTML = `
-
-                    <img
-                        src="${event.target.result}"
-                        style="
-                            width:100%;
-                            height:100%;
-                            object-fit:cover;
-                        "
-                    >
-
-                `;
-
-            };
-
-
-        reader.readAsDataURL(file);
-
-    };
-
-
-    // ===============================
-    // SAQLASH
-    // ===============================
-
-    document.getElementById(
-        "saveEditedProfile"
-    ).onclick = async function () {
-
-        const button = this;
-
-        const telegramId =
-            window.Telegram &&
-            window.Telegram.WebApp &&
-            window.Telegram.WebApp.initDataUnsafe &&
-            window.Telegram.WebApp.initDataUnsafe.user
-                ? String(
-                    window.Telegram.WebApp
-                        .initDataUnsafe
-                        .user.id
-                )
-                : null;
-
-
-        if (!telegramId) {
-
-            alert(
-                "Telegram ID topilmadi ❌"
-            );
-
-            return;
-
-        }
-
-
-        const name =
-            document.getElementById(
-                "editProfileName"
-            ).value.trim();
-
-
-        let username =
-            document.getElementById(
-                "editProfileUsername"
-            ).value.trim();
-
-
-        const bio =
-            document.getElementById(
-                "editProfileBio"
-            ).value.trim();
-
-
-        if (
-            username &&
-            !username.startsWith("@")
-        ) {
-
-            username =
-                "@" + username;
-
-        }
-
-
-        const imagePicker =
-            document.getElementById(
-                "editProfileImagePicker"
-            );
-
-
-        const imageFile =
-            imagePicker.files[0];
-
-
-        try {
-
-            button.disabled = true;
-
-            button.innerText =
-                "Saqlanmoqda...";
-
-
-            // ===============================
-            // RASM
-            // ===============================
-
-            let avatarURL = null;
-
-
-            if (imageFile) {
-
-                const fileName =
-                    telegramId +
-                    "_" +
-                    Date.now() +
-                    "_" +
-                    imageFile.name.replace(
-                        /[^a-zA-Z0-9._-]/g,
-                        "_"
-                    );
-
-
-                const uploadResponse =
-                    await fetch(
-                        SUPABASE_URL +
-                        "/storage/v1/object/Profiles/" +
-                        fileName,
-                        {
-                            method:"POST",
-
-                            headers:{
-                                "apikey":
-                                    SUPABASE_KEY,
-
-                                "Authorization":
-                                    "Bearer " +
-                                    SUPABASE_KEY,
-
-                                "Content-Type":
-                                    imageFile.type,
-
-                                "x-upsert":
-                                    "false"
-                            },
-
-                            body:imageFile
-                        }
-                    );
-
-
-                if (!uploadResponse.ok) {
-
-                    throw new Error(
-                        "Rasm yuklanmadi: " +
-                        await uploadResponse.text()
-                    );
-
-                }
-
-
-                avatarURL =
-                    SUPABASE_URL +
-                    "/storage/v1/object/public/Profiles/" +
-                    fileName;
-
-            }
-
-
-            // ===============================
-            // PROFIL BORLIGINI TEKSHIRISH
-            // ===============================
-
-            const checkResponse =
-                await fetch(
-                    SUPABASE_URL +
-                    "/rest/v1/profiles" +
-                    "?telegram_id=eq." +
-                    encodeURIComponent(
-                        telegramId
-                    ) +
-                    "&select=id",
-                    {
-                        headers:{
-                            "apikey":
-                                SUPABASE_KEY,
-
-                            "Authorization":
-                                "Bearer " +
-                                SUPABASE_KEY
-                        }
-                    }
-                );
-
-
-            if (!checkResponse.ok) {
-
-                throw new Error(
-                    await checkResponse.text()
-                );
-
-            }
-
-
-            const existing =
-                await checkResponse.json();
-
-
-            let response;
-
-
-            // ===============================
-            // UPDATE
-            // ===============================
-
-            if (
-                existing.length > 0
-            ) {
-
-                const profileId =
-                    existing[0].id;
-
-
-                response =
-                    await fetch(
-                        SUPABASE_URL +
-                        "/rest/v1/profiles?id=eq." +
-                        encodeURIComponent(
-                            profileId
-                        ),
-                        {
-                            method:"PATCH",
-
-                            headers:{
-                                "apikey":
-                                    SUPABASE_KEY,
-
-                                "Authorization":
-                                    "Bearer " +
-                                    SUPABASE_KEY,
-
-                                "Content-Type":
-                                    "application/json",
-
-                                "Prefer":
-                                    "return=minimal"
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    display_name:
-                                        name,
-
-                                    username:
-                                        username,
-
-                                    bio:
-                                        bio,
-
-                                    ...(avatarURL
-                                        ? {
-                                            avatar_url:
-                                                avatarURL
-                                        }
-                                        : {})
-
-                                })
-                        }
-                    );
-
-
-            } else {
-
-                // ===============================
-                // INSERT
-                // ===============================
-
-                response =
-                    await fetch(
-                        SUPABASE_URL +
-                        "/rest/v1/profiles",
-                        {
-                            method:"POST",
-
-                            headers:{
-                                "apikey":
-                                    SUPABASE_KEY,
-
-                                "Authorization":
-                                    "Bearer " +
-                                    SUPABASE_KEY,
-
-                                "Content-Type":
-                                    "application/json",
-
-                                "Prefer":
-                                    "return=minimal"
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    telegram_id:
-                                        telegramId,
-
-                                    display_name:
-                                        name,
-
-                                    username:
-                                        username,
-
-                                    bio:
-                                        bio,
-
-                                    avatar_url:
-                                        avatarURL
-
-                                })
-                        }
-                    );
-
-            }
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    await response.text()
-                );
-
-            }
-
-
-            // ===============================
-            // PROFIL OYNASINI YANGILASH
-            // ===============================
-
-            document.getElementById(
-                "profileDisplayName"
-            ).innerText =
-                name || "Ism";
-
-
-            document.getElementById(
-                "profileDisplayUsername"
-            ).innerText =
-                username || "@username";
-
-
-            document.getElementById(
-                "profileDisplayBio"
-            ).innerText =
-                bio;
-
-
-            if (avatarURL) {
-
-                document.getElementById(
-                    "profileImage"
-                ).innerHTML = `
-
-                    <img
-                        src="${avatarURL}"
-                        style="
-                            width:100%;
-                            height:100%;
-                            object-fit:cover;
-                        "
-                    >
-
-                `;
-
-            }
-
-
-            // ===============================
-            // TAHRIRLASH OYNASINI YOPISH
-            // ===============================
-
-            editModal.remove();
-
-            alert(
-                "Profil saqlandi ✅"
-            );
-
-
-        } catch (error) {
-
-            console.log(
-                "Profil saqlash xatosi:",
-                error
-            );
-
-            alert(
-                "Profil saqlanmadi ❌\n\n" +
-                error.message
-            );
-
-        } finally {
-
-            button.disabled = false;
-
-            button.innerText =
-                "💾 Saqlash";
-
-        }
-
-    });
-  
 // ===============================
 // BAZADAN PROFILNI OLISH
 // ===============================
 
-const telegramId =
-    window.Telegram &&
-    window.Telegram.WebApp &&
-    window.Telegram.WebApp.initDataUnsafe &&
-    window.Telegram.WebApp.initDataUnsafe.user
-        ? String(
-            window.Telegram.WebApp.initDataUnsafe.user.id
-        )
-        : null;
+async function loadProfileFromDatabase() {
 
-if (telegramId) {
+    const telegramId =
+        getTelegramId();
+
+    if (!telegramId) {
+        console.log("Telegram ID topilmadi");
+        return;
+    }
 
     try {
 
@@ -2119,57 +1455,411 @@ if (telegramId) {
             await response.json();
 
 
-        if (data.length > 0) {
+        if (data.length === 0) {
+            return;
+        }
 
-            const profile =
-                data[0];
+
+        const profile =
+            data[0];
 
 
-            // ===============================
-            // ISM
-            // ===============================
+        // ===============================
+        // ISM
+        // ===============================
 
+        const nameElement =
             document.getElementById(
                 "profileDisplayName"
-            ).innerText =
+            );
+
+        if (nameElement) {
+
+            nameElement.innerText =
                 profile.display_name ||
                 "Ism";
 
+        }
 
-            // ===============================
-            // USERNAME
-            // ===============================
 
+        // ===============================
+        // USERNAME
+        // ===============================
+
+        const usernameElement =
             document.getElementById(
                 "profileDisplayUsername"
-            ).innerText =
+            );
+
+        if (usernameElement) {
+
+            usernameElement.innerText =
                 profile.username ||
                 "@username";
 
+        }
 
-            // ===============================
-            // BIO
-            // ===============================
 
+        // ===============================
+        // BIO
+        // ===============================
+
+        const bioElement =
             document.getElementById(
                 "profileDisplayBio"
-            ).innerText =
+            );
+
+        if (bioElement) {
+
+            bioElement.innerText =
                 profile.bio ||
                 "";
 
+        }
+
+
+        // ===============================
+        // RASM
+        // ===============================
+
+        const profileImage =
+            document.getElementById(
+                "profileImage"
+            );
+
+        if (
+            profileImage &&
+            profile.avatar_url
+        ) {
+
+            profileImage.innerHTML = `
+
+                <img
+                    src="${profile.avatar_url}"
+                    style="
+                        width:100%;
+                        height:100%;
+                        object-fit:cover;
+                        border-radius:50%;
+                    "
+                >
+
+            `;
+
+        }
+
+
+    } catch (error) {
+
+        console.log(
+            "Profilni olishda xato:",
+            error
+        );
+
+    }
+
+}
+
+
+// ===============================
+// TAHRIRLASH TUGMASI
+// ===============================
+
+if (editButton) {
+
+    editButton.addEventListener(
+        "click",
+        function() {
+
 
             // ===============================
-            // RASM
+            // YANGI TAHRIRLASH OYNASI
             // ===============================
 
-            if (profile.avatar_url) {
+            const editModal =
+                document.createElement("div");
+
+
+            editModal.id =
+                "editProfileModal";
+
+
+            editModal.style.cssText = `
+                position:fixed;
+                inset:0;
+                z-index:99999;
+                background:#000;
+                color:white;
+                overflow-y:auto;
+                padding:20px;
+            `;
+
+
+            editModal.innerHTML = `
+
+                <button
+                    id="closeEditProfile"
+                    style="
+                        background:none;
+                        border:0;
+                        color:white;
+                        font-size:32px;
+                        margin-bottom:20px;
+                    "
+                >
+                    ‹
+                </button>
+
+
+                <h2
+                    style="
+                        margin:0 0 25px 0;
+                        font-size:22px;
+                    "
+                >
+                    Profilni tahrirlash
+                </h2>
+
+
+                <!-- RASM -->
+
+                <div
+                    style="
+                        text-align:center;
+                        margin-bottom:25px;
+                    "
+                >
+
+                    <div
+                        id="editProfileImage"
+                        style="
+                            width:110px;
+                            height:110px;
+                            margin:auto;
+                            border-radius:50%;
+                            background:#333;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            overflow:hidden;
+                            font-size:45px;
+                        "
+                    >
+                        👤
+                    </div>
+
+
+                    <label
+                        for="editProfileImagePicker"
+                        style="
+                            display:inline-block;
+                            margin-top:15px;
+                            padding:11px 16px;
+                            background:#222;
+                            border-radius:10px;
+                            cursor:pointer;
+                        "
+                    >
+                        🖼 Rasmni o‘zgartirish
+                    </label>
+
+
+                    <input
+                        id="editProfileImagePicker"
+                        type="file"
+                        accept="image/*"
+                        style="display:none;"
+                    >
+
+                </div>
+
+
+                <!-- ISM -->
+
+                <label>
+                    Ism
+                </label>
+
+
+                <input
+                    id="editProfileName"
+                    type="text"
+                    maxlength="30"
+                    placeholder="Ismingiz"
+                    style="
+                        width:100%;
+                        margin:8px 0 18px;
+                        padding:14px;
+                        border-radius:12px;
+                        border:1px solid #444;
+                        background:#222;
+                        color:white;
+                        outline:none;
+                    "
+                >
+
+
+                <!-- USERNAME -->
+
+                <label>
+                    Username
+                </label>
+
+
+                <input
+                    id="editProfileUsername"
+                    type="text"
+                    maxlength="30"
+                    placeholder="@username"
+                    style="
+                        width:100%;
+                        margin:8px 0 18px;
+                        padding:14px;
+                        border-radius:12px;
+                        border:1px solid #444;
+                        background:#222;
+                        color:white;
+                        outline:none;
+                    "
+                >
+
+
+                <!-- BIO -->
+
+                <label>
+                    Bio
+                </label>
+
+
+                <textarea
+                    id="editProfileBio"
+                    maxlength="50"
+                    placeholder="O‘zingiz haqingizda..."
+                    style="
+                        width:100%;
+                        height:90px;
+                        margin:8px 0 5px;
+                        padding:14px;
+                        border-radius:12px;
+                        border:1px solid #444;
+                        background:#222;
+                        color:white;
+                        outline:none;
+                        resize:none;
+                    "
+                ></textarea>
+
+
+                <div
+                    style="
+                        text-align:right;
+                        color:#888;
+                        font-size:12px;
+                    "
+                >
+                    Maksimum 50 ta belgi
+                </div>
+
+
+                <!-- SAQLASH -->
+
+                <button
+                    id="saveEditedProfile"
+                    style="
+                        width:100%;
+                        margin-top:20px;
+                        padding:15px;
+                        border:0;
+                        border-radius:12px;
+                        background:white;
+                        color:black;
+                        font-size:16px;
+                        font-weight:bold;
+                    "
+                >
+                    💾 Saqlash
+                </button>
+
+            `;
+
+
+            document.body.appendChild(
+                editModal
+            );
+
+
+            // ===============================
+            // HOZIRGI MA'LUMOTLARNI OLISH
+            // ===============================
+
+            const currentName =
+                document.getElementById(
+                    "profileDisplayName"
+                );
+
+
+            const currentUsername =
+                document.getElementById(
+                    "profileDisplayUsername"
+                );
+
+
+            const currentBio =
+                document.getElementById(
+                    "profileDisplayBio"
+                );
+
+
+            document.getElementById(
+                "editProfileName"
+            ).value =
+                currentName
+                    ? (
+                        currentName.innerText === "Ism"
+                            ? ""
+                            : currentName.innerText
+                    )
+                    : "";
+
+
+            document.getElementById(
+                "editProfileUsername"
+            ).value =
+                currentUsername
+                    ? (
+                        currentUsername.innerText === "@username"
+                            ? ""
+                            : currentUsername.innerText
+                    )
+                    : "";
+
+
+            document.getElementById(
+                "editProfileBio"
+            ).value =
+                currentBio
+                    ? currentBio.innerText
+                    : "";
+
+
+            // ===============================
+            // ESKI RASMNI KO‘RSATISH
+            // ===============================
+
+            const oldImage =
+                document.querySelector(
+                    "#profileImage img"
+                );
+
+
+            if (oldImage) {
 
                 document.getElementById(
-                    "profileImage"
+                    "editProfileImage"
                 ).innerHTML = `
 
                     <img
-                        src="${profile.avatar_url}"
+                        src="${oldImage.src}"
                         style="
                             width:100%;
                             height:100%;
@@ -2182,16 +1872,290 @@ if (telegramId) {
 
             }
 
-        }
 
-    } catch (error) {
+            // ===============================
+            // ORQAGA
+            // ===============================
 
-        console.log(
-            "Profilni olishda xato:",
-            error
-        );
+            document.getElementById(
+                "closeEditProfile"
+            ).onclick =
+                function() {
 
-    }
+                    editModal.remove();
 
-        }
-    
+                };
+
+
+            // ===============================
+            // RASM TANLASH
+            // ===============================
+
+            document.getElementById(
+                "editProfileImagePicker"
+            ).onchange =
+                function() {
+
+                    const file =
+                        this.files[0];
+
+
+                    if (!file) {
+                        return;
+                    }
+
+
+                    if (
+                        !file.type.startsWith(
+                            "image/"
+                        )
+                    ) {
+
+                        alert(
+                            "Faqat rasm tanlang!"
+                        );
+
+                        this.value = "";
+
+                        return;
+                    }
+
+
+                    const reader =
+                        new FileReader();
+
+
+                    reader.onload =
+                        function(event) {
+
+                            document.getElementById(
+                                "editProfileImage"
+                            ).innerHTML = `
+
+                                <img
+                                    src="${event.target.result}"
+                                    style="
+                                        width:100%;
+                                        height:100%;
+                                        object-fit:cover;
+                                        border-radius:50%;
+                                    "
+                                >
+
+                            `;
+
+                        };
+
+
+                    reader.readAsDataURL(
+                        file
+                    );
+
+                };
+
+
+            // ===============================
+            // SAQLASH
+            // ===============================
+
+            document.getElementById(
+                "saveEditedProfile"
+            ).onclick =
+                async function() {
+
+
+                    const button =
+                        this;
+
+
+                    const telegramId =
+                        getTelegramId();
+
+
+                    if (!telegramId) {
+
+                        alert(
+                            "Telegram ID topilmadi ❌"
+                        );
+
+                        return;
+                    }
+
+
+                    const name =
+                        document.getElementById(
+                            "editProfileName"
+                        ).value.trim();
+
+
+                    let username =
+                        document.getElementById(
+                            "editProfileUsername"
+                        ).value.trim();
+
+
+                    const bio =
+                        document.getElementById(
+                            "editProfileBio"
+                        ).value.trim();
+
+
+                    // ===============================
+                    // USERNAME @ QO‘SHISH
+                    // ===============================
+
+                    if (
+                        username &&
+                        !username.startsWith("@")
+                    ) {
+
+                        username =
+                            "@" + username;
+
+                    }
+
+
+                    const imagePicker =
+                        document.getElementById(
+                            "editProfileImagePicker"
+                        );
+
+
+                    const imageFile =
+                        imagePicker.files[0];
+
+
+                    try {
+
+                        button.disabled =
+                            true;
+
+
+                        button.innerText =
+                            "Saqlanmoqda...";
+
+
+                        // ===============================
+                        // RASM YUKLASH
+                        // ===============================
+
+                        let avatarURL =
+                            null;
+
+
+                        if (imageFile) {
+
+                            const fileName =
+                                telegramId +
+                                "_" +
+                                Date.now() +
+                                "_" +
+                                imageFile.name.replace(
+                                    /[^a-zA-Z0-9._-]/g,
+                                    "_"
+                                );
+
+
+                            const uploadResponse =
+                                await fetch(
+                                    SUPABASE_URL +
+                                    "/storage/v1/object/Profiles/" +
+                                    fileName,
+                                    {
+                                        method:
+                                            "POST",
+
+                                        headers: {
+
+                                            "apikey":
+                                                SUPABASE_KEY,
+
+                                            "Authorization":
+                                                "Bearer " +
+                                                SUPABASE_KEY,
+
+                                            "Content-Type":
+                                                imageFile.type,
+
+                                            "x-upsert":
+                                                "false"
+
+                                        },
+
+                                        body:
+                                            imageFile
+
+                                    }
+                                );
+
+
+                            if (
+                                !uploadResponse.ok
+                            ) {
+
+                                throw new Error(
+                                    "Rasm yuklanmadi: " +
+                                    await uploadResponse.text()
+                                );
+
+                            }
+
+
+                            avatarURL =
+                                SUPABASE_URL +
+                                "/storage/v1/object/public/Profiles/" +
+                                fileName;
+
+                        }
+
+
+                        // ===============================
+                        // PROFIL BORLIGINI TEKSHIRISH
+                        // ===============================
+
+                        const checkResponse =
+                            await fetch(
+                                SUPABASE_URL +
+                                "/rest/v1/profiles" +
+                                "?telegram_id=eq." +
+                                encodeURIComponent(
+                                    telegramId
+                                ) +
+                                "&select=id,avatar_url",
+                                {
+                                    method:
+                                        "GET",
+
+                                    headers: {
+
+                                        "apikey":
+                                            SUPABASE_KEY,
+
+                                        "Authorization":
+                                            "Bearer " +
+                                            SUPABASE_KEY
+
+                                    }
+                                }
+                            );
+
+
+                        if (
+                            !checkResponse.ok
+                        ) {
+
+                            throw new Error(
+                                await checkResponse.text()
+                            );
+
+                        }
+
+
+                        const existing =
+                            await checkResponse.json();
+
+
+                        let response;
+
+
+                   
