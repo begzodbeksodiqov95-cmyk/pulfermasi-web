@@ -1369,66 +1369,87 @@ profileButton.addEventListener(
         </div>
 
     </div>
+// ===============================
+// ALOHIDA PROFIL TAHRIRLASH OYNASI
+// ===============================
 
+document.getElementById("editProfile").onclick = function() {
 
-    <!-- ========================= -->
-    <!-- TAHRIRLASH OYNASI -->
-    <!-- ========================= -->
+    const editModal = document.createElement("div");
 
-    <div id="editProfileBox"
-        style="
-            display:none;
-            margin-top:30px;
-            padding-bottom:30px;
-        ">
+    editModal.style.cssText = `
+        position:fixed;
+        inset:0;
+        background:#000;
+        color:white;
+        z-index:99999;
+        overflow-y:auto;
+        padding:20px;
+    `;
+
+    editModal.innerHTML = `
+
+        <button id="closeEditProfile" style="
+            background:none;
+            border:0;
+            color:white;
+            font-size:32px;
+            margin-bottom:20px;
+        ">‹</button>
 
         <div style="
-            font-size:20px;
+            font-size:22px;
             font-weight:bold;
-            margin-bottom:20px;
+            margin-bottom:25px;
         ">
             Profilni tahrirlash
         </div>
 
-
-        <!-- RASM -->
-        <label style="
-            display:block;
-            margin-bottom:8px;
+        <div style="
+            text-align:center;
+            margin-bottom:25px;
         ">
-            Profil rasmi
-        </label>
 
-        <label
-            for="profileImagePicker"
-            style="
+            <div id="editProfileImage" style="
+                width:110px;
+                height:110px;
+                border-radius:50%;
+                background:#333;
+                margin:0 auto 15px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                overflow:hidden;
+                border:2px solid #555;
+                font-size:45px;
+            ">👤</div>
+
+            <label for="editProfileImagePicker" style="
                 display:inline-block;
-                color:white;
                 background:#222;
+                color:white;
                 padding:11px 16px;
                 border-radius:10px;
-                margin-bottom:20px;
             ">
-            🖼 Rasmni o‘zgartirish
-        </label>
+                🖼 Rasmni o‘zgartirish
+            </label>
 
+            <input
+                id="editProfileImagePicker"
+                type="file"
+                accept="image/*"
+                style="display:none;"
+            >
 
-        <input
-            id="profileImagePicker"
-            type="file"
-            accept="image/*"
-            style="display:none;"
-        >
+        </div>
 
-
-        <!-- ISM -->
         <label>Ism</label>
 
         <input
-            id="profileName"
+            id="editProfileName"
             type="text"
-            placeholder="Ismingiz"
             maxlength="30"
+            placeholder="Ismingiz"
             style="
                 width:100%;
                 margin-top:8px;
@@ -1442,15 +1463,13 @@ profileButton.addEventListener(
             "
         >
 
-
-        <!-- USERNAME -->
         <label>Username</label>
 
         <input
-            id="profileUsername"
+            id="editProfileUsername"
             type="text"
-            placeholder="@username"
             maxlength="30"
+            placeholder="@username"
             style="
                 width:100%;
                 margin-top:8px;
@@ -1464,14 +1483,12 @@ profileButton.addEventListener(
             "
         >
 
-
-        <!-- BIO -->
         <label>Bio</label>
 
         <textarea
-            id="profileBio"
-            placeholder="O‘zingiz haqingizda..."
+            id="editProfileBio"
             maxlength="50"
+            placeholder="O‘zingiz haqingizda..."
             style="
                 width:100%;
                 height:90px;
@@ -1486,7 +1503,6 @@ profileButton.addEventListener(
             "
         ></textarea>
 
-
         <div style="
             text-align:right;
             color:#888;
@@ -1496,25 +1512,65 @@ profileButton.addEventListener(
             Maksimum 50 ta belgi
         </div>
 
-
-        <!-- SAQLASH -->
-        <button
-            id="saveProfile"
-            style="
-                width:100%;
-                margin-top:20px;
-                padding:15px;
-                border:0;
-                border-radius:12px;
-                background:white;
-                color:black;
-                font-size:16px;
-                font-weight:bold;
-            ">
+        <button id="saveEditedProfile" style="
+            width:100%;
+            margin-top:20px;
+            padding:15px;
+            border:0;
+            border-radius:12px;
+            background:white;
+            color:black;
+            font-size:16px;
+            font-weight:bold;
+        ">
             💾 Saqlash
         </button>
 
-    </div>
+    `;
+
+    document.body.appendChild(editModal);
+
+
+    // ORQAGA
+    document.getElementById("closeEditProfile").onclick = function() {
+        editModal.remove();
+    };
+
+
+    // HOZIRGI ISM
+    document.getElementById("editProfileName").value =
+        document.getElementById("profileDisplayName").innerText;
+
+
+    // HOZIRGI USERNAME
+    document.getElementById("editProfileUsername").value =
+        document.getElementById("profileDisplayUsername").innerText;
+
+
+    // HOZIRGI BIO
+    document.getElementById("editProfileBio").value =
+        document.getElementById("profileDisplayBio").innerText;
+
+
+    // HOZIRGI RASM
+    const oldImage = document.querySelector("#profileImage img");
+
+    if (oldImage) {
+
+        document.getElementById("editProfileImage").innerHTML = `
+            <img
+                src="${oldImage.src}"
+                style="
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                "
+            >
+        `;
+
+    }
+
+};
 
 `;
 
