@@ -1405,7 +1405,61 @@ profileButton.addEventListener(
             modal
         );
 
+// ===============================
+// BAZADAN PROFILNI OLISH
+// ===============================
 
+const telegramId =
+    window.Telegram &&
+    window.Telegram.WebApp &&
+    window.Telegram.WebApp.initDataUnsafe &&
+    window.Telegram.WebApp.initDataUnsafe.user
+        ? String(
+            window.Telegram.WebApp.initDataUnsafe.user.id
+        )
+        : null;
+
+if (telegramId) {
+
+    const response = await fetch(
+        SUPABASE_URL +
+        "/rest/v1/profiles" +
+        "?telegram_id=eq." +
+        encodeURIComponent(telegramId) +
+        "&select=display_name,username,bio",
+        {
+            headers: {
+                "apikey": SUPABASE_KEY,
+                "Authorization":
+                    "Bearer " + SUPABASE_KEY
+            }
+        }
+    );
+
+    if (response.ok) {
+
+        const data =
+            await response.json();
+
+        if (data.length > 0) {
+
+            document.getElementById(
+                "profileName"
+            ).value =
+                data[0].display_name || "";
+
+            document.getElementById(
+                "profileUsername"
+            ).value =
+                data[0].username || "";
+
+            document.getElementById(
+                "profileBio"
+            ).value =
+                data[0].bio || "";
+        }
+    }
+}
         // ===============================
         // ORQAGA
         // ===============================
