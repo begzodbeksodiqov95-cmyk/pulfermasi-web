@@ -1053,7 +1053,7 @@ loadVideos();                                                    color:black;
    // ===============================
 // PROFIL OYNASI - SUPABASE
 // ===============================
-alert("PROFIL KODI ISHLADI");
+
 const profileButton =
     document.getElementById("profileButton");
 
