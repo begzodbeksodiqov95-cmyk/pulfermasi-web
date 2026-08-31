@@ -1484,3 +1484,76 @@ profileButton.addEventListener(
         // ===============================
         // ORQAGA
         // ===============================
+document.getElementById("closeProfile").onclick = function() {
+    modal.remove();
+};
+
+document.getElementById("saveProfile").onclick = async function() {
+
+    const telegramId = getTelegramId();
+
+    const name = document.getElementById("profileName").value.trim();
+    const username = document.getElementById("profileUsername").value.trim();
+    const bio = document.getElementById("profileBio").value.trim();
+
+    if (!telegramId) {
+        alert("Telegram ID topilmadi ❌");
+        return;
+    }
+
+    const button = document.getElementById("saveProfile");
+
+    button.disabled = true;
+    button.innerText = "Saqlanmoqda...";
+
+    try {
+
+        const response = await fetch(
+            SUPABASE_URL + "/rest/v1/profiles",
+            {
+                method: "POST",
+
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": "Bearer " + SUPABASE_KEY,
+                    "Content-Type": "application/json",
+                    "Prefer": "resolution=merge-duplicates"
+                },
+
+                body: JSON.stringify({
+                    telegram_id: telegramId,
+                    display_name: name,
+                    username: username,
+                    bio: bio
+                })
+            }
+        );
+
+        if (!response.ok) {
+
+            const errorText = await response.text();
+
+            alert(
+                "Saqlashda xato ❌\n\n" +
+                errorText
+            );
+
+            return;
+        }
+
+        alert("Profil saqlandi ✅");
+
+    } catch (error) {
+
+        console.log(error);
+
+        alert("Internet xatosi ❌");
+
+    } finally {
+
+        button.disabled = false;
+        button.innerText = "💾 Saqlash";
+
+    }
+
+};
