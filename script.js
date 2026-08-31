@@ -1,4 +1,3 @@
-alert("SCRIPT ISHLAYAPTI");
 let current = 0;
 let startY = 0;
 
