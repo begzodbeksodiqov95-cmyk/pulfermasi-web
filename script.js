@@ -1089,6 +1089,23 @@ picker.addEventListener(
                         setTimeout(
                             function() {
 
-                                progress.remove();
+                                progress.remove;
+                                 },
+                    3000
+                );
 
+            };
+
+
+        xhr.send(file);
+
+
+        picker.value =
+            "";
+
+    }
+);
+
+
+loadVideos();
             
