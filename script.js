@@ -1387,6 +1387,21 @@ profileButton.addEventListener(
                 ">
                     Maksimum 50 ta belgi
                 </div>
+                <button
+    id="saveProfile"
+    style="
+        width:100%;
+        margin-top:20px;
+        padding:15px;
+        border:0;
+        border-radius:12px;
+        background:white;
+        color:black;
+        font-size:16px;
+        font-weight:bold;
+    ">
+    💾 Saqlash
+</button>
 
             </div>
 
