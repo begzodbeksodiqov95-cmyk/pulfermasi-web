@@ -2017,7 +2017,48 @@ if (imageFile) {
                     );
 
 
-                    modal.remove();
+                    // ===============================
+// PROFIL OYNASINI YANGILASH
+// ===============================
+
+document.getElementById(
+    "profileDisplayName"
+).innerText = name || "Ism";
+
+document.getElementById(
+    "profileDisplayUsername"
+).innerText = username || "@username";
+
+document.getElementById(
+    "profileDisplayBio"
+).innerText = bio || "";
+
+if (avatarURL) {
+
+    document.getElementById(
+        "profileImage"
+    ).innerHTML = `
+
+        <img
+            src="${avatarURL}"
+            style="
+                width:100%;
+                height:100%;
+                object-fit:cover;
+            "
+        >
+
+    `;
+
+}
+
+document.getElementById(
+    "editProfileBox"
+).style.display = "none";
+
+alert(
+    "Profil saqlandi ✅"
+);
 
 
                 } catch (error) {
