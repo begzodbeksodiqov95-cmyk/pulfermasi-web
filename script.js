@@ -2108,10 +2108,298 @@ if (editButton) {
 
                         }
 
+// ===============================
+// PROFIL BORLIGINI TEKSHIRISH
+// ===============================
 
-                        // ===============================
-                        // PROFIL BORLIGINI TEKSHIRISH
-                        // ===============================
+const checkResponse =
+    await fetch(
+        SUPABASE_URL +
+        "/rest/v1/profiles" +
+        "?telegram_id=eq." +
+        encodeURIComponent(
+            telegramId
+        ) +
+        "&select=id,avatar_url",
+        {
+            method: "GET",
+
+            headers: {
+                "apikey":
+                    SUPABASE_KEY,
+
+                "Authorization":
+                    "Bearer " +
+                    SUPABASE_KEY
+            }
+        }
+    );
+
+
+if (!checkResponse.ok) {
+
+    throw new Error(
+        await checkResponse.text()
+    );
+
+}
+
+
+const existing =
+    await checkResponse.json();
+
+
+let response;
+
+
+// ===============================
+// UPDATE
+// ===============================
+
+if (
+    existing.length > 0
+) {
+
+    const profileId =
+        existing[0].id;
+
+
+    response =
+        await fetch(
+            SUPABASE_URL +
+            "/rest/v1/profiles?id=eq." +
+            encodeURIComponent(
+                profileId
+            ),
+            {
+                method: "PATCH",
+
+                headers: {
+                    "apikey":
+                        SUPABASE_KEY,
+
+                    "Authorization":
+                        "Bearer " +
+                        SUPABASE_KEY,
+
+                    "Content-Type":
+                        "application/json",
+
+                    "Prefer":
+                        "return=minimal"
+                },
+
+                body:
+                    JSON.stringify({
+
+                        display_name:
+                            name,
+
+                        username:
+                            username,
+
+                        bio:
+                            bio,
+
+                        ...(avatarURL
+                            ? {
+                                avatar_url:
+                                    avatarURL
+                            }
+                            : {})
+
+                    })
+            }
+        );
+
+
+} else {
+
+    // ===============================
+    // INSERT
+    // ===============================
+
+    response =
+        await fetch(
+            SUPABASE_URL +
+            "/rest/v1/profiles",
+            {
+                method: "POST",
+
+                headers: {
+                    "apikey":
+                        SUPABASE_KEY,
+
+                    "Authorization":
+                        "Bearer " +
+                        SUPABASE_KEY,
+
+                    "Content-Type":
+                        "application/json",
+
+                    "Prefer":
+                        "return=minimal"
+                },
+
+                body:
+                    JSON.stringify({
+
+                        telegram_id:
+                            telegramId,
+
+                        display_name:
+                            name,
+
+                        username:
+                            username,
+
+                        bio:
+                            bio,
+
+                        avatar_url:
+                            avatarURL
+
+                    })
+            }
+        );
+
+}
+
+
+// ===============================
+// JAVOBNI TEKSHIRISH
+// ===============================
+
+if (!response.ok) {
+
+    throw new Error(
+        await response.text()
+    );
+
+}
+
+
+// ===============================
+// PROFIL OYNASINI YANGILASH
+// ===============================
+
+const displayName =
+    document.getElementById(
+        "profileDisplayName"
+    );
+
+if (displayName) {
+
+    displayName.innerText =
+        name || "Ism";
+
+}
+
+
+const displayUsername =
+    document.getElementById(
+        "profileDisplayUsername"
+    );
+
+if (displayUsername) {
+
+    displayUsername.innerText =
+        username || "@username";
+
+}
+
+
+const displayBio =
+    document.getElementById(
+        "profileDisplayBio"
+    );
+
+if (displayBio) {
+
+    displayBio.innerText =
+        bio || "";
+
+}
+
+
+// ===============================
+// YANGI RASMNI CHIQARISH
+// ===============================
+
+if (avatarURL) {
+
+    const profileImage =
+        document.getElementById(
+            "profileImage"
+        );
+
+    if (profileImage) {
+
+        profileImage.innerHTML = `
+
+            <img
+                src="${avatarURL}"
+                style="
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                    border-radius:50%;
+                "
+            >
+
+        `;
+
+    }
+
+}
+
+
+// ===============================
+// TAHRIRLASH OYNASINI YOPISH
+// ===============================
+
+editModal.remove();
+
+alert(
+    "Profil saqlandi ✅"
+);
+
+
+} catch (error) {
+
+    console.log(
+        "Profil saqlash xatosi:",
+        error
+    );
+
+    alert(
+        "Profil saqlanmadi ❌\n\n" +
+        error.message
+    );
+
+
+} finally {
+
+    button.disabled =
+        false;
+
+    button.innerText =
+        "💾 Saqlash";
+
+}
+
+};
+
+}
+);
+
+
+// ===============================
+// PROFIL MA'LUMOTLARINI YUKLASH
+// ===============================
+
+loadProfileFromDatabase();
+                    
 
                     
 
