@@ -1426,7 +1426,7 @@ if (telegramId) {
         "/rest/v1/profiles" +
         "?telegram_id=eq." +
         encodeURIComponent(telegramId) +
-        "&select=display_name,username,bio",
+        "&select=display_name,username,bio,avatar_url",
         {
             headers: {
                 "apikey": SUPABASE_KEY,
