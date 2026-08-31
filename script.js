@@ -920,3 +920,167 @@ picker.addEventListener(
 
         progress.style.left =
             "50%";
+progress.style.transform =
+            "translate(-50%, -50%)";
+
+        progress.style.background =
+            "#111";
+
+        progress.style.color =
+            "#fff";
+
+        progress.style.padding =
+            "20px 30px";
+
+        progress.style.borderRadius =
+            "15px";
+
+        progress.style.zIndex =
+            "99999";
+
+
+        progress.innerText =
+            "Yuklanmoqda: 0%";
+
+
+        document.body.appendChild(
+            progress
+        );
+
+
+        const xhr =
+            new XMLHttpRequest();
+
+
+        xhr.open(
+            "POST",
+            uploadURL,
+            true
+        );
+
+
+        xhr.setRequestHeader(
+            "Authorization",
+            "Bearer " +
+            SUPABASE_KEY
+        );
+
+
+        xhr.setRequestHeader(
+            "apikey",
+            SUPABASE_KEY
+        );
+
+
+        xhr.setRequestHeader(
+            "Content-Type",
+            file.type
+        );
+
+
+        xhr.setRequestHeader(
+            "x-upsert",
+            "false"
+        );
+
+
+        xhr.upload.onprogress =
+            function(event) {
+
+                if (
+                    event.lengthComputable
+                ) {
+
+                    const percent =
+                        Math.round(
+                            event.loaded /
+                            event.total *
+                            100
+                        );
+
+
+                    progress.innerText =
+                        "Yuklanmoqda: " +
+                        percent +
+                        "%";
+
+                }
+
+            };
+
+
+        xhr.onload =
+            async function() {
+
+                if (
+                    xhr.status >= 200 &&
+                    xhr.status < 300
+                ) {
+
+                    const publicURL =
+                        SUPABASE_URL +
+                        "/storage/v1/object/public/Videos/" +
+                        fileName;
+
+
+                    progress.innerText =
+                        "Saqlanmoqda...";
+
+
+                    const dbResponse =
+                        await fetch(
+                            SUPABASE_URL +
+                            "/rest/v1/videos",
+                            {
+                                method: "POST",
+
+                                headers: {
+
+                                    "apikey":
+                                        SUPABASE_KEY,
+
+                                    "Authorization":
+                                        "Bearer " +
+                                        SUPABASE_KEY,
+
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Prefer":
+                                        "return=minimal"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        videos_url:
+                                            publicURL,
+
+                                        likes:
+                                            0
+
+                                    })
+
+                            }
+                        );
+
+
+                    if (
+                        !dbResponse.ok
+                    ) {
+
+                        progress.innerText =
+                            "Database xatosi: " +
+                            dbResponse.status;
+
+
+                        console.log(
+                            await dbResponse.text()
+                        );
+
+
+                        setTimeout(
+                            function() {
+
+                                progress.remove();
