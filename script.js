@@ -1084,3 +1084,99 @@ progress.style.transform =
                             function() {
 
                                 progress.remove();
+                                    
+
+                        },
+                        4000
+                    );
+
+
+                    return;
+
+                }
+
+
+                progress.innerText =
+                    "Yuklandi! ✅";
+
+
+                addVideoToFeed({
+
+                    id:
+                        Date.now(),
+
+                    videos_url:
+                        publicURL,
+
+                    likes:
+                        0
+
+                });
+
+
+                showVideo(
+                    getVideos().length - 1
+                );
+
+
+                setTimeout(
+                    function() {
+
+                        progress.remove();
+
+                    },
+                    1000
+                );
+
+
+            } else {
+
+                progress.innerText =
+                    "Upload xatosi: " +
+                    xhr.status;
+
+
+                setTimeout(
+                    function() {
+
+                        progress.remove();
+
+                    },
+                    4000
+                );
+
+            }
+
+        };
+
+
+    xhr.onerror =
+        function() {
+
+            progress.innerText =
+                "Internet xatosi ❌";
+
+
+            setTimeout(
+                function() {
+
+                    progress.remove();
+
+                },
+                3000
+            );
+
+        };
+
+
+    xhr.send(file);
+
+
+    picker.value =
+        "";
+
+    }
+);
+
+
+loadVideos();
