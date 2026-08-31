@@ -26,7 +26,7 @@ const likes =
         ? 0  
         : item.likes;  
 
-box.innerHTML = `  
+box.innerHTML =   
     <video  
         src="${item.videos_url}"  
         controls  
@@ -50,13 +50,13 @@ box.innerHTML = `
 💬  
 <span>0</span>
 
-</div>  
-<div class="action share-button">
-    ↗️
-    <span>Ulashish</span>
-</div>
+</div>  <div class="action">  
+            ↗️  
+            <span>Ulashish</span>  
+        </div>  
+
     </div>  
-`;  
+;  
 
 box.dataset.id = item.id;  
 
@@ -151,29 +151,9 @@ box.dataset.id,
 commentButton
 
 );
+
 }
-);
-const shareButton =
-    box.querySelector(".share-button");
 
-shareButton.addEventListener(
-    "click",
-    function(event) {
-
-        event.stopPropagation();
-
-        const videoURL =
-            item.videos_url;
-
-        const telegramShareURL =
-            "https://t.me/share/url?url=" +
-            encodeURIComponent(videoURL);
-
-        window.open(
-            telegramShareURL,
-            "_blank"
-        );
-    }
 );
 feed.appendChild(box);
 }
@@ -228,9 +208,7 @@ try {
             }  
 
         }  
-    );  
-
-
+    );
     if (  
         getVideos().length > 0  
     ) {  
@@ -276,7 +254,7 @@ function openComments(videoId, commentButton) {
     modal.style.padding = "15px";
     modal.style.boxSizing = "border-box";
 
-    modal.innerHTML = `
+    modal.innerHTML = 
         <div style="
             text-align:center;
             font-size:20px;
@@ -345,7 +323,7 @@ function openComments(videoId, commentButton) {
             </button>
 
         </div>
-    `;
+    ;
 
     document.body.appendChild(modal);
 
@@ -378,7 +356,7 @@ function openComments(videoId, commentButton) {
         comment.style.wordBreak =
             "break-word";
 
-        comment.innerHTML = `
+        comment.innerHTML = 
             <div style="
                 font-weight:bold;
                 margin-bottom:5px;
@@ -387,7 +365,7 @@ function openComments(videoId, commentButton) {
             </div>
 
             <div></div>
-        `;
+        ;
 
         comment
             .querySelector("div:last-child")
@@ -412,7 +390,6 @@ function openComments(videoId, commentButton) {
                         headers: {
                             "apikey":
                                 SUPABASE_KEY,
-
                             "Authorization":
                                 "Bearer " +
                                 SUPABASE_KEY
@@ -608,7 +585,6 @@ function openComments(videoId, commentButton) {
 
     loadComments();
 }
-
 function showVideo(index) {
 
 const videos =  
@@ -896,9 +872,7 @@ const file =
 
 
                 progress.innerText =  
-                    "Saqlanmoqda...";  
-
-
+                    "Saqlanmoqda...";
                 const dbResponse =  
                     await fetch(  
                         SUPABASE_URL +  
@@ -1047,750 +1021,6 @@ const file =
 
 }
 
-); 
+);
 
-loadVideos();                                                    color:black;
-   // ===============================
-// PROFIL OYNASI - SUPABASE
-// ===============================
-
-const profileButton =
-    document.getElementById("profileButton");
-
-
-// Telegram ID
-function getTelegramId() {
-
-    if (
-        window.Telegram &&
-        window.Telegram.WebApp &&
-        window.Telegram.WebApp.initDataUnsafe &&
-        window.Telegram.WebApp.initDataUnsafe.user
-    ) {
-        return String(
-            window.Telegram.WebApp.initDataUnsafe.user.id
-        );
-    }
-
-    return null;
-}
-
-
-// ===============================
-// PROFILNI BAZADAN OLISH
-// ===============================
-
-async function loadProfileData() {
-
-    const telegramId =
-        getTelegramId();
-
-    if (!telegramId) {
-        return null;
-    }
-
-    try {
-
-        const response =
-            await fetch(
-                SUPABASE_URL +
-                "/rest/v1/profiles" +
-                "?telegram_id=eq." +
-                encodeURIComponent(telegramId) +
-                "&select=*",
-                {
-                    headers: {
-                        "apikey":
-                            SUPABASE_KEY,
-
-                        "Authorization":
-                            "Bearer " +
-                            SUPABASE_KEY
-                    }
-                }
-            );
-
-
-        if (!response.ok) {
-
-            const errorText =
-                await response.text();
-
-            console.log(
-                "Profil olish xatosi:",
-                errorText
-            );
-
-            return null;
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (data.length > 0) {
-            return data[0];
-        }
-
-
-        return null;
-
-    } catch (error) {
-
-        console.log(
-            "Profil olish xatosi:",
-            error
-        );
-
-        return null;
-    }
-}
-
-
-// ===============================
-// PROFIL OYNASINI OCHISH
-// ===============================
-
-profileButton.addEventListener(
-    "click",
-    async function () {
-
-        const oldProfile =
-            document.getElementById(
-                "profileModal"
-            );
-
-        if (oldProfile) {
-            oldProfile.remove();
-        }
-
-
-        const modal =
-            document.createElement("div");
-
-        modal.id =
-            "profileModal";
-
-
-        modal.style.position =
-            "fixed";
-
-        modal.style.inset =
-            "0";
-
-        modal.style.background =
-            "#111";
-
-        modal.style.color =
-            "#fff";
-
-        modal.style.zIndex =
-            "100000";
-
-        modal.style.padding =
-            "20px";
-
-        modal.style.overflowY =
-            "auto";
-
-
-        modal.innerHTML = `
-
-            <button id="closeProfile" style="
-                position:absolute;
-                top:15px;
-                left:15px;
-                background:none;
-                border:0;
-                color:white;
-                font-size:30px;
-            ">‹</button>
-
-
-            <div style="
-                text-align:center;
-                margin-top:20px;
-            ">
-
-                <div id="profileImage"
-                    style="
-                        width:90px;
-                        height:90px;
-                        border-radius:50%;
-                        background:#333;
-                        margin:0 auto 15px;
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        font-size:40px;
-                        overflow:hidden;
-                    ">
-                    👤
-                </div>
-
-
-                <h2>Profil</h2>
-
-
-                <div style="
-                    color:#888;
-                    margin-top:5px;
-                ">
-                    Profilingizni sozlang
-                </div>
-
-            </div>
-
-
-            <div style="
-                margin-top:30px;
-            ">
-
-                <label>
-                    Ism
-                </label>
-
-                <input
-                    id="profileName"
-                    type="text"
-                    placeholder="Ismingiz"
-                    maxlength="30"
-                    style="
-                        width:100%;
-                        margin-top:8px;
-                        margin-bottom:18px;
-                        padding:14px;
-                        border-radius:12px;
-                        border:1px solid #444;
-                        background:#222;
-                        color:white;
-                        outline:none;
-                    "
-                >
-
-
-                <label>
-                    Username
-                </label>
-
-                <input
-                    id="profileUsername"
-                    type="text"
-                    placeholder="@username"
-                    maxlength="30"
-                    style="
-                        width:100%;
-                        margin-top:8px;
-                        margin-bottom:18px;
-                        padding:14px;
-                        border-radius:12px;
-                        border:1px solid #444;
-                        background:#222;
-                        color:white;
-                        outline:none;
-                    "
-                >
-
-
-                <label>
-                    Bio
-                </label>
-
-                <textarea
-                    id="profileBio"
-                    placeholder="O'zingiz haqingizda..."
-                    maxlength="50"
-                    style="
-                        width:100%;
-                        height:90px;
-                        margin-top:8px;
-                        padding:14px;
-                        border-radius:12px;
-                        border:1px solid #444;
-                        background:#222;
-                        color:white;
-                        outline:none;
-                        resize:none;
-                    "
-                ></textarea>
-
-
-                <div style="
-                    text-align:right;
-                    color:#888;
-                    font-size:12px;
-                    margin-top:4px;
-                ">
-                    Maksimum 50 ta belgi
-                </div>
-
-
-                <label
-                    for="profileImagePicker"
-                    style="
-                        display:block;
-                        margin-top:20px;
-                        padding:14px;
-                        background:#222;
-                        border-radius:12px;
-                        text-align:center;
-                        cursor:pointer;
-                    ">
-                    🖼 Profil rasmi yuklash
-                </label>
-
-
-                <input
-                    id="profileImagePicker"
-                    type="file"
-                    accept="image/*"
-                    style="display:none;"
-                >
-
-
-                <button
-                    id="saveProfile"
-                    style="
-                        width:100%;
-                        margin-top:20px;
-                        padding:15px;
-                        border:0;
-                        border-radius:12px;
-                        background:white;
-                        color:black;
-                        font-size:16px;
-                        font-weight:bold;
-                    ">
-                    💾 Saqlash
-                </button>
-
-            </div>
-        `;
-
-
-        document.body.appendChild(
-            modal
-        );
-
-
-        // ===============================
-        // BAZADAN MA'LUMOTLARNI YUKLASH
-        // ===============================
-
-        const profile =
-            await loadProfileData();
-
-
-        if (profile) {
-
-            document.getElementById(
-                "profileName"
-            ).value =
-                profile.display_name || "";
-
-
-            document.getElementById(
-                "profileUsername"
-            ).value =
-                profile.username || "";
-
-
-            document.getElementById(
-                "profileBio"
-            ).value =
-                profile.bio || "";
-
-
-            if (profile.avatar_url) {
-
-                document.getElementById(
-                    "profileImage"
-                ).innerHTML = `
-
-                    <img
-                        src="${profile.avatar_url}"
-                        style="
-                            width:100%;
-                            height:100%;
-                            object-fit:cover;
-                        "
-                    >
-
-                `;
-
-            }
-
-        }
-
-
-        // ===============================
-        // RASM TANLASH
-        // ===============================
-
-        document
-            .getElementById(
-                "profileImagePicker"
-            )
-            .addEventListener(
-                "change",
-                function () {
-
-                    const file =
-                        this.files[0];
-
-                    if (!file) {
-                        return;
-                    }
-
-
-                    if (
-                        !file.type.startsWith(
-                            "image/"
-                        )
-                    ) {
-
-                        alert(
-                            "Faqat rasm tanlang!"
-                        );
-
-                        return;
-                    }
-
-
-                    const reader =
-                        new FileReader();
-
-
-                    reader.onload =
-                        function (event) {
-
-                            document.getElementById(
-                                "profileImage"
-                            ).innerHTML = `
-
-                                <img
-                                    src="${event.target.result}"
-                                    style="
-                                        width:100%;
-                                        height:100%;
-                                        object-fit:cover;
-                                    "
-                                >
-
-                            `;
-
-                        };
-
-
-                    reader.readAsDataURL(
-                        file
-                    );
-
-                }
-            );
-
-
-        // ===============================
-        // SAQLASH
-        // ===============================
-
-        document
-            .getElementById(
-                "saveProfile"
-            )
-            .addEventListener(
-                "click",
-                async function () {
-
-                    const telegramId =
-                        getTelegramId();
-
-
-                    if (!telegramId) {
-
-                        alert(
-                            "Telegram ID topilmadi ❌"
-                        );
-
-                        return;
-                    }
-
-
-                    const name =
-                        document
-                            .getElementById(
-                                "profileName"
-                            )
-                            .value
-                            .trim();
-
-
-                    let username =
-                        document
-                            .getElementById(
-                                "profileUsername"
-                            )
-                            .value
-                            .trim();
-
-
-                    const bio =
-                        document
-                            .getElementById(
-                                "profileBio"
-                            )
-                            .value
-                            .trim();
-
-
-                    if (
-                        username &&
-                        !username.startsWith("@")
-                    ) {
-
-                        username =
-                            "@" +
-                            username;
-
-                    }
-
-
-                    const saveButton =
-                        document.getElementById(
-                            "saveProfile"
-                        );
-
-
-                    saveButton.disabled =
-                        true;
-
-                    saveButton.innerText =
-                        "Saqlanmoqda...";
-
-
-                    try {
-
-                        // Avval profil bor-yo'qligini tekshiramiz
-
-                        const checkResponse =
-                            await fetch(
-                                SUPABASE_URL +
-                                "/rest/v1/profiles" +
-                                "?telegram_id=eq." +
-                                encodeURIComponent(
-                                    telegramId
-                                ) +
-                                "&select=id",
-                                {
-                                    headers: {
-
-                                        "apikey":
-                                            SUPABASE_KEY,
-
-                                        "Authorization":
-                                            "Bearer " +
-                                            SUPABASE_KEY
-
-                                    }
-                                }
-                            );
-
-
-                        if (
-                            !checkResponse.ok
-                        ) {
-
-                            const errorText =
-                                await checkResponse.text();
-
-                            alert(
-                                "Bazani tekshirishda xato:\n\n" +
-                                errorText
-                            );
-
-                            return;
-                        }
-
-
-                        const existing =
-                            await checkResponse.json();
-
-
-                        let response;
-
-
-                        // ===============================
-                        // MAVJUD PROFILNI YANGILASH
-                        // ===============================
-
-                        if (
-                            existing.length > 0
-                        ) {
-
-                            const profileId =
-                                existing[0].id;
-
-
-                            response =
-                                await fetch(
-                                    SUPABASE_URL +
-                                    "/rest/v1/profiles?id=eq." +
-                                    encodeURIComponent(
-                                        profileId
-                                    ),
-                                    {
-                                        method:
-                                            "PATCH",
-
-                                        headers: {
-
-                                            "apikey":
-                                                SUPABASE_KEY,
-
-                                            "Authorization":
-                                                "Bearer " +
-                                                SUPABASE_KEY,
-
-                                            "Content-Type":
-                                                "application/json",
-
-                                            "Prefer":
-                                                "return=minimal"
-
-                                        },
-
-                                        body:
-                                            JSON.stringify({
-
-                                                username:
-                                                    username,
-
-                                                display_name:
-                                                    name,
-
-                                                bio:
-                                                    bio
-
-                                            })
-
-                                    }
-                                );
-
-
-                        } else {
-
-                            // ===============================
-                            // YANGI PROFIL YARATISH
-                            // ===============================
-
-                            response =
-                                await fetch(
-                                    SUPABASE_URL +
-                                    "/rest/v1/profiles",
-                                    {
-                                        method:
-                                            "POST",
-
-                                        headers: {
-
-                                            "apikey":
-                                                SUPABASE_KEY,
-
-                                            "Authorization":
-                                                "Bearer " +
-                                                SUPABASE_KEY,
-
-                                            "Content-Type":
-                                                "application/json",
-
-                                            "Prefer":
-                                                "return=minimal"
-
-                                        },
-
-                                        body:
-                                            JSON.stringify({
-
-                                                telegram_id:
-                                                    telegramId,
-
-                                                username:
-                                                    username,
-
-                                                display_name:
-                                                    name,
-
-                                                bio:
-                                                    bio
-
-                                            })
-
-                                    }
-                                );
-
-                        }
-
-
-                        if (!response.ok) {
-
-                            const errorText =
-                                await response.text();
-
-                            alert(
-                                "Supabase xatosi:\n\n" +
-                                errorText
-                            );
-
-                            return;
-                        }
-
-
-                        alert(
-                            "Profil saqlandi ✅"
-                        );
-
-
-                        modal.remove();
-
-
-                    } catch (error) {
-
-                        alert(
-                            "Xato:\n\n" +
-                            error.message
-                        );
-
-                    } finally {
-
-                        saveButton.disabled =
-                            false;
-
-                        saveButton.innerText =
-                            "💾 Saqlash";
-
-                    }
-
-                }
-            );
-
-
-        // ===============================
-        // ORQAGA
-        // ===============================
-
-        document
-            .getElementById(
-                "closeProfile"
-            )
-            .addEventListener(
-                "click",
-                function () {
-
-                    modal.remove();
-
-                }
-            );
-
-    }
-);                     
+loadVideos();
