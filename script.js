@@ -2082,55 +2082,116 @@ const telegramId =
 
 if (telegramId) {
 
-    const response = await fetch(
-        SUPABASE_URL +
-        "/rest/v1/profiles" +
-        "?telegram_id=eq." +
-        encodeURIComponent(telegramId) +
-        "&select=display_name,username,bio,avatar_url",
-        {
-            headers: {
-                "apikey": SUPABASE_KEY,
-                "Authorization":
-                    "Bearer " + SUPABASE_KEY
-            }
-        }
-    );
+    try {
 
-    if (response.ok) {
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/profiles" +
+                "?telegram_id=eq." +
+                encodeURIComponent(telegramId) +
+                "&select=display_name,username,bio,avatar_url",
+                {
+                    method: "GET",
+
+                    headers: {
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                await response.text()
+            );
+
+        }
+
 
         const data =
             await response.json();
 
+
         if (data.length > 0) {
 
-            document.getElementById(
-                "profileName"
-            ).value =
-                data[0].display_name || "";
+            const profile =
+                data[0];
+
+
+            // ===============================
+            // ISM
+            // ===============================
 
             document.getElementById(
-                "profileUsername"
-            ).value =
-                data[0].username || "";
+                "profileDisplayName"
+            ).innerText =
+                profile.display_name ||
+                "Ism";
+
+
+            // ===============================
+            // USERNAME
+            // ===============================
 
             document.getElementById(
-                "profileBio"
-            ).value =
-                data[0].bio || "";
+                "profileDisplayUsername"
+            ).innerText =
+                profile.username ||
+                "@username";
 
 
-                } finally {
+            // ===============================
+            // BIO
+            // ===============================
 
-                    button.disabled =
-                        false;
+            document.getElementById(
+                "profileDisplayBio"
+            ).innerText =
+                profile.bio ||
+                "";
 
-                    button.innerText =
-                        "💾 Saqlash";
 
-                }
+            // ===============================
+            // RASM
+            // ===============================
 
-            };
+            if (profile.avatar_url) {
+
+                document.getElementById(
+                    "profileImage"
+                ).innerHTML = `
+
+                    <img
+                        src="${profile.avatar_url}"
+                        style="
+                            width:100%;
+                            height:100%;
+                            object-fit:cover;
+                            border-radius:50%;
+                        "
+                    >
+
+                `;
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Profilni olishda xato:",
+            error
+        );
 
     }
-);
+
+        }
+    });
