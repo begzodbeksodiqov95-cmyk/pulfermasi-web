@@ -1795,19 +1795,23 @@ if (imageFile) {
 
                                     },
 
-                                    body:
-                                        JSON.stringify({
+                            body:
+    JSON.stringify({
 
-                                            display_name:
-                                                name,
+        display_name:
+            name,
 
-                                            username:
-                                                username,
+        username:
+            username,
 
-                                            bio:
-                                                bio
+        bio:
+            bio,
 
-                                        })
+        ...(avatarURL
+            ? { avatar_url: avatarURL }
+            : {})
+
+    })
 
                                 }
                             );
