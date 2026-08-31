@@ -631,3 +631,292 @@ sendButton.onclick =
                     "Komment xatosi:",
                     await response.text()
                 );
+alert(
+    "Komment yuborilmadi ❌"
+);
+
+return;
+}
+
+
+addComment(
+    text
+);
+
+
+input.value =
+    "";
+
+
+list.scrollTop =
+    list.scrollHeight;
+
+
+const countElement =
+    commentButton.querySelector(
+        "span"
+    );
+
+
+if (countElement) {
+
+    let count =
+        Number(
+            countElement.innerText
+        ) || 0;
+
+
+    count++;
+
+
+    countElement.innerText =
+        count;
+
+}
+
+
+} catch (error) {
+
+    console.log(
+        "Xato:",
+        error
+    );
+
+    alert(
+        "Internet xatosi ❌"
+    );
+
+} finally {
+
+    sendButton.disabled =
+        false;
+
+    sendButton.innerText =
+        "Yuborish";
+
+}
+
+};
+
+
+input.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            sendButton.click();
+
+        }
+
+    }
+);
+
+
+document
+    .getElementById(
+        "closeComments"
+    )
+    .onclick =
+    function() {
+
+        modal.remove();
+
+    };
+
+
+loadComments();
+
+}
+
+
+
+function showVideo(index) {
+
+    const videos =
+        getVideos();
+
+
+    if (
+        index < 0 ||
+        index >= videos.length
+    ) {
+
+        return;
+
+    }
+
+
+    videos.forEach(
+        function(box) {
+
+            box.classList.remove(
+                "active"
+            );
+
+
+            const video =
+                box.querySelector(
+                    "video"
+                );
+
+
+            if (video) {
+
+                video.pause();
+
+            }
+
+        }
+    );
+
+
+    current =
+        index;
+
+
+    const box =
+        videos[current];
+
+
+    box.classList.add(
+        "active"
+    );
+
+
+    const video =
+        box.querySelector(
+            "video"
+        );
+
+
+    if (video) {
+
+        video.currentTime =
+            0;
+
+    }
+
+}
+
+
+
+document.addEventListener(
+    "touchstart",
+    function(event) {
+
+        startY =
+            event.touches[0].clientY;
+
+    }
+);
+
+
+document.addEventListener(
+    "touchend",
+    function(event) {
+
+        const endY =
+            event.changedTouches[0].clientY;
+
+
+        const distance =
+            startY - endY;
+
+
+        if (
+            Math.abs(distance) < 60
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            distance > 0
+        ) {
+
+            showVideo(
+                current + 1
+            );
+
+        } else {
+
+            showVideo(
+                current - 1
+            );
+
+        }
+
+    }
+);
+
+
+
+picker.addEventListener(
+    "change",
+    function() {
+
+        const file =
+            picker.files[0];
+
+
+        if (!file) {
+            return;
+        }
+
+
+        if (
+            !file.type.startsWith(
+                "video/"
+            )
+        ) {
+
+            alert(
+                "Faqat video tanlang!"
+            );
+
+            picker.value =
+                "";
+
+            return;
+
+        }
+
+
+        const fileName =
+            Date.now() +
+            "_" +
+            Math.random()
+                .toString(36)
+                .substring(2) +
+            "_" +
+            file.name.replace(
+                /[^a-zA-Z0-9._-]/g,
+                "_"
+            );
+
+
+        const uploadURL =
+            SUPABASE_URL +
+            "/storage/v1/object/Videos/" +
+            fileName;
+
+
+        const progress =
+            document.createElement(
+                "div"
+            );
+
+
+        progress.style.position =
+            "fixed";
+
+        progress.style.top =
+            "50%";
+
+        progress.style.left =
+            "50%";
