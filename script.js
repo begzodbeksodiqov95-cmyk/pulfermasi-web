@@ -1378,8 +1378,11 @@ profileButton.addEventListener(
 // ===============================
 // ALOHIDA PROFIL TAHRIRLASH
 // ===============================
+const editButton = document.getElementById("editProfile");
 
-document.getElementById("editProfile").onclick = function () {
+if (editButton) {
+
+    editButton.addEventListener("click", function() {
 
     const editModal = document.createElement("div");
 
@@ -2064,7 +2067,8 @@ document.getElementById("editProfile").onclick = function () {
     };
 
 };
-      // ===============================
+}     
+    // ===============================
 // PROFILNI TAHRIRLASHNI OCHISH
 // ===============================
 
