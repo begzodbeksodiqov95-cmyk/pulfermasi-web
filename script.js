@@ -1191,7 +1191,7 @@ const profileButton =
 
 profileButton.addEventListener(
     "click",
-    function() {
+  async  function() {
 
         const oldProfile =
             document.getElementById("profileModal");
