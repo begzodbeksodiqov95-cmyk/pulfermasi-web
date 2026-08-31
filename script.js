@@ -1089,7 +1089,7 @@ picker.addEventListener(
                         setTimeout(
                             function() {
 
-                                progress.remove;
+                                progress.remove();
                                  },
                     3000
                 );
