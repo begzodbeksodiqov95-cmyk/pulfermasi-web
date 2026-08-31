@@ -431,3 +431,203 @@ function openComments(
 
 
     function addComment(text) {
+const noComments =
+    document.getElementById(
+        "noComments"
+    );
+
+
+if (noComments) {
+    noComments.remove();
+}
+
+
+const comment =
+    document.createElement(
+        "div"
+    );
+
+
+comment.style.padding =
+    "12px 5px";
+
+comment.style.borderBottom =
+    "1px solid #333";
+
+comment.style.wordBreak =
+    "break-word";
+
+
+comment.innerHTML = `
+
+    <div style="
+        font-weight:bold;
+        margin-bottom:5px;
+    ">
+        👤 Foydalanuvchi
+    </div>
+
+    <div></div>
+
+`;
+
+
+comment
+    .querySelector(
+        "div:last-child"
+    )
+    .textContent =
+        text;
+
+
+list.appendChild(
+    comment
+);
+
+}
+
+
+
+async function loadComments() {
+
+    try {
+
+        const response =
+            await fetch(
+                SUPABASE_URL +
+                "/rest/v1/comments" +
+                "?select=comment_text" +
+                "&video_id=eq." +
+                Number(videoId),
+                {
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            "Bearer " +
+                            SUPABASE_KEY
+
+                    }
+                }
+            );
+
+
+        if (!response.ok) {
+
+            console.log(
+                "Kommentlarni olish xatosi:",
+                await response.text()
+            );
+
+            return;
+        }
+
+
+        const comments =
+            await response.json();
+
+
+        if (
+            comments.length > 0
+        ) {
+
+            comments.forEach(
+                function(item) {
+
+                    if (
+                        item.comment_text
+                    ) {
+
+                        addComment(
+                            item.comment_text
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+    } catch (error) {
+
+        console.log(
+            "Komment xatosi:",
+            error
+        );
+
+    }
+
+}
+
+
+
+sendButton.onclick =
+    async function() {
+
+        const text =
+            input.value.trim();
+
+
+        if (!text) {
+            return;
+        }
+
+
+        sendButton.disabled =
+            true;
+
+
+        sendButton.innerText =
+            "Yuborilmoqda...";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    SUPABASE_URL +
+                    "/rest/v1/comments",
+                    {
+                        method: "POST",
+
+                        headers: {
+
+                            "apikey":
+                                SUPABASE_KEY,
+
+                            "Authorization":
+                                "Bearer " +
+                                SUPABASE_KEY,
+
+                            "Content-Type":
+                                "application/json",
+
+                            "Prefer":
+                                "return=minimal"
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                video_id:
+                                    Number(videoId),
+
+                                comment_text:
+                                    text
+
+                            })
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                console.log(
+                    "Komment xatosi:",
+                    await response.text()
+                );
