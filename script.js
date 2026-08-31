@@ -1179,9 +1179,9 @@ progress.style.transform =
 );
 
 
-loadVideos();
-// ===============================
-// PROFIL OYNASI — 1-QADAM
+loadVideos();// ===============================
+// PROFIL OYNASI — 2-QADAM
+// NAME + USERNAME + BIO + RASM
 // ===============================
 
 const profileButton =
@@ -1192,9 +1192,7 @@ profileButton.addEventListener(
     function() {
 
         const oldProfile =
-            document.getElementById(
-                "profileModal"
-            );
+            document.getElementById("profileModal");
 
         if (oldProfile) {
             oldProfile.remove();
@@ -1249,19 +1247,44 @@ profileButton.addEventListener(
                 margin-top:50px;
             ">
 
-                <div style="
-                    width:90px;
-                    height:90px;
-                    border-radius:50%;
-                    background:#333;
-                    margin:0 auto 15px;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    font-size:40px;
-                ">
+                <div id="profileImage"
+                    style="
+                        width:90px;
+                        height:90px;
+                        border-radius:50%;
+                        background:#333;
+                        margin:0 auto 15px;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:40px;
+                        overflow:hidden;
+                    ">
                     👤
                 </div>
+
+
+                <label
+                    for="profileImagePicker"
+                    style="
+                        display:inline-block;
+                        color:#fff;
+                        background:#222;
+                        padding:10px 15px;
+                        border-radius:10px;
+                        cursor:pointer;
+                        margin-bottom:20px;
+                    ">
+                    🖼 Rasm yuklash
+                </label>
+
+
+                <input
+                    id="profileImagePicker"
+                    type="file"
+                    accept="image/*"
+                    style="display:none;"
+                >
 
 
                 <h2>
@@ -1278,6 +1301,95 @@ profileButton.addEventListener(
 
             </div>
 
+
+            <div style="
+                margin-top:30px;
+            ">
+
+
+                <label>
+                    Ism
+                </label>
+
+                <input
+                    id="profileName"
+                    type="text"
+                    placeholder="Ismingiz"
+                    maxlength="30"
+                    style="
+                        width:100%;
+                        margin-top:8px;
+                        margin-bottom:18px;
+                        padding:14px;
+                        border-radius:12px;
+                        border:1px solid #444;
+                        background:#222;
+                        color:white;
+                        outline:none;
+                        box-sizing:border-box;
+                    "
+                >
+
+
+                <label>
+                    Username
+                </label>
+
+                <input
+                    id="profileUsername"
+                    type="text"
+                    placeholder="@username"
+                    maxlength="30"
+                    style="
+                        width:100%;
+                        margin-top:8px;
+                        margin-bottom:18px;
+                        padding:14px;
+                        border-radius:12px;
+                        border:1px solid #444;
+                        background:#222;
+                        color:white;
+                        outline:none;
+                        box-sizing:border-box;
+                    "
+                >
+
+
+                <label>
+                    Bio
+                </label>
+
+                <textarea
+                    id="profileBio"
+                    placeholder="O'zingiz haqingizda..."
+                    maxlength="50"
+                    style="
+                        width:100%;
+                        height:90px;
+                        margin-top:8px;
+                        padding:14px;
+                        border-radius:12px;
+                        border:1px solid #444;
+                        background:#222;
+                        color:white;
+                        outline:none;
+                        resize:none;
+                        box-sizing:border-box;
+                    "
+                ></textarea>
+
+
+                <div style="
+                    text-align:right;
+                    color:#888;
+                    font-size:12px;
+                    margin-top:4px;
+                ">
+                    Maksimum 50 ta belgi
+                </div>
+
+            </div>
+
         `;
 
 
@@ -1285,6 +1397,78 @@ profileButton.addEventListener(
             modal
         );
 
+
+        // ===============================
+        // RASM TANLASH
+        // ===============================
+
+        document
+            .getElementById(
+                "profileImagePicker"
+            )
+            .addEventListener(
+                "change",
+                function() {
+
+                    const file =
+                        this.files[0];
+
+
+                    if (!file) {
+                        return;
+                    }
+
+
+                    if (
+                        !file.type.startsWith(
+                            "image/"
+                        )
+                    ) {
+
+                        alert(
+                            "Faqat rasm tanlang!"
+                        );
+
+                        return;
+                    }
+
+
+                    const reader =
+                        new FileReader();
+
+
+                    reader.onload =
+                        function(event) {
+
+                            document.getElementById(
+                                "profileImage"
+                            ).innerHTML = `
+
+                                <img
+                                    src="${event.target.result}"
+                                    style="
+                                        width:100%;
+                                        height:100%;
+                                        object-fit:cover;
+                                    "
+                                >
+
+                            `;
+
+                        };
+
+
+                    reader.readAsDataURL(
+                        file
+                    );
+
+                }
+            );
+
+
+        // ===============================
+        // ORQAGA
+        // ===============================
 
         document
             .getElementById(
