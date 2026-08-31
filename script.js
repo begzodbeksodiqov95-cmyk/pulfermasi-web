@@ -1619,6 +1619,72 @@ const imagePicker =
 
 const imageFile =
     imagePicker.files[0];
+              // ===============================
+// RASMNI PROFILES BUCKETGA YUKLASH
+// ===============================
+
+let avatarURL = null;
+
+if (imageFile) {
+
+    const fileName =
+        telegramId +
+        "_" +
+        Date.now() +
+        "_" +
+        imageFile.name.replace(
+            /[^a-zA-Z0-9._-]/g,
+            "_"
+        );
+
+
+    const uploadResponse =
+        await fetch(
+            SUPABASE_URL +
+            "/storage/v1/object/Profiles/" +
+            fileName,
+            {
+                method: "POST",
+
+                headers: {
+                    "apikey":
+                        SUPABASE_KEY,
+
+                    "Authorization":
+                        "Bearer " +
+                        SUPABASE_KEY,
+
+                    "Content-Type":
+                        imageFile.type,
+
+                    "x-upsert":
+                        "true"
+                },
+
+                body:
+                    imageFile
+            }
+        );
+
+
+    if (!uploadResponse.ok) {
+
+        const errorText =
+            await uploadResponse.text();
+
+        throw new Error(
+            "Rasm yuklanmadi: " +
+            errorText
+        );
+
+    }
+
+
+    avatarURL =
+        SUPABASE_URL +
+        "/storage/v1/object/public/Profiles/" +
+        fileName;
+} 
                 if (
                     username &&
                     !username.startsWith("@")
