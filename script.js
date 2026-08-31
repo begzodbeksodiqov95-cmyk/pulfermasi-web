@@ -1180,3 +1180,124 @@ progress.style.transform =
 
 
 loadVideos();
+// ===============================
+// PROFIL OYNASI — 1-QADAM
+// ===============================
+
+const profileButton =
+    document.getElementById("profileButton");
+
+profileButton.addEventListener(
+    "click",
+    function() {
+
+        const oldProfile =
+            document.getElementById(
+                "profileModal"
+            );
+
+        if (oldProfile) {
+            oldProfile.remove();
+        }
+
+
+        const modal =
+            document.createElement("div");
+
+
+        modal.id =
+            "profileModal";
+
+
+        modal.style.position =
+            "fixed";
+
+        modal.style.inset =
+            "0";
+
+        modal.style.background =
+            "#111";
+
+        modal.style.color =
+            "#fff";
+
+        modal.style.zIndex =
+            "100000";
+
+        modal.style.padding =
+            "20px";
+
+        modal.style.overflowY =
+            "auto";
+
+
+        modal.innerHTML = `
+
+            <button id="closeProfile" style="
+                position:absolute;
+                top:15px;
+                left:15px;
+                background:none;
+                border:0;
+                color:white;
+                font-size:30px;
+            ">‹</button>
+
+
+            <div style="
+                text-align:center;
+                margin-top:50px;
+            ">
+
+                <div style="
+                    width:90px;
+                    height:90px;
+                    border-radius:50%;
+                    background:#333;
+                    margin:0 auto 15px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:40px;
+                ">
+                    👤
+                </div>
+
+
+                <h2>
+                    Profil
+                </h2>
+
+
+                <div style="
+                    color:#888;
+                    margin-top:5px;
+                ">
+                    Profilingizni sozlang
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(
+            modal
+        );
+
+
+        document
+            .getElementById(
+                "closeProfile"
+            )
+            .addEventListener(
+                "click",
+                function() {
+
+                    modal.remove();
+
+                }
+            );
+
+    }
+);
