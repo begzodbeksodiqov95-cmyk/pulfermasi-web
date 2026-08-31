@@ -1510,7 +1510,6 @@ document
         "click",
         async function() {
 
-            // Telegram ID olish
             const telegramId =
                 window.Telegram &&
                 window.Telegram.WebApp &&
@@ -1525,14 +1524,13 @@ document
             if (!telegramId) {
 
                 alert(
-                    "Telegram foydalanuvchisi topilmadi ❌"
+                    "Telegram ID topilmadi ❌"
                 );
 
                 return;
             }
 
 
-            // Ma'lumotlarni olish
             const name =
                 document
                     .getElementById("profileName")
@@ -1554,7 +1552,6 @@ document
                     .trim();
 
 
-            // Username oldida @ bo'lmasa qo'shamiz
             if (
                 username &&
                 !username.startsWith("@")
@@ -1581,7 +1578,6 @@ document
 
             try {
 
-                // Avval shu Telegram ID borligini tekshiramiz
                 const checkResponse =
                     await fetch(
                         SUPABASE_URL +
@@ -1608,8 +1604,11 @@ document
 
                 if (!checkResponse.ok) {
 
+                    const errorText =
+                        await checkResponse.text();
+
                     throw new Error(
-                        "Profilni tekshirishda xato"
+                        errorText
                     );
 
                 }
@@ -1622,7 +1621,6 @@ document
                 let response;
 
 
-                // Profil mavjud bo'lsa — yangilaymiz
                 if (
                     existing.length > 0
                 ) {
@@ -1639,7 +1637,8 @@ document
                                 profileId
                             ),
                             {
-                                method: "PATCH",
+                                method:
+                                    "PATCH",
 
                                 headers: {
 
@@ -1661,11 +1660,11 @@ document
                                 body:
                                     JSON.stringify({
 
-                                        username:
-                                            username,
-
                                         display_name:
                                             name,
+
+                                        username:
+                                            username,
 
                                         bio:
                                             bio
@@ -1678,13 +1677,13 @@ document
 
                 } else {
 
-                    // Profil mavjud bo'lmasa — yangi profil yaratamiz
                     response =
                         await fetch(
                             SUPABASE_URL +
                             "/rest/v1/profiles",
                             {
-                                method: "POST",
+                                method:
+                                    "POST",
 
                                 headers: {
 
@@ -1709,11 +1708,11 @@ document
                                         telegram_id:
                                             telegramId,
 
-                                        username:
-                                            username,
-
                                         display_name:
                                             name,
+
+                                        username:
+                                            username,
 
                                         bio:
                                             bio
