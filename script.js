@@ -1661,7 +1661,7 @@ if (imageFile) {
                         imageFile.type,
 
                     "x-upsert":
-                        "true"
+    "false"
                 },
 
                 body:
