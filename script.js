@@ -1611,7 +1611,14 @@ if (data[0].avatar_url) {
                         .value
                         .trim();
 
+// Tanlangan rasmni olish
+const imagePicker =
+    document.getElementById(
+        "profileImagePicker"
+    );
 
+const imageFile =
+    imagePicker.files[0];
                 if (
                     username &&
                     !username.startsWith("@")
