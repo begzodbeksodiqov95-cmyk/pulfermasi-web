@@ -1845,22 +1845,25 @@ if (imageFile) {
 
                                     },
 
-                                    body:
-                                        JSON.stringify({
+                        body:
+    JSON.stringify({
 
-                                            telegram_id:
-                                                telegramId,
+        telegram_id:
+            telegramId,
 
-                                            display_name:
-                                                name,
+        display_name:
+            name,
 
-                                            username:
-                                                username,
+        username:
+            username,
 
-                                            bio:
-                                                bio
+        bio:
+            bio,
 
-                                        })
+        avatar_url:
+            avatarURL
+
+    })
 
                                 }
                             );
