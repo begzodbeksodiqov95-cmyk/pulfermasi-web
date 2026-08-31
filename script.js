@@ -1457,6 +1457,28 @@ if (telegramId) {
                 "profileBio"
             ).value =
                 data[0].bio || "";
+        // ===============================
+// BAZADAGI RASMNI CHIQARISH
+// ===============================
+
+if (data[0].avatar_url) {
+
+    document.getElementById(
+        "profileImage"
+    ).innerHTML = `
+
+        <img
+            src="${data[0].avatar_url}"
+            style="
+                width:100%;
+                height:100%;
+                object-fit:cover;
+            "
+        >
+
+    `;
+
+}
         }
     }
 }
