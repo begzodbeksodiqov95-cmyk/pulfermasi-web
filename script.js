@@ -1228,178 +1228,295 @@ profileButton.addEventListener(
 
         modal.style.overflowY =
             "auto";
+      modal.innerHTML = `
+
+    <!-- ORQAGA -->
+    <button id="closeProfile" style="
+        position:absolute;
+        top:15px;
+        left:15px;
+        background:none;
+        border:0;
+        color:white;
+        font-size:32px;
+        z-index:10;
+    ">‹</button>
 
 
-        modal.innerHTML = `
+    <!-- PROFIL -->
+    <div style="
+        text-align:center;
+        padding-top:55px;
+    ">
 
-            <button id="closeProfile" style="
-                position:absolute;
-                top:15px;
-                left:15px;
-                background:none;
-                border:0;
-                color:white;
-                font-size:30px;
-            ">‹</button>
-
-
-            <div style="
-                text-align:center;
-                margin-top:50px;
+        <!-- PROFIL RASMI -->
+        <div id="profileImage"
+            style="
+                width:105px;
+                height:105px;
+                border-radius:50%;
+                background:#333;
+                margin:0 auto 14px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:45px;
+                overflow:hidden;
+                border:2px solid #555;
             ">
-
-                <div id="profileImage"
-                    style="
-                        width:90px;
-                        height:90px;
-                        border-radius:50%;
-                        background:#333;
-                        margin:0 auto 15px;
-                        display:flex;
-                        align-items:center;
-                        justify-content:center;
-                        font-size:40px;
-                        overflow:hidden;
-                    ">
-                    👤
-                </div>
+            👤
+        </div>
 
 
-                <label
-                    for="profileImagePicker"
-                    style="
-                        display:inline-block;
-                        color:#fff;
-                        background:#222;
-                        padding:10px 15px;
-                        border-radius:10px;
-                        cursor:pointer;
-                        margin-bottom:20px;
-                    ">
-                    🖼 Rasm yuklash
-                </label>
-
-
-                <input
-                    id="profileImagePicker"
-                    type="file"
-                    accept="image/*"
-                    style="display:none;"
-                >
-
-
-                <h2>Profil</h2>
-
-
-                <div style="
-                    color:#888;
-                    margin-top:5px;
-                ">
-                    Profilingizni sozlang
-                </div>
-
-            </div>
-
-
-            <div style="
-                margin-top:30px;
+        <!-- ISM -->
+        <div id="profileDisplayName"
+            style="
+                font-size:23px;
+                font-weight:bold;
+                margin-top:5px;
             ">
+            Ism
+        </div>
 
-                <label>Ism</label>
 
-                <input
-                    id="profileName"
-                    type="text"
-                    placeholder="Ismingiz"
-                    maxlength="30"
+        <!-- USERNAME -->
+        <div id="profileDisplayUsername"
+            style="
+                color:#999;
+                font-size:15px;
+                margin-top:5px;
+            ">
+            @username
+        </div>
+
+
+        <!-- OBUNACHI / OBUNA -->
+        <div style="
+            display:flex;
+            justify-content:center;
+            gap:45px;
+            margin-top:22px;
+        ">
+
+            <div>
+                <div id="followersCount"
                     style="
-                        width:100%;
-                        margin-top:8px;
-                        margin-bottom:18px;
-                        padding:14px;
-                        border-radius:12px;
-                        border:1px solid #444;
-                        background:#222;
-                        color:white;
-                        outline:none;
-                        box-sizing:border-box;
-                    "
-                >
-
-
-                <label>Username</label>
-
-                <input
-                    id="profileUsername"
-                    type="text"
-                    placeholder="@username"
-                    maxlength="30"
-                    style="
-                        width:100%;
-                        margin-top:8px;
-                        margin-bottom:18px;
-                        padding:14px;
-                        border-radius:12px;
-                        border:1px solid #444;
-                        background:#222;
-                        color:white;
-                        outline:none;
-                        box-sizing:border-box;
-                    "
-                >
-
-
-                <label>Bio</label>
-
-                <textarea
-                    id="profileBio"
-                    placeholder="O'zingiz haqingizda..."
-                    maxlength="50"
-                    style="
-                        width:100%;
-                        height:90px;
-                        margin-top:8px;
-                        padding:14px;
-                        border-radius:12px;
-                        border:1px solid #444;
-                        background:#222;
-                        color:white;
-                        outline:none;
-                        resize:none;
-                        box-sizing:border-box;
-                    "
-                ></textarea>
-
-
-                <div style="
-                    text-align:right;
-                    color:#888;
-                    font-size:12px;
-                    margin-top:4px;
-                ">
-                    Maksimum 50 ta belgi
-                </div>
-
-
-                <button
-                    id="saveProfile"
-                    style="
-                        width:100%;
-                        margin-top:20px;
-                        padding:15px;
-                        border:0;
-                        border-radius:12px;
-                        background:white;
-                        color:black;
-                        font-size:16px;
+                        font-size:19px;
                         font-weight:bold;
                     ">
-                    💾 Saqlash
-                </button>
+                    0
+                </div>
 
+                <div style="
+                    color:#999;
+                    font-size:13px;
+                    margin-top:3px;
+                ">
+                    Obunachilar
+                </div>
             </div>
-        `;
 
+
+            <div>
+                <div id="followingCount"
+                    style="
+                        font-size:19px;
+                        font-weight:bold;
+                    ">
+                    0
+                </div>
+
+                <div style="
+                    color:#999;
+                    font-size:13px;
+                    margin-top:3px;
+                ">
+                    Obunalar
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- TAHRIRLASH -->
+        <button id="editProfile"
+            style="
+                width:100%;
+                margin-top:25px;
+                padding:13px;
+                border:1px solid #555;
+                border-radius:12px;
+                background:#222;
+                color:white;
+                font-size:16px;
+                font-weight:bold;
+            ">
+            ✏️ Profilni tahrirlash
+        </button>
+
+
+        <!-- BIO -->
+        <div id="profileDisplayBio"
+            style="
+                text-align:left;
+                margin-top:25px;
+                padding:0 5px;
+                color:#ddd;
+                font-size:15px;
+                line-height:1.5;
+                word-break:break-word;
+            ">
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- TAHRIRLASH OYNASI -->
+    <!-- ========================= -->
+
+    <div id="editProfileBox"
+        style="
+            display:none;
+            margin-top:30px;
+            padding-bottom:30px;
+        ">
+
+        <div style="
+            font-size:20px;
+            font-weight:bold;
+            margin-bottom:20px;
+        ">
+            Profilni tahrirlash
+        </div>
+
+
+        <!-- RASM -->
+        <label style="
+            display:block;
+            margin-bottom:8px;
+        ">
+            Profil rasmi
+        </label>
+
+        <label
+            for="profileImagePicker"
+            style="
+                display:inline-block;
+                color:white;
+                background:#222;
+                padding:11px 16px;
+                border-radius:10px;
+                margin-bottom:20px;
+            ">
+            🖼 Rasmni o‘zgartirish
+        </label>
+
+
+        <input
+            id="profileImagePicker"
+            type="file"
+            accept="image/*"
+            style="display:none;"
+        >
+
+
+        <!-- ISM -->
+        <label>Ism</label>
+
+        <input
+            id="profileName"
+            type="text"
+            placeholder="Ismingiz"
+            maxlength="30"
+            style="
+                width:100%;
+                margin-top:8px;
+                margin-bottom:18px;
+                padding:14px;
+                border-radius:12px;
+                border:1px solid #444;
+                background:#222;
+                color:white;
+                outline:none;
+            "
+        >
+
+
+        <!-- USERNAME -->
+        <label>Username</label>
+
+        <input
+            id="profileUsername"
+            type="text"
+            placeholder="@username"
+            maxlength="30"
+            style="
+                width:100%;
+                margin-top:8px;
+                margin-bottom:18px;
+                padding:14px;
+                border-radius:12px;
+                border:1px solid #444;
+                background:#222;
+                color:white;
+                outline:none;
+            "
+        >
+
+
+        <!-- BIO -->
+        <label>Bio</label>
+
+        <textarea
+            id="profileBio"
+            placeholder="O‘zingiz haqingizda..."
+            maxlength="50"
+            style="
+                width:100%;
+                height:90px;
+                margin-top:8px;
+                padding:14px;
+                border-radius:12px;
+                border:1px solid #444;
+                background:#222;
+                color:white;
+                outline:none;
+                resize:none;
+            "
+        ></textarea>
+
+
+        <div style="
+            text-align:right;
+            color:#888;
+            font-size:12px;
+            margin-top:4px;
+        ">
+            Maksimum 50 ta belgi
+        </div>
+
+
+        <!-- SAQLASH -->
+        <button
+            id="saveProfile"
+            style="
+                width:100%;
+                margin-top:20px;
+                padding:15px;
+                border:0;
+                border-radius:12px;
+                background:white;
+                color:black;
+                font-size:16px;
+                font-weight:bold;
+            ">
+            💾 Saqlash
+        </button>
+
+    </div>
+
+`;
 
         document.body.appendChild(
             modal
