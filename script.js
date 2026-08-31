@@ -1500,3 +1500,271 @@ profileButton.addEventListener(
 
     }
 );
+// ===============================
+// PROFILNI SUPABASE GA SAQLASH
+// ===============================
+
+document
+    .getElementById("saveProfile")
+    .addEventListener(
+        "click",
+        async function() {
+
+            // Telegram ID olish
+            const telegramId =
+                window.Telegram &&
+                window.Telegram.WebApp &&
+                window.Telegram.WebApp.initDataUnsafe &&
+                window.Telegram.WebApp.initDataUnsafe.user
+                    ? String(
+                        window.Telegram.WebApp.initDataUnsafe.user.id
+                    )
+                    : null;
+
+
+            if (!telegramId) {
+
+                alert(
+                    "Telegram foydalanuvchisi topilmadi ❌"
+                );
+
+                return;
+            }
+
+
+            // Ma'lumotlarni olish
+            const name =
+                document
+                    .getElementById("profileName")
+                    .value
+                    .trim();
+
+
+            let username =
+                document
+                    .getElementById("profileUsername")
+                    .value
+                    .trim();
+
+
+            const bio =
+                document
+                    .getElementById("profileBio")
+                    .value
+                    .trim();
+
+
+            // Username oldida @ bo'lmasa qo'shamiz
+            if (
+                username &&
+                !username.startsWith("@")
+            ) {
+
+                username =
+                    "@" + username;
+
+            }
+
+
+            const saveButton =
+                document.getElementById(
+                    "saveProfile"
+                );
+
+
+            saveButton.disabled =
+                true;
+
+            saveButton.innerText =
+                "Saqlanmoqda...";
+
+
+            try {
+
+                // Avval shu Telegram ID borligini tekshiramiz
+                const checkResponse =
+                    await fetch(
+                        SUPABASE_URL +
+                        "/rest/v1/profiles" +
+                        "?telegram_id=eq." +
+                        encodeURIComponent(
+                            telegramId
+                        ) +
+                        "&select=id",
+                        {
+                            headers: {
+
+                                "apikey":
+                                    SUPABASE_KEY,
+
+                                "Authorization":
+                                    "Bearer " +
+                                    SUPABASE_KEY
+
+                            }
+                        }
+                    );
+
+
+                if (!checkResponse.ok) {
+
+                    throw new Error(
+                        "Profilni tekshirishda xato"
+                    );
+
+                }
+
+
+                const existing =
+                    await checkResponse.json();
+
+
+                let response;
+
+
+                // Profil mavjud bo'lsa — yangilaymiz
+                if (
+                    existing.length > 0
+                ) {
+
+                    const profileId =
+                        existing[0].id;
+
+
+                    response =
+                        await fetch(
+                            SUPABASE_URL +
+                            "/rest/v1/profiles?id=eq." +
+                            encodeURIComponent(
+                                profileId
+                            ),
+                            {
+                                method: "PATCH",
+
+                                headers: {
+
+                                    "apikey":
+                                        SUPABASE_KEY,
+
+                                    "Authorization":
+                                        "Bearer " +
+                                        SUPABASE_KEY,
+
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Prefer":
+                                        "return=minimal"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        username:
+                                            username,
+
+                                        display_name:
+                                            name,
+
+                                        bio:
+                                            bio
+
+                                    })
+
+                            }
+                        );
+
+
+                } else {
+
+                    // Profil mavjud bo'lmasa — yangi profil yaratamiz
+                    response =
+                        await fetch(
+                            SUPABASE_URL +
+                            "/rest/v1/profiles",
+                            {
+                                method: "POST",
+
+                                headers: {
+
+                                    "apikey":
+                                        SUPABASE_KEY,
+
+                                    "Authorization":
+                                        "Bearer " +
+                                        SUPABASE_KEY,
+
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Prefer":
+                                        "return=minimal"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        telegram_id:
+                                            telegramId,
+
+                                        username:
+                                            username,
+
+                                        display_name:
+                                            name,
+
+                                        bio:
+                                            bio
+
+                                    })
+
+                            }
+                        );
+
+                }
+
+
+                if (!response.ok) {
+
+                    const errorText =
+                        await response.text();
+
+                    throw new Error(
+                        errorText
+                    );
+
+                }
+
+
+                alert(
+                    "Profil saqlandi ✅"
+                );
+
+
+            } catch (error) {
+
+                console.log(
+                    "Profil saqlash xatosi:",
+                    error
+                );
+
+                alert(
+                    "Profil saqlanmadi ❌\n\n" +
+                    error.message
+                );
+
+
+            } finally {
+
+                saveButton.disabled =
+                    false;
+
+                saveButton.innerText =
+                    "💾 Saqlash";
+
+            }
+
+        }
+    );
