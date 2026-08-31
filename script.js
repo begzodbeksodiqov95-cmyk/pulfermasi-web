@@ -1521,7 +1521,19 @@ profileButton.addEventListener(
         document.body.appendChild(
             modal
         );
+// ===============================
+// PROFILNI TAHRIRLASHNI OCHISH
+// ===============================
 
+document
+    .getElementById("editProfile")
+    .onclick = function() {
+
+        document
+            .getElementById("editProfileBox")
+            .style.display = "block";
+
+    };
 // ===============================
 // BAZADAN PROFILNI OLISH
 // ===============================
