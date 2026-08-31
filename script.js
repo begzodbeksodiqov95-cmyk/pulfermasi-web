@@ -2113,49 +2113,7 @@ if (editButton) {
                         // PROFIL BORLIGINI TEKSHIRISH
                         // ===============================
 
-                        const checkResponse =
-                            await fetch(
-                                SUPABASE_URL +
-                                "/rest/v1/profiles" +
-                                "?telegram_id=eq." +
-                                encodeURIComponent(
-                                    telegramId
-                                ) +
-                                "&select=id,avatar_url",
-                                {
-                                    method:
-                                        "GET",
-
-                                    headers: {
-
-                                        "apikey":
-                                            SUPABASE_KEY,
-
-                                        "Authorization":
-                                            "Bearer " +
-                                            SUPABASE_KEY
-
-                                    }
-                                }
-                            );
-
-
-                        if (
-                            !checkResponse.ok
-                        ) {
-
-                            throw new Error(
-                                await checkResponse.text()
-                            );
-
-                        }
-
-
-                        const existing =
-                            await checkResponse.json();
-
-
-                        let response;
+                    
 
 
                    
