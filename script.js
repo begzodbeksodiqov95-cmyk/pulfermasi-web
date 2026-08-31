@@ -1619,7 +1619,10 @@ const imagePicker =
 
 const imageFile =
     imagePicker.files[0];
-              // ===============================
+              
+
+                try {
+// ===============================
 // RASMNI PROFILES BUCKETGA YUKLASH
 // ===============================
 
@@ -1707,10 +1710,7 @@ if (imageFile) {
 
                 button.innerText =
                     "Saqlanmoqda...";
-
-
-                try {
-
+                    
                     // Avval profilni tekshiramiz
 
                     const checkResponse =
