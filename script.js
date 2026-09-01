@@ -2377,6 +2377,7 @@ alert(
         error.message
     );
 
+.
 
 } finally {
 
@@ -2392,7 +2393,7 @@ alert(
 
 });
 
-
+}
 // ===============================
 // PROFIL MA'LUMOTLARINI YUKLASH
 // ===============================
