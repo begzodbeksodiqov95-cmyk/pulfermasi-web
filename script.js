@@ -1421,18 +1421,423 @@ if (profileButton) {
             // HOZIRCHA TAHRIRLASH ISHLAMAYDI
             // ===============================
 
+            // ===============================
+// ALOHIDA PROFIL TAHRIRLASH OYNASI
+// ===============================
+
+document.getElementById(
+    "editProfile"
+).onclick =
+    function () {
+
+        // Eski tahrirlash oynasi bo‘lsa o‘chiramiz
+        const oldEdit =
             document.getElementById(
-                "editProfile"
-            ).onclick =
-                function () {
+                "editProfileModal"
+            );
 
-                    alert(
-                        "Tahrirlash keyingi qadamda qo‘shiladi."
-                    );
+        if (oldEdit) {
+            oldEdit.remove();
+        }
 
-                };
+
+        // ===============================
+        // YANGI OYNA
+        // ===============================
+
+        const editModal =
+            document.createElement("div");
+
+        editModal.id =
+            "editProfileModal";
+
+
+        editModal.style.cssText = `
+            position:fixed;
+            inset:0;
+            z-index:200000;
+            background:#000;
+            color:white;
+            padding:20px;
+            overflow-y:auto;
+        `;
+
+
+        editModal.innerHTML = `
+
+            <!-- ORQAGA -->
+
+            <button
+                id="closeEditProfile"
+                style="
+                    background:none;
+                    border:0;
+                    color:white;
+                    font-size:34px;
+                    margin-bottom:20px;
+                "
+            >
+                ‹
+            </button>
+
+
+            <!-- SARLAVHA -->
+
+            <h2
+                style="
+                    margin:0 0 30px 0;
+                    font-size:22px;
+                "
+            >
+                Profilni tahrirlash
+            </h2>
+
+
+            <!-- RASM -->
+
+            <div
+                style="
+                    text-align:center;
+                    margin-bottom:30px;
+                "
+            >
+
+                <div
+                    id="editProfileImage"
+                    style="
+                        width:110px;
+                        height:110px;
+                        margin:auto;
+                        border-radius:50%;
+                        background:#333;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        overflow:hidden;
+                        font-size:45px;
+                    "
+                >
+                    👤
+                </div>
+
+
+                <label
+                    for="editProfileImagePicker"
+                    style="
+                        display:inline-block;
+                        margin-top:15px;
+                        padding:11px 17px;
+                        background:#222;
+                        border-radius:10px;
+                    "
+                >
+                    🖼 Rasm yuklash
+                </label>
+
+
+                <input
+                    id="editProfileImagePicker"
+                    type="file"
+                    accept="image/*"
+                    style="display:none;"
+                >
+
+            </div>
+
+
+            <!-- ISM -->
+
+            <label>
+                Ism
+            </label>
+
+            <input
+                id="editProfileName"
+                type="text"
+                maxlength="30"
+                placeholder="Ismingiz"
+                style="
+                    width:100%;
+                    margin:8px 0 20px;
+                    padding:14px;
+                    border-radius:12px;
+                    border:1px solid #444;
+                    background:#222;
+                    color:white;
+                    outline:none;
+                    font-size:16px;
+                "
+            >
+
+
+            <!-- USERNAME -->
+
+            <label>
+                Username
+            </label>
+
+            <input
+                id="editProfileUsername"
+                type="text"
+                maxlength="30"
+                placeholder="@username"
+                style="
+                    width:100%;
+                    margin:8px 0 20px;
+                    padding:14px;
+                    border-radius:12px;
+                    border:1px solid #444;
+                    background:#222;
+                    color:white;
+                    outline:none;
+                    font-size:16px;
+                "
+            >
+
+
+            <!-- BIO -->
+
+            <label>
+                Bio
+            </label>
+
+            <textarea
+                id="editProfileBio"
+                maxlength="50"
+                placeholder="O‘zingiz haqingizda..."
+                style="
+                    width:100%;
+                    height:100px;
+                    margin:8px 0 5px;
+                    padding:14px;
+                    border-radius:12px;
+                    border:1px solid #444;
+                    background:#222;
+                    color:white;
+                    outline:none;
+                    resize:none;
+                    font-size:16px;
+                "
+            ></textarea>
+
+
+            <div
+                style="
+                    text-align:right;
+                    color:#888;
+                    font-size:12px;
+                    margin-bottom:25px;
+                "
+            >
+                Maksimum 50 ta belgi
+            </div>
+
+
+            <!-- SAQLASH -->
+
+            <button
+                id="saveEditedProfile"
+                style="
+                    width:100%;
+                    padding:15px;
+                    border:0;
+                    border-radius:12px;
+                    background:white;
+                    color:black;
+                    font-size:16px;
+                    font-weight:bold;
+                "
+            >
+                💾 Saqlash
+            </button>
+
+        `;
+
+
+        // Oynani chiqarish
+        document.body.appendChild(
+            editModal
+        );
+
+
+        // ===============================
+        // PROFILDAGI HOZIRGI MA'LUMOTLAR
+        // ===============================
+
+        const currentName =
+            document.getElementById(
+                "profileDisplayName"
+            );
+
+        const currentUsername =
+            document.getElementById(
+                "profileDisplayUsername"
+            );
+
+        const currentBio =
+            document.getElementById(
+                "profileDisplayBio"
+            );
+
+
+        document.getElementById(
+            "editProfileName"
+        ).value =
+            currentName
+                ? (
+                    currentName.innerText === "Ism"
+                        ? ""
+                        : currentName.innerText
+                )
+                : "";
+
+
+        document.getElementById(
+            "editProfileUsername"
+        ).value =
+            currentUsername
+                ? (
+                    currentUsername.innerText === "@username"
+                        ? ""
+                        : currentUsername.innerText
+                )
+                : "";
+
+
+        document.getElementById(
+            "editProfileBio"
+        ).value =
+            currentBio
+                ? currentBio.innerText
+                : "";
+
+
+        // ===============================
+        // ESKI PROFIL RASMINI KO‘RSATISH
+        // ===============================
+
+        const oldImage =
+            document.querySelector(
+                "#profileImage img"
+            );
+
+
+        if (oldImage) {
+
+            document.getElementById(
+                "editProfileImage"
+            ).innerHTML = `
+
+                <img
+                    src="${oldImage.src}"
+                    style="
+                        width:100%;
+                        height:100%;
+                        object-fit:cover;
+                        border-radius:50%;
+                    "
+                >
+
+            `;
 
         }
-    );
 
+
+        // ===============================
+        // ORQAGA
+        // ===============================
+
+        document.getElementById(
+            "closeEditProfile"
+        ).onclick =
+            function () {
+
+                editModal.remove();
+
+            };
+
+
+        // ===============================
+        // RASM TANLASH
+        // ===============================
+
+        document.getElementById(
+            "editProfileImagePicker"
+        ).onchange =
+            function () {
+
+                const file =
+                    this.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+
+                if (
+                    !file.type.startsWith(
+                        "image/"
+                    )
+                ) {
+
+                    alert(
+                        "Faqat rasm tanlang!"
+                    );
+
+                    this.value = "";
+
+                    return;
+                }
+
+
+                const reader =
+                    new FileReader();
+
+
+                reader.onload =
+                    function (event) {
+
+                        document.getElementById(
+                            "editProfileImage"
+                        ).innerHTML = `
+
+                            <img
+                                src="${event.target.result}"
+                                style="
+                                    width:100%;
+                                    height:100%;
+                                    object-fit:cover;
+                                    border-radius:50%;
+                                "
+                            >
+
+                        `;
+
+                    };
+
+
+                reader.readAsDataURL(
+                    file
+                );
+
+            };
+
+
+        // ===============================
+        // SAQLASH
+        // HOZIRCHA ISHLAMAYDI
+        // ===============================
+
+        document.getElementById(
+            "saveEditedProfile"
+        ).onclick =
+            function () {
+
+                alert(
+                    "Saqlash funksiyasi keyingi qadamda ulanadi."
+                );
+
+            };
+
+    };
 }
