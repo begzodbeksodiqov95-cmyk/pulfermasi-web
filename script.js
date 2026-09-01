@@ -1180,3 +1180,259 @@ progress.style.transform =
 
 
 loadVideos();
+// ===============================
+// 1-QADAM — PROFIL OYNASI
+// ===============================
+
+const profileButton =
+    document.getElementById("profileButton");
+
+if (profileButton) {
+
+    profileButton.addEventListener(
+        "click",
+        function () {
+
+            // Eski profil oynasi bo‘lsa o‘chiramiz
+            const oldProfile =
+                document.getElementById("profileModal");
+
+            if (oldProfile) {
+                oldProfile.remove();
+            }
+
+            // ===============================
+            // PROFIL OYNASINI YARATISH
+            // ===============================
+
+            const modal =
+                document.createElement("div");
+
+            modal.id =
+                "profileModal";
+
+            modal.style.cssText = `
+                position:fixed;
+                inset:0;
+                z-index:100000;
+                background:#111;
+                color:white;
+                padding:20px;
+                overflow-y:auto;
+            `;
+
+            modal.innerHTML = `
+
+                <!-- ORQAGA -->
+                <button
+                    id="closeProfile"
+                    style="
+                        position:absolute;
+                        top:15px;
+                        left:15px;
+                        background:none;
+                        border:0;
+                        color:white;
+                        font-size:34px;
+                        z-index:10;
+                    "
+                >
+                    ‹
+                </button>
+
+
+                <!-- PROFIL -->
+                <div
+                    style="
+                        text-align:center;
+                        padding-top:60px;
+                    "
+                >
+
+                    <!-- PROFIL RASMI -->
+                    <div
+                        id="profileImage"
+                        style="
+                            width:105px;
+                            height:105px;
+                            margin:0 auto 15px;
+                            border-radius:50%;
+                            background:#333;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            overflow:hidden;
+                            border:2px solid #555;
+                            font-size:45px;
+                        "
+                    >
+                        👤
+                    </div>
+
+
+                    <!-- ISM -->
+                    <div
+                        id="profileDisplayName"
+                        style="
+                            font-size:23px;
+                            font-weight:bold;
+                            margin-top:5px;
+                        "
+                    >
+                        Ism
+                    </div>
+
+
+                    <!-- USERNAME -->
+                    <div
+                        id="profileDisplayUsername"
+                        style="
+                            color:#999;
+                            font-size:15px;
+                            margin-top:5px;
+                        "
+                    >
+                        @username
+                    </div>
+
+
+                    <!-- OBUNACHILAR / OBUNALAR -->
+                    <div
+                        style="
+                            display:flex;
+                            justify-content:center;
+                            gap:55px;
+                            margin-top:25px;
+                        "
+                    >
+
+                        <!-- OBUNACHILAR -->
+                        <div>
+
+                            <div
+                                id="followersCount"
+                                style="
+                                    font-size:19px;
+                                    font-weight:bold;
+                                "
+                            >
+                                0
+                            </div>
+
+                            <div
+                                style="
+                                    color:#999;
+                                    font-size:13px;
+                                    margin-top:4px;
+                                "
+                            >
+                                Obunachilar
+                            </div>
+
+                        </div>
+
+
+                        <!-- OBUNALAR -->
+                        <div>
+
+                            <div
+                                id="followingCount"
+                                style="
+                                    font-size:19px;
+                                    font-weight:bold;
+                                "
+                            >
+                                0
+                            </div>
+
+                            <div
+                                style="
+                                    color:#999;
+                                    font-size:13px;
+                                    margin-top:4px;
+                                "
+                            >
+                                Obunalar
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BIO -->
+                    <div
+                        id="profileDisplayBio"
+                        style="
+                            text-align:left;
+                            margin-top:30px;
+                            padding:0 5px;
+                            color:#ddd;
+                            font-size:15px;
+                            line-height:1.5;
+                            word-break:break-word;
+                        "
+                    >
+                    </div>
+
+
+                    <!-- TAHRIRLASH -->
+                    <button
+                        id="editProfile"
+                        style="
+                            width:100%;
+                            margin-top:25px;
+                            padding:14px;
+                            border:1px solid #555;
+                            border-radius:12px;
+                            background:#222;
+                            color:white;
+                            font-size:16px;
+                            font-weight:bold;
+                        "
+                    >
+                        ✏️ Profilni tahrirlash
+                    </button>
+
+                </div>
+
+            `;
+
+
+            // Oynani sahifaga qo‘shish
+            document.body.appendChild(modal);
+
+
+            // ===============================
+            // ORQAGA TUGMASI
+            // ===============================
+
+            document.getElementById(
+                "closeProfile"
+            ).onclick =
+                function () {
+
+                    modal.remove();
+
+                };
+
+
+            // ===============================
+            // HOZIRCHA TAHRIRLASH ISHLAMAYDI
+            // ===============================
+
+            document.getElementById(
+                "editProfile"
+            ).onclick =
+                function () {
+
+                    alert(
+                        "Tahrirlash keyingi qadamda qo‘shiladi."
+                    );
+
+                };
+
+        }
+    );
+
+}
