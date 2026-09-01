@@ -1840,4 +1840,6 @@ document.getElementById(
             };
 
     };
-
+        }
+        );
+}
