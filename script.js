@@ -1828,18 +1828,4 @@ document.getElementById(
         // HOZIRCHA ISHLAMAYDI
         // ===============================
 
-        document.getElementById(
-            "saveEditedProfile"
-        ).onclick =
-            function () {
-
-                alert(
-                    "Saqlash funksiyasi keyingi qadamda ulanadi."
-                );
-
-            };
-
-    };
-        }
-        );
-}
+        
