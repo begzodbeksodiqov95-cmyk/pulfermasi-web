@@ -1830,10 +1830,165 @@ document.getElementById(
     document.getElementById(
     "saveEditedProfile"
 ).onclick =
-    function () {
+    async function () {
 
-        alert(
-            "Saqlash funksiyasi keyingi qadamda ulanadi."
-        );
+        const name =
+            document.getElementById(
+                "editProfileName"
+            ).value.trim();
 
+        const username =
+            document.getElementById(
+                "editProfileUsername"
+            ).value.trim();
+
+        const bio =
+            document.getElementById(
+                "editProfileBio"
+            ).value.trim();
+
+        const tgUser =
+            window.Telegram?.WebApp?.initDataUnsafe?.user;
+
+        if (!tgUser) {
+            alert("Telegram foydalanuvchisi topilmadi!");
+            return;
+        }
+
+        const telegramId =
+            tgUser.id;
+
+        const button =
+            document.getElementById(
+                "saveEditedProfile"
+            );
+
+        button.innerText =
+            "⏳ Saqlanmoqda...";
+
+        button.disabled = true;
+
+        try {
+
+            const check =
+                await fetch(
+                    `${SUPABASE_URL}/rest/v1/profiles?telegram_id=eq.${telegramId}&select=id`,
+                    {
+                        headers: {
+                            apikey: SUPABASE_KEY,
+                            Authorization:
+                                `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+            const existing =
+                await check.json();
+
+
+            const data = {
+                telegram_id: telegramId,
+                display_name: name,
+                username: username,
+                bio: bio
+            };
+
+
+            let response;
+
+
+            if (existing.length > 0) {
+
+                response =
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/profiles?telegram_id=eq.${telegramId}`,
+                        {
+                            method: "PATCH",
+                            headers: {
+                                apikey: SUPABASE_KEY,
+                                Authorization:
+                                    `Bearer ${SUPABASE_KEY}`,
+                                "Content-Type":
+                                    "application/json"
+                            },
+                            body:
+                                JSON.stringify(data)
+                        }
+                    );
+
+            } else {
+
+                response =
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/profiles`,
+                        {
+                            method: "POST",
+                            headers: {
+                                apikey: SUPABASE_KEY,
+                                Authorization:
+                                    `Bearer ${SUPABASE_KEY}`,
+                                "Content-Type":
+                                    "application/json"
+                            },
+                            body:
+                                JSON.stringify(data)
+                        }
+                    );
+            }
+
+
+            if (!response.ok) {
+
+                const error =
+                    await response.text();
+
+                throw new Error(error);
+            }
+
+
+            alert("✅ Profil saqlandi!");
+
+            editModal.remove();
+
+            document.getElementById(
+                "profileDisplayName"
+            ).innerText =
+                name || "Ism";
+
+            document.getElementById(
+                "profileDisplayUsername"
+            ).innerText =
+                username
+                    ? (
+                        username.startsWith("@")
+                            ? username
+                            : "@" + username
+                    )
+                    : "@username";
+
+            document.getElementById(
+                "profileDisplayBio"
+            ).innerText =
+                bio;
+
+
+        } catch (error) {
+
+            console.log(
+                "PROFIL SAQLASH XATOSI:",
+                error
+            );
+
+            alert(
+                "❌ Profil saqlanmadi!"
+            );
+
+        } finally {
+
+            button.innerText =
+                "💾 Saqlash";
+
+            button.disabled =
+                false;
+        }
     };
