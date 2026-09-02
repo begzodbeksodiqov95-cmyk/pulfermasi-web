@@ -1,11 +1,10 @@
 // ==========================================
 // PROFILE DATABASE
-// Ism + Username + Bio + Rasm
 // ==========================================
 
 (function () {
 
-    // Telegram foydalanuvchi ID sini olish
+    // Telegram ID
     function getTelegramId() {
 
         if (
@@ -17,15 +16,7 @@
             return Telegram.WebApp.initDataUnsafe.user.id;
         }
 
-        // Telegram tashqarisida test qilish uchun
-        let savedId = localStorage.getItem("telegram_id");
-
-        if (!savedId) {
-            savedId = "test_" + Date.now();
-            localStorage.setItem("telegram_id", savedId);
-        }
-
-        return savedId;
+        return localStorage.getItem("telegram_id");
     }
 
 
@@ -36,6 +27,11 @@
     async function loadProfileFromDatabase() {
 
         const telegramId = getTelegramId();
+
+        if (!telegramId) {
+            console.log("Telegram ID topilmadi");
+            return;
+        }
 
         try {
 
@@ -56,21 +52,20 @@
 
             if (!response.ok) {
                 throw new Error(
-                    "Profilni olishda xato: " +
+                    "Profilni yuklashda xato: " +
                     response.status
                 );
             }
 
             const data = await response.json();
 
-            if (!data || data.length === 0) {
-                console.log("Profil bazada hali yo‘q.");
+            if (!data.length) {
+                console.log("Profil bazada topilmadi");
                 return;
             }
 
             const profile = data[0];
 
-            // Profil oynasi mavjud bo‘lsa yangilaymiz
             const name =
                 document.getElementById(
                     "profileDisplayName"
@@ -95,8 +90,7 @@
             if (name) {
 
                 name.innerText =
-                    profile.display_name ||
-                    "Ism";
+                    profile.display_name || "Ism";
 
             }
 
@@ -105,12 +99,7 @@
 
                 username.innerText =
                     profile.username
-                        ? (
-                            profile.username
-                                .startsWith("@")
-                                ? profile.username
-                                : "@" + profile.username
-                        )
+                        ? "@" + profile.username.replace(/^@/, "")
                         : "@username";
 
             }
@@ -145,9 +134,8 @@
 
             }
 
-
             console.log(
-                "Profil bazadan yuklandi."
+                "Profil bazadan yuklandi ✅"
             );
 
         } catch (error) {
@@ -163,13 +151,24 @@
 
 
     // ==========================================
-    // PROFILNI BAZAGA SAQLASH
+    // SAQLASH
     // ==========================================
 
     async function saveProfileToDatabase() {
 
         const telegramId =
             getTelegramId();
+
+        if (!telegramId) {
+
+            alert(
+                "Telegram ID topilmadi ❌"
+            );
+
+            return;
+
+        }
+
 
         const nameInput =
             document.getElementById(
@@ -193,47 +192,34 @@
 
 
         const displayName =
-            nameInput
-                ? nameInput.value.trim()
-                : "";
+            nameInput.value.trim();
 
         let username =
-            usernameInput
-                ? usernameInput.value.trim()
-                : "";
+            usernameInput.value.trim();
 
         const bio =
-            bioInput
-                ? bioInput.value.trim()
-                : "";
+            bioInput.value.trim();
 
 
         if (!displayName) {
 
-            alert("Ismingizni kiriting!");
+            alert("Ismni kiriting!");
             return;
 
         }
 
 
-        if (username.startsWith("@")) {
-
-            username =
-                username.substring(1);
-
-        }
+        username =
+            username.replace(/^@/, "");
 
 
         try {
 
-            let avatarUrl = null;
-
-
             // ==================================
-            // ESKI PROFILNI OLAMIZ
+            // ESKI PROFILNI TEKSHIRISH
             // ==================================
 
-            const oldResponse =
+            const checkResponse =
                 await fetch(
                     SUPABASE_URL +
                     "/rest/v1/profiles?telegram_id=eq." +
@@ -241,9 +227,7 @@
                     "&select=id,avatar_url",
                     {
                         headers: {
-                            "apikey":
-                                SUPABASE_KEY,
-
+                            "apikey": SUPABASE_KEY,
                             "Authorization":
                                 "Bearer " +
                                 SUPABASE_KEY
@@ -252,19 +236,23 @@
                 );
 
 
-            const oldData =
-                await oldResponse.json();
+            if (!checkResponse.ok) {
 
-
-            if (
-                oldData.length > 0 &&
-                oldData[0].avatar_url
-            ) {
-
-                avatarUrl =
-                    oldData[0].avatar_url;
+                throw new Error(
+                    "Profilni tekshirishda xato"
+                );
 
             }
+
+
+            const existing =
+                await checkResponse.json();
+
+
+            let avatarUrl =
+                existing.length
+                    ? existing[0].avatar_url
+                    : null;
 
 
             // ==================================
@@ -280,16 +268,16 @@
                 const file =
                     imagePicker.files[0];
 
+
                 const fileName =
                     telegramId +
                     "_" +
                     Date.now() +
                     "_" +
-                    file.name
-                        .replace(
-                            /[^a-zA-Z0-9._-]/g,
-                            "_"
-                        );
+                    file.name.replace(
+                        /[^a-zA-Z0-9._-]/g,
+                        "_"
+                    );
 
 
                 const uploadResponse =
@@ -316,13 +304,14 @@
 
                             body: file
                         }
+
                     );
 
 
                 if (!uploadResponse.ok) {
 
                     throw new Error(
-                        "Rasm yuklanmadi"
+                        "Profil rasmi yuklanmadi"
                     );
 
                 }
@@ -337,37 +326,34 @@
 
 
             // ==================================
-            // PROFIL BAZADA BOR-YO‘QLIGI
+            // PROFIL MA'LUMOTI
             // ==================================
 
-            const checkResponse =
-                await fetch(
-                    SUPABASE_URL +
-                    "/rest/v1/profiles?telegram_id=eq." +
-                    encodeURIComponent(telegramId) +
-                    "&select=id",
-                    {
-                        headers: {
-                            "apikey":
-                                SUPABASE_KEY,
+            const profileData = {
 
-                            "Authorization":
-                                "Bearer " +
-                                SUPABASE_KEY
-                        }
-                    }
-                );
+                telegram_id:
+                    telegramId,
 
+                display_name:
+                    displayName,
 
-            const existing =
-                await checkResponse.json();
+                username:
+                    username,
+
+                bio:
+                    bio,
+
+                avatar_url:
+                    avatarUrl
+
+            };
 
 
             // ==================================
-            // UPDATE
+            // UPDATE YOKI INSERT
             // ==================================
 
-            if (existing.length > 0) {
+            if (existing.length) {
 
                 const updateResponse =
                     await fetch(
@@ -395,22 +381,11 @@
                             },
 
                             body:
-                                JSON.stringify({
-
-                                    display_name:
-                                        displayName,
-
-                                    username:
-                                        username,
-
-                                    bio:
-                                        bio,
-
-                                    avatar_url:
-                                        avatarUrl
-
-                                })
+                                JSON.stringify(
+                                    profileData
+                                )
                         }
+
                     );
 
 
@@ -422,13 +397,7 @@
 
                 }
 
-            }
-
-            // ==================================
-            // INSERT
-            // ==================================
-
-            else {
+            } else {
 
                 const insertResponse =
                     await fetch(
@@ -455,25 +424,11 @@
                             },
 
                             body:
-                                JSON.stringify({
-
-                                    telegram_id:
-                                        telegramId,
-
-                                    display_name:
-                                        displayName,
-
-                                    username:
-                                        username,
-
-                                    bio:
-                                        bio,
-
-                                    avatar_url:
-                                        avatarUrl
-
-                                })
+                                JSON.stringify(
+                                    profileData
+                                )
                         }
+
                     );
 
 
@@ -489,7 +444,7 @@
 
 
             // ==================================
-            // EKRANDAGI PROFILNI YANGILASH
+            // PROFIL OYNASINI YANGILASH
             // ==================================
 
             const profileName =
@@ -562,6 +517,7 @@
 
 
             // Tahrirlash oynasini yopish
+
             const editModal =
                 document.getElementById(
                     "editProfileModal"
@@ -573,7 +529,7 @@
 
 
             alert(
-                "Profil muvaffaqiyatli saqlandi! ✅"
+                "Profil muvaffaqiyatli saqlandi ✅"
             );
 
 
@@ -595,7 +551,7 @@
 
 
     // ==========================================
-    // SAQLASH TUGMASINI KUZATISH
+    // SAQLASH TUGMASI
     // ==========================================
 
     document.addEventListener(
@@ -617,7 +573,7 @@
 
 
     // ==========================================
-    // PROFIL OYNASI OCHILGANDA YUKLASH
+    // PROFIL OCHILGANDA BAZADAN YUKLASH
     // ==========================================
 
     document.addEventListener(
@@ -644,12 +600,5 @@
         }
     );
 
-
-    // Globalga chiqaramiz
-    window.loadProfileFromDatabase =
-        loadProfileFromDatabase;
-
-    window.saveProfileToDatabase =
-        saveProfileToDatabase;
 
 })();
