@@ -1466,6 +1466,4 @@ document.getElementById(
     };
 
 };
-    };
-
-}
+    
