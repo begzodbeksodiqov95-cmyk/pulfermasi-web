@@ -1827,16 +1827,17 @@ document.getElementById(
         // SAQLASH
         // HOZIRCHA ISHLAMAYDI
         // ===============================
-    document.getElementById(
-    "saveEditedProfile"
-).onclick =
-    function () {
+        document.getElementById(
+        "saveEditedProfile"
+    ).onclick =
+        function () {
 
-        alert(
-            "Saqlash funksiyasi keyingi qadamda ulanadi."
-        );
+            alert(
+                "Saqlash funksiyasi keyingi qadamda ulanadi."
+            );
 
-    };
-    };
+        };
 
-        }
+    });
+
+}
