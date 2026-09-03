@@ -1211,15 +1211,14 @@ if (profileButton) {
             modal.id =
                 "profileModal";
 
-            modal.style.cssText = `
-                position:fixed;
-                inset:0;
-                z-index:100000;
-                background:#111;
-                color:white;
-                padding:20px;
-                overflow-y:auto;
-            `;
+            modal.style.cssText =
+  "position:fixed;" +
+  "inset:0;" +
+  "z-index:100000;" +
+  "background:#111;" +
+  "color:white;" +
+  "padding:20px;" +
+  "overflow-y:auto;";
 
             modal.innerHTML = `
 
