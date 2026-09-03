@@ -1363,7 +1363,109 @@ if (profileButton) {
             modal.remove();
 
         };
+document.getElementById(
+    "editProfile"
+).onclick = function () {
 
+    const editModal =
+        document.createElement("div");
+
+    editModal.id =
+        "editProfileModal";
+
+    editModal.style.cssText = `
+        position:fixed;
+        inset:0;
+        z-index:200000;
+        background:#000;
+        color:white;
+        padding:20px;
+    `;
+
+    editModal.innerHTML = `
+        <button
+            id="closeEditProfile"
+            style="
+                background:none;
+                border:0;
+                color:white;
+                font-size:34px;
+            "
+        >
+            ‹
+        </button>
+
+        <h2 style="margin:20px 0;">
+            Profilni tahrirlash
+        </h2>
+
+        <input
+            id="editProfileName"
+            placeholder="Ism"
+            style="
+                width:100%;
+                padding:12px;
+                margin-bottom:15px;
+            "
+        >
+
+        <input
+            id="editProfileUsername"
+            placeholder="Username"
+            style="
+                width:100%;
+                padding:12px;
+                margin-bottom:15px;
+            "
+        >
+
+        <textarea
+            id="editProfileBio"
+            placeholder="Bio"
+            maxlength="50"
+            style="
+                width:100%;
+                height:100px;
+                padding:12px;
+                margin-bottom:15px;
+            "
+        ></textarea>
+
+        <button
+            id="saveEditedProfile"
+            style="
+                width:100%;
+                padding:14px;
+                font-weight:bold;
+            "
+        >
+            💾 Saqlash
+        </button>
+    `;
+
+    document.body.appendChild(
+        editModal
+    );
+
+    document.getElementById(
+        "closeEditProfile"
+    ).onclick = function () {
+
+        editModal.remove();
+
+    };
+
+    document.getElementById(
+        "saveEditedProfile"
+    ).onclick = function () {
+
+        alert(
+            "Saqlash tugmasi ishladi ✅"
+        );
+
+    };
+
+};
     };
 
 }
